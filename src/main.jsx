@@ -3,11 +3,56 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { AppContextProvider } from './context/AppContext.jsx'
+import { createTheme, ThemeProvider } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#00BC7D',
+      contrastText: '#FFF',
+    },
+    // secondary: {
+    //   light: '#ff7961',
+    //   main: '#f44336',
+    //   dark: '#ba000d',
+    //   contrastText: '#000',
+    // },
+  },
+  typography: {
+    h1: {
+      fontSize: '1rem',
+      fontWeight: 600
+    },
+    h2: {
+      fontSize: '1.75rem',
+      fontWeight: 600
+    },
+    h3: {
+      fontSize: '1.5rem',
+      fontWeight: 600
+    }
+  },
+  components: {
+    MuiLink: {
+      defaultProps: {
+        underline: 'hover',
+        color: 'primary',
+      },
+      styleOverrides: {
+        root: {
+          cursor: 'pointer',
+        },
+      },
+    },
+  }
+})
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AppContextProvider>
-      <App />
-    </AppContextProvider>
+    <ThemeProvider theme={theme}>
+      <AppContextProvider>
+        <App />
+      </AppContextProvider>
+    </ThemeProvider>
   </StrictMode>,
 )
