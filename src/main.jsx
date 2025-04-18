@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.jsx'
 import { AppContextProvider } from './context/AppContext.jsx'
 import { createTheme, ThemeProvider } from '@mui/material';
+import { ToastContainer } from 'react-toastify';
 
 const theme = createTheme({
   palette: {
@@ -11,6 +12,10 @@ const theme = createTheme({
       main: '#00BC7D',
       contrastText: '#FFF',
     },
+    secondary: {
+      main: '#FB2C36',
+      contrastText: '#FFF'
+    }
     // secondary: {
     //   light: '#ff7961',
     //   main: '#f44336',
@@ -52,6 +57,7 @@ createRoot(document.getElementById('root')).render(
     <ThemeProvider theme={theme}>
       <AppContextProvider>
         <App />
+        <ToastContainer />
       </AppContextProvider>
     </ThemeProvider>
   </StrictMode>,

@@ -20,9 +20,10 @@ export default function PasswordField({ password, setPassword, label="Password" 
 
   return (
     <FormControl fullWidth variant="outlined">
-      <InputLabel htmlFor={"outlined-adornment-password" + password}>{label}</InputLabel>
+      <InputLabel htmlFor={"outlined-adornment-password" + label}>{label}</InputLabel>
       <OutlinedInput
-        id={"outlined-adornment-password" + password}
+        required
+        id={"outlined-adornment-password" + label}
         type={showPassword ? 'text' : 'password'}
         endAdornment={
           <InputAdornment position="end">

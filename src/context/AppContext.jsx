@@ -1,21 +1,45 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import axios from "axios";
 
-export const AppContent = createContext();
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+
+export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const value = {
-    backendUrl,
+    axios,
     isLoggedIn, setIsLoggedIn,
-    userData, setUserData
+    userData, setUserData,
+    isAdmin, setIsAdmin
   }
-  
+
+  const validateUser = async () => {
+    try {
+      const { data } = await axios.get('api/v1/user/me')
+      if (data.role === 'admin') {
+        setIsAdmin(true)
+      }
+      setIsLoggedIn(true)
+      setUserData(data)
+    } catch(err) {
+      console.log(err);
+      setIsLoggedIn(false)
+      setIsAdmin(false)
+    }
+  }
+
+  // useEffect(() => {
+    // validateUser()
+  // }, [])
+
   return (
-    <AppContent.Provider value={value}>
+    <AppContext.Provider value={value}>
       {props.children}
-    </AppContent.Provider>
+    </AppContext.Provider>
   )
 }
