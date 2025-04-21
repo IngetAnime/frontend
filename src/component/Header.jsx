@@ -130,7 +130,7 @@ export default function Header() {
             {/* IngetAnime logo */}
             <Link 
               sx={{ 
-                display: { xs: 'none', md: 'flex' }, 
+                display: { xs: 'none', sm: 'flex' }, 
                 alignItems: 'center', 
                 gap: 1, width: 'fit-content' 
               }} 
@@ -141,11 +141,11 @@ export default function Header() {
             </Link>
 
             {/* Search anime */}
-            <Search onKeyDown={(e) => handleSearch(e)}>
+            <Search onKeyDown={(e) => handleSearch(e)} sx={{ flexGrow: { xs: 1, md: 'unset' } }}>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
-              <StyledInputBase
+              <StyledInputBase sx={{ width: '100%' }}
                 placeholder="Cari judul anime…"
                 inputProps={{ 'aria-label': 'search' }}
               />
@@ -245,7 +245,7 @@ function MobileMenu({ menuItem, profileMenu, userData, isLoggedIn }) {
   );
 
   return (
-  <div className="md:hidden">
+  <div className="lg:hidden">
     {/* Navigation icon */}
     <IconButton
       size="large"
@@ -333,11 +333,10 @@ function DekstopMenu({ menuItem, profileMenu, userData, isLoggedIn }) {
   return (
     <div className="hidden md:flex gap-10 items-center">
       {/* Navigation */}
-      <Box sx={{ display: 'flex', gap: '2rem' }}>
+      <Box sx={{ gap: '1rem' }} component={'div'} className="hidden lg:flex">
         {menuItem.map((menu, index) => (
-          <ButtonLink key={index} 
+          <ButtonLink key={index}
             sx={{ 
-              display: { xs: 'none', md: 'flex' }, 
               alignItems: 'center', 
               gap: 1, width: 'fit-content', textTransform: 'none'
             }} 
@@ -380,7 +379,7 @@ function DekstopMenu({ menuItem, profileMenu, userData, isLoggedIn }) {
           }}
           to={'/auth/login'} 
         >
-          <Box sx={{ display: { xs: 'none', md: 'inline-flex' } }}>Masuk</Box>
+          <Box>Masuk</Box>
         </ButtonLink>
       </div>
 
