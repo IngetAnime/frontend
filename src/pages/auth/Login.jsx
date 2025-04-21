@@ -36,7 +36,6 @@ export default function LoginPage() {
       {/* Login form */}
       <Box fullWidth sx={{display: 'flex', flexDirection: 'column', gap: 2 }} component={'form'} onSubmit={(e) => handleSubmit(e)}>
         <TextField
-          required
           id="identifier"
           label="Username atau email"
           value={identifier}
