@@ -1,18 +1,20 @@
 import { 
-  Container, Box, Button, Avatar, Typography,
+  Container, Box,
+  Typography
 } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import Link from "../../component/Link.jsx";
+import ButtonLink from "../../component/ButtonLink.jsx"
+import Logo from "../../component/Logo.jsx";
 import underDevelopment from "../../helper/underDevelopment.js";
 import Wrapper from "../../component/Wrapper.jsx";
 
 export default function AuthPage() {
   return (
-    <Wrapper>
+    <Wrapper className={'flex flex-col gap-10'}>
       <BackgroundForDekstop />
       <Header />
-      <Container fullWidth sx={{ display: 'flex', justifyContent: 'flex-start', gap: 5 }}>
-        <Box sx={{ my: 4, display: 'flex', flexDirection: 'column', gap: 5, width: { sm: '30rem' } }} component={'main'}>
+      <Container>
+        <Box component={'main'} className="flex flex-col gap-5 max-w-100">
           <Outlet />
           <LoginPlatform />
         </Box>
@@ -33,31 +35,53 @@ function BackgroundForDekstop() {
 function Header() {
   return (
     <Box component={'header'} className="p-5 flex justify-between items-center">
-      <Link sx={{ display: 'flex', alignItems: 'center', gap: 1, width: 'fit-content' }} color="" underline="none" to={'/'}>
-        <Avatar src="/images/logo.jpg" sx={{ m: '5px' }}/>
-        <Typography variant={'h1'}>IngetAnime!</Typography>
-      </Link>
+      <Logo />
     </Box>
   )
 }
 
 function LoginPlatform() {
   return (
-    <Box fullWidth sx={{display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Box sx={{display: 'flex', gap: 1 }}>
-        <Button fullWidth variant="contained" color="default" sx={{ p: 1, textTransform: 'none' }} 
-          startIcon={<img src="/images/google.png" alt="MAL" style={{ height: 15 }}/>}
-          onClick={underDevelopment}
-        >
-          Google
-        </Button>
-        <Button fullWidth variant="contained" color="primary" sx={{ p: 1, textTransform: 'none', background: '#2E51A2' }} 
-          startIcon={<img src="/images/mal.png" alt="MAL" style={{ height: 25 }}/>}
-          onClick={underDevelopment}
-        >
-          MyAnimeList
-        </Button>
-      </Box>
+    <Box className="flex gap-2.5">
+      <ButtonLink 
+        fullWidth sx={{ textTransform: 'none' }}
+        variant="contained" color="default" 
+        startIcon={<img src="/images/google.png" alt="MAL" style={{ height: 15 }}/>}
+        onClick={underDevelopment}
+      >
+        Google
+      </ButtonLink>
+      <ButtonLink 
+        fullWidth sx={{ textTransform: 'none', background: '#2E51A2' }} 
+        variant="contained" color="primary" 
+        startIcon={<img src="/images/mal.png" alt="MAL" style={{ height: 25 }}/>}
+        onClick={underDevelopment}      
+      >
+        MyAnimeList
+      </ButtonLink>
+    </Box>
+  )
+}
+
+export function TitleAndSubtitle({ title, subtitle }) {
+  return (
+    <Box 
+      className="flex flex-col gap-2.5"
+    >
+      <Typography variant="h2" textAlign={'center'}>{title}</Typography>
+      <Typography textAlign={'center'}>{subtitle}</Typography>
+    </Box>
+  )
+}
+
+export function Form({ children, onSubmit }) {
+  return (
+    <Box 
+      className="flex flex-col gap-2.5"
+      component={'form'} 
+      onSubmit={(e) => onSubmit(e)}
+    >
+      {children}
     </Box>
   )
 }

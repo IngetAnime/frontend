@@ -2,6 +2,7 @@ import { Box, Typography, TextField, Button } from "@mui/material"
 import { useEffect, useState } from "react"
 import underDevelopment from "../../helper/underDevelopment"
 import { Send } from "@mui/icons-material"
+import { Form, TitleAndSubtitle } from "./AuthPage"
 
 export default function ForgotPasswordPage() {
   const [identifier, setIdentifier] = useState('')
@@ -40,9 +41,9 @@ export default function ForgotPasswordPage() {
     return () => clearTimeout(timer);
   }, [seconds, canResend]);
 
-  const handleResend = () => {
+  const handleResend = (e) => {
     if (!canResend) return;
-
+    underDevelopment(e)
     const expireAt = Date.now() + expiryTime * 1000;
     localStorage.setItem('resendExpireAt', String(expireAt));
     setSeconds(expiryTime);
@@ -52,27 +53,20 @@ export default function ForgotPasswordPage() {
   return (
     <>
       {/* Title and subtitle */}
-      <Box fullWidth sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h2" textAlign={'center'}>Daijoubu!!!</Typography>
-        <Typography textAlign={'center'}>Gak usah takut akunmu hilang, kami akan bantu kok!</Typography>
-      </Box>
+      <TitleAndSubtitle title={'Daijoubu!!!'} subtitle={'Gak usah takut akunmu hilang, kami akan bantu kok!'}/>
 
       {/* Forgot password form */}
-      <Box fullWidth sx={{display: 'flex', flexDirection: 'column', gap: 2 }} component={'form'} 
-        onSubmit={(e) => {
-          underDevelopment(e)
-          handleResend()
-        }}>
+      <Form onSubmit={handleResend}>
         <TextField
           id="identifier"
           label="Username atau email"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
         />
-        <Button variant="contained" color="primary" sx={{ p: 1 }} endIcon={<Send />} type="submit" disabled={!canResend}>
+        <Button variant="contained" color="primary" endIcon={<Send />} type="submit" disabled={!canResend} size="large">
           Kirim tautan {!canResend ? ` ulang dalam ${seconds} detik` : ''}
         </Button>
-      </Box>
+      </Form>
     </>
   )
 }
