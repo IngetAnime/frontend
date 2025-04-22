@@ -7,6 +7,7 @@ import { AppContext } from "../../context/AppContext.jsx";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import getLastPath from "../../helper/getLastPath.js";
+import { Form, TitleAndSubtitle } from "./AuthPage.jsx";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('')
@@ -31,13 +32,10 @@ export default function RegisterPage() {
   return (
     <>
       {/* Title and subtitle */}
-      <Box fullWidth sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h2" textAlign={'center'}>Yōkoso!!!</Typography>
-        <Typography textAlign={'center'}>Cari tempat nonton anime terbaik? Yuk eksplor disini!</Typography>
-      </Box>
+      <TitleAndSubtitle title={'Yōkoso!!!'} subtitle={'Cari tempat nonton anime terbaik? Yuk eksplor disini!'}/>
 
       {/* Register form */}
-      <Box fullWidth sx={{display: 'flex', flexDirection: 'column', gap: 2 }} component={'form'} onSubmit={(e) => handleSubmit(e)}>
+      <Form onSubmit={handleSubmit}>
         <TextField
           id="username"
           label="Username"
@@ -63,11 +61,11 @@ export default function RegisterPage() {
           setPassword={setConfirmPassword}
           label="Konfirmasi password"
         />
-        <Button variant="contained" color="primary" sx={{ p: 1 }} endIcon={<Login />} type="submit">Daftar</Button>
-        <Typography sx={{ textAlign: 'center', color: 'initial' }}>
+        <Button variant="contained" color="primary" endIcon={<Login />} type="submit" size="large">Daftar</Button>
+        <Typography textAlign={'center'}>
           Sudah punya akun? <Link to={'/auth/login'}>Masuk</Link>
         </Typography>
-      </Box>
+      </Form>
     </>
   )
 }

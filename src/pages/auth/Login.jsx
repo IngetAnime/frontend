@@ -7,6 +7,7 @@ import Link from "../../component/Link";
 import { AppContext } from "../../context/AppContext.jsx";
 import { toast } from "react-toastify";
 import getLastPath from "../../helper/getLastPath.js";
+import { Form, TitleAndSubtitle } from "./AuthPage.jsx";
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('')
@@ -28,13 +29,10 @@ export default function LoginPage() {
   return (
     <>
       {/* Title and subtitle */}
-      <Box fullWidth sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h2" textAlign={'center'}>Okaerinasai!!!</Typography>
-        <Typography textAlign={'center'}>Tempat nonton anime makin banyak nih. Yuk eksplor lagi!</Typography>
-      </Box>
+      <TitleAndSubtitle title={'Okaerinasai!!!'} subtitle={'Tempat nonton anime makin banyak nih. Yuk eksplor lagi!'} />
 
       {/* Login form */}
-      <Box fullWidth sx={{display: 'flex', flexDirection: 'column', gap: 2 }} component={'form'} onSubmit={(e) => handleSubmit(e)}>
+      <Form onSubmit={handleSubmit}>
         <TextField
           id="identifier"
           label="Username atau email"
@@ -46,11 +44,11 @@ export default function LoginPage() {
           setPassword={setPassword}
         />
         <Link textAlign={'right'} to={'/auth/forgot-password'}>Lupa password?</Link>
-        <Button variant="contained" color="primary" sx={{ p: 1 }} endIcon={<Login />} type="submit">Masuk</Button>
-        <Typography sx={{ textAlign: 'center', color: 'initial' }}>
+        <Button variant="contained" color="primary" endIcon={<Login />} type="submit" size="large">Masuk</Button>
+        <Typography textAlign={'center'}>
           Belum punya akun? <Link to={'/auth/register'}>Daftar</Link>
         </Typography>
-      </Box>
+      </Form>
     </>
   )
 }

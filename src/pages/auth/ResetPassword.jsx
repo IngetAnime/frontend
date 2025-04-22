@@ -7,6 +7,7 @@ import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import getLastPath from "../../helper/getLastPath.js"
 import { AppContext } from "../../context/AppContext.jsx"
+import { Form, TitleAndSubtitle } from "./AuthPage.jsx"
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
@@ -27,13 +28,10 @@ export default function ResetPasswordPage() {
   return (
     <>
       {/* Title and subtitle */}
-      <Box fullWidth sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h2" textAlign={'center'}>Daijoubu!!!</Typography>
-        <Typography textAlign={'center'}>Gak usah takut akunmu hilang, kami akan bantu kok!</Typography>
-      </Box>
+      <TitleAndSubtitle title={'Daijoubu!!!'} subtitle={'Gak usah takut akunmu hilang, kami akan bantu kok!'}/>
 
       {/* Reset password form */}
-      <Box fullWidth sx={{display: 'flex', flexDirection: 'column', gap: 2 }} component={'form'} onSubmit={(e) => handleResetPassword(e)}>
+      <Form onSubmit={handleResetPassword}>
         <PasswordField key={'1'}
           password={password} 
           setPassword={setPassword}
@@ -43,8 +41,8 @@ export default function ResetPasswordPage() {
           setPassword={setConfirmPassword}
           label="Konfirmasi password"
         />
-        <Button variant="contained" color="primary" sx={{ p: 1 }} endIcon={<Key />} type="submit">Reset password</Button>
-      </Box>
+        <Button variant="contained" color="primary" endIcon={<Key />} type="submit" size="large">Reset password</Button>
+      </Form>
     </>
   )
 }
