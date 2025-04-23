@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import ButtonLink from "./ButtonLink";
 
-export default function ButtonAnime({ backgroundColor, sx, icon, content, to }) {
+export default function AnimeButton({ backgroundColor, sx, icon, content, to }) {
   backgroundColor = 
     backgroundColor === 'green' ? '#00BC7D' :
     backgroundColor === 'yellow' ? '#F0B100' :

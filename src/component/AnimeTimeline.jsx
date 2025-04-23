@@ -3,19 +3,14 @@ import {
   List,
   ListItem,
   CardMedia,
-  CardContent,
-  CardActions
 } from "@mui/material";
 import PropTypes from 'prop-types';
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot, TimelineOppositeContent,  } from "@mui/lab";
 import { timelineItemClasses } from '@mui/lab/TimelineItem';
-import {
-  timelineOppositeContentClasses,
-} from '@mui/lab/TimelineOppositeContent';
 import { tabsClasses } from '@mui/material/Tabs';
 import ButtonLink from "../component/ButtonLink";
-import { AccessTime, CloudUpload, KeyboardDoubleArrowRight, PlayArrow } from "@mui/icons-material";
-import AnimeButton from "../component/AnimeButton";
+import AnimePlatform from "./AnimePlatform";
+import AnimeImage from "./AnimeImage";
 import { useState } from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/id'
@@ -106,7 +101,7 @@ export default function AnimeTimeline({ animes }) {
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={4}/>
                   </Timeline>
                 ) : (
-                  <Typography marginTop={'5rem'}>Tidak ada anime yang tayang hari ini</Typography>
+                  <Typography className="py-15 text-center">Tidak ada anime yang tayang hari ini</Typography>
                 )
               }
               
@@ -160,14 +155,14 @@ function AnimeTimelineItem({ time, animes }) {
         <List disablePadding>
           {animes.map((anime, index) => (
             <ListItem key={index} disableGutters>
-              <Card className="flex flex-col md:flex-row overflow-hidden md:h-35">
+              <Card className="flex flex-col sm:flex-row overflow-hidden sm:h-35 gap-2 sm:gap-0">
                 <AnimeImage 
                   picture={anime.picture} 
                   title={anime.title} 
                   episodeAired={anime.mainPlatform.episodeAired} 
                   progress={anime.myListStatus.progress} 
                 />
-                <Box className="flex flex-col justify-between p-1 px-2">
+                <Box className="flex flex-col justify-between py-1 px-2 w-full gap-2 sm:gap-0">
                   <Typography 
                     sx={{ 
                       display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', 
@@ -187,52 +182,5 @@ function AnimeTimelineItem({ time, animes }) {
         <Box padding={2} />
       </TimelineContent>
     </TimelineItem>
-  )
-}
-
-function AnimeImage({ picture, title, episodeAired, progress }) {
-  return (
-    <Box className="w-full h-25 md:h-full relative">
-      <CardMedia className="w-full h-full" component={'img'} image={picture} alt={title} />
-      <AnimeButton 
-        sx={{ position: 'absolute', bottom: 0, left: { xs: 'unset', md: '0' }, right: { xs: 0, md: 'unset ' } }}
-        icon={<CloudUpload />} backgroundColor={'green'} 
-        content={episodeAired}
-      />
-      <AnimeButton 
-        sx={{ position: 'absolute', top: 0, left: 0 }}
-        backgroundColor="yellow" content={episodeAired - progress} 
-        icon={<AccessTime />} to={'/anime/:1/my-list-status'}
-      />
-    </Box>
-  )
-}
-
-function ImageAndEpisodeAired({ src, episodeAired }) {
-  return(
-    <div className="rounded-l-md overflow-hidden w-30 h-full relative">
-      {/* Image */}
-      <img src={src} className="w-full h-full object-cover"/>
-
-      {/* Episode aired */}
-      <AnimeButton 
-        sx={{ position: 'absolute', bottom: 0, left: 0 }} icon={<CloudUpload />} backgroundColor={'green'} 
-        content={episodeAired}
-      />
-    </div>
-  )
-}
-
-function AnimePlatform({ platforms }) {
-  return (
-    <ul className="flex flex-wrap overflow-hidden">
-      {platforms.map((platform, index) => (
-        <li key={index}>
-          <ButtonLink sx={{ height: '2rem', minWidth: 'unset' }}>
-            <img src={platform.icon} className="h-full object-contain" />
-          </ButtonLink>
-        </li>
-      ))}
-    </ul>
   )
 }

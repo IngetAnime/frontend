@@ -1,6 +1,7 @@
 import { 
   Box,
   Container,
+  Divider,
   Typography
 } from "@mui/material";
 import Header from "../component/Header";
@@ -9,12 +10,16 @@ import AnimeTimeline from "../component/AnimeTimeline";
 import ButtonLink from "../component/ButtonLink";
 import { KeyboardDoubleArrowRight } from "@mui/icons-material";
 import underDevelopment from "../helper/underDevelopment";
+import AnimeExplore from "../component/AnimeExplore";
 
 export default function DashboardUser() {
   const anime = [
     {
       title: 'Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni',
+      description: `In role-playing games, slimes are usually the easiest monster to kill, and because of that, they yield few experience points. But what would happen if you live long enough to keep defeating them for 300 years? After many years of being a corporate slave, Azusa Aizawa abruptly passes away due to severe exhaustion. Seemingly headed for the afterlife, she meets a goddess who bestows her with immortality alongside a peaceful life in another world. There, Azusa enjoys her days tending to her farm, protecting the nearby village, and killing about 25 slimes per day—a routine that continues for at least three centuries.`,
       picture: 'https://cdn.myanimelist.net/images/anime/1074/147339l.jpg',
+      genres: ['Comedy', 'Fantasy'],
+      score: 7.12,
       mainPlatform: {
         episodeAired: 12
       },
@@ -33,7 +38,10 @@ export default function DashboardUser() {
     },
     {
       title: 'Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni',
+      description: 'Centuries ago, mankind was slaughtered to near extinction by monstrous humanoid creatures called Titans, forcing humans to hide in fear behind enormous concentric walls. What makes these giants truly terrifying is that their taste for human flesh is not born out of hunger but what appears to be out of pleasure.',
       picture: 'https://cdn.myanimelist.net/images/anime/1074/147339l.jpg',
+      genres: ['Action', 'Drama', 'Gore', 'Military', 'Shounen', 'Survival'],
+      score: 7.12,
       mainPlatform: {
         episodeAired: 12
       },
@@ -54,25 +62,38 @@ export default function DashboardUser() {
   return (
     <Wrapper>
       <Header />
-      <Container sx={{ display: 'flex', flexWrap: 'wrap', gap: '3rem', justifyContent: 'space-between' }}>
-        <Box sx={{ py: '1rem', display: 'flex', flexDirection: 'column', width: { xs: '100%', md: '30rem'} }}>
-          <div className="max-h-[75vh] md:max-h-[80vh] overflow-hidden">
-            <AnimeTimeline animes={anime}/>
-          </div>
-          <ButtonLink
-            onClick={(e) => underDevelopment(e)} 
-            variant="contained" endIcon={<KeyboardDoubleArrowRight />} 
-            sx={{ 
-              width: 'fit-content', alignSelf: 'flex-end', my: '1rem'
-            }}
-          >
-            Lebih banyak
-          </ButtonLink>
-        </Box>
+      <Container className="flex flex-wrap justify-between overflow-hidden">
+        <AnimeWrap>
+          <AnimeTimeline animes={anime}/>
+        </AnimeWrap>
+        <Divider orientation="vertical" flexItem />
+        <AnimeWrap>
+          <AnimeExplore animes={anime} />
+        </AnimeWrap>
+
         {/* <Box sx={{ py: '1rem', maxHeight: '100vh', overflow: 'hidden', width: { xs: '100%', md: '30rem'} }}>
           <AnimeTimeline animes={anime}/>
         </Box> */}
       </Container>
     </Wrapper>
+  )
+}
+
+function AnimeWrap({ children }) {
+  return (
+    <Box className="flex flex-col w-full md:max-w-[48%] pt-4">
+      <Box className="max-h-[75vh] overflow-hidden">
+        {children}
+      </Box>
+      <ButtonLink
+        onClick={(e) => underDevelopment(e)} 
+        variant="contained" endIcon={<KeyboardDoubleArrowRight />} 
+        sx={{ 
+          width: 'fit-content', alignSelf: 'flex-end', my: '1rem'
+        }}
+      >
+        Lebih banyak
+      </ButtonLink>
+    </Box>
   )
 }

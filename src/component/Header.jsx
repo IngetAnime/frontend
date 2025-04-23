@@ -50,9 +50,9 @@ export default function Header() {
         <AppBar> {/* Make nav static */}
           <Toolbar className="flex gap-5"> {/* Basic styling for nav */}
             <MobileMenu menuItem={menuItem} profileMenu={profileMenu} />
-            <Logo color="white" className="hidden sm:flex"/>
+            <Logo color="white" className="hidden md:flex"/>
             <AnimeSearch />
-            <Box className="flex-1 hidden sm:block" />
+            <Box className="flex-1 hidden md:block" />
             <DekstopMenu menuItem={menuItem} profileMenu={profileMenu} isLoggedIn={isLoggedIn} />
           </Toolbar>
         </AppBar>
@@ -87,7 +87,7 @@ function AnimeSearch() {
     // marginRight: theme.spacing(2),
     // marginLeft: 0,
     width: '100%',
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
     //   marginLeft: theme.spacing(3),
       width: 'auto',
     },
@@ -147,7 +147,7 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=false }) {
   }
 
   return (
-    <Box className="hidden sm:flex gap-5">
+    <Box className="hidden md:flex gap-5">
       {/* Navigation */}
       <List className="flex gap-2.5">
         {menuItem.map((menu, index) => (
@@ -293,7 +293,7 @@ function MobileMenu({ menuItem, profileMenu }) {
   }
 
   return (
-    <Box className="block sm:hidden">
+    <Box className="block md:hidden">
       <IconButton color="inherit" onClick={() => toogleDrawer(true)}>
         <MenuIcon />
       </IconButton>
