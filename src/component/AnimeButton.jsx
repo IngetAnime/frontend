@@ -13,7 +13,19 @@ export default function ButtonAnime({ backgroundColor, sx, icon, content, to }) 
   return (
     <ButtonLink to={to} variant="contained" size="small" 
       sx={{ 
-        backgroundColor, justifyContent: 'space-around', gap: '0.5rem', px: '0.5rem', minWidth: 'unset', ...sx, 
+        backgroundColor, justifyContent: 'space-around', gap: '0.5rem', px: '0.5rem', 
+        minWidth: 'unset', width: 'fit-content', height: 'fit-content',
+        boxShadow: 'none',
+        '&:hover': {
+          boxShadow: 'none',
+        },
+        '&:focus': {
+          boxShadow: 'none',
+        },
+        '&:active': {
+          boxShadow: 'none',
+        },
+        ...sx, 
       }}
     >
       {icon}

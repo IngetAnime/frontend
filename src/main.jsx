@@ -38,6 +38,15 @@ const theme = createTheme({
     }
   },
   components: {
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+          paddingBottom: 0,
+          margin: 0
+        }
+      }
+    },
     MuiLink: {
       defaultProps: {
         underline: 'hover',

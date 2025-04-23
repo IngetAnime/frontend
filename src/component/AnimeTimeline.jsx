@@ -1,12 +1,20 @@
 import { 
-  Typography, Box, Card, Tabs, Tab
+  Typography, Box, Card, Tabs, Tab,
+  List,
+  ListItem,
+  CardMedia,
+  CardContent,
+  CardActions
 } from "@mui/material";
 import PropTypes from 'prop-types';
-import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot,  } from "@mui/lab";
+import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot, TimelineOppositeContent,  } from "@mui/lab";
 import { timelineItemClasses } from '@mui/lab/TimelineItem';
+import {
+  timelineOppositeContentClasses,
+} from '@mui/lab/TimelineOppositeContent';
 import { tabsClasses } from '@mui/material/Tabs';
 import ButtonLink from "../component/ButtonLink";
-import { AccessTime, CloudUpload, KeyboardDoubleArrowRight } from "@mui/icons-material";
+import { AccessTime, CloudUpload, KeyboardDoubleArrowRight, PlayArrow } from "@mui/icons-material";
 import AnimeButton from "../component/AnimeButton";
 import { useState } from "react";
 import dayjs from "dayjs";
@@ -30,73 +38,68 @@ export default function AnimeTimeline({ animes }) {
   };
 
   return (
-    <div>
-      <Typography variant="h2" sx={{ pb: 1 }}>Jadwal Rilis Anime Mingguan!</Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <Box sx={{ width: '100%', bgcolor: 'background.paper', display: 'flex', alignItems: 'center', p: 0 }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            variant="scrollable"
-            scrollButtons
-            allowScrollButtonsMobile
-            aria-label="scrollable auto tabs example"
-            sx={{
-              width: '100%',
-              [`& .${tabsClasses.scrollButtons}`]: {
-                width: 'unset',
+    <Box className="flex flex-col gap-4">
+      <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
+      <Box className="flex flex-col items-center gap-2">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          variant="scrollable"
+          scrollButtons
+          allowScrollButtonsMobile
+          aria-label="scrollable auto tabs example"
+          sx={{
+            width: '100%',
+            [`& .${tabsClasses.scrollButtons}`]: {
+              width: 'unset',
 
-                '&.Mui-disabled': { opacity: 0.3 },
-              },
-              [`& .${tabsClasses.scrollButtons}:first-of-type`]: {
-                pr: '0.5rem'
-              },
-              [`& .${tabsClasses.scrollButtons}:last-of-type`]: {
-                pl: '0.5rem'
-              },
-            }}
-          >
-            {days.map((day, index) => {
-              const hari = dayjs(day.date).format('dddd')
-              const tanggal = dayjs(day.date).format('D')
-              return (
-                <Tab
-                  key={index}
-                  sx={{
-                    p: 0,
-                    minWidth: '5rem'
-                  }}
-                  label={
-                    <>
-                    <Typography textTransform={'none'} fontSize={'small'} fontWeight={'bold'}>
-                      {hari === dayjs().format('dddd') ? 'Hari ini' : hari}
-                    </Typography>
-                    <Typography textTransform={'none'} fontSize={'small'}>
-                      {hari === dayjs().format('dddd') ? hari : tanggal}
-                    </Typography>
-                    </>
-                  } 
-                  {...a11yProps(index)} 
-                />
-              )
-            })}
-          </Tabs>
-        </Box>
+              '&.Mui-disabled': { opacity: 0.3 },
+            },
+            [`& .${tabsClasses.scrollButtons}:first-of-type`]: {
+              pr: '0.5rem'
+            },
+            [`& .${tabsClasses.scrollButtons}:last-of-type`]: {
+              pl: '0.5rem'
+            },
+          }}
+        >
+          {days.map((day, index) => {
+            const hari = dayjs(day.date).format('dddd')
+            const tanggal = dayjs(day.date).format('D')
+            return (
+              <Tab
+                key={index}
+                sx={{
+                  p: 0,
+                  minWidth: '5rem'
+                }}
+                label={
+                  <>
+                  <Typography textTransform={'none'} fontSize={'small'} fontWeight={'bold'}>
+                    {hari === dayjs().format('dddd') ? 'Hari ini' : hari}
+                  </Typography>
+                  <Typography textTransform={'none'} fontSize={'small'}>
+                    {hari === dayjs().format('dddd') ? hari : tanggal}
+                  </Typography>
+                  </>
+                } 
+                {...a11yProps(index)} 
+              />
+            )
+          })}
+        </Tabs>
+
         {days.map((day, index) => {
           return (
             <CustomTabPanel value={value} index={index} key={index}>
               {
                 (index === 3 || index === 0 || index === 6) ? (
-                  <Timeline
-                    key={index}
-                    sx={{
-                      [`& .${timelineItemClasses.root}:before`]: {
-                        flex: 0,
-                        padding: 0,
-                      },
-                      px: 0
-                    }}
-                  >
+                  <Timeline key={index} sx={{
+                    [`& .${timelineItemClasses.root}:before`]: {
+                      flex: 0,
+                      padding: 0,
+                    },
+                  }}>
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={1}/>
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={2}/>
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={3}/>
@@ -111,7 +114,7 @@ export default function AnimeTimeline({ animes }) {
           )
         })}
       </Box>
-    </div>
+    </Box>
   )
 }
 
@@ -119,15 +122,16 @@ function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
   return (
-    <div
+    <Box
       role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      className="w-full min-h-[75vh]"
       {...other}
     >
-      {value === index && <Box sx={{ minHeight: '75vh' }}>{children}</Box>}
-    </div>
+      {value === index && children}
+    </Box>
   );
 }
 
@@ -151,32 +155,56 @@ function AnimeTimelineItem({ time, animes }) {
         <TimelineDot />
         <TimelineConnector />
       </TimelineSeparator>
-      <TimelineContent sx={{px: '0.5rem'}}>
-        <Typography color="textSecondary" pb={1}>{time}</Typography>
-        <ul className="flex flex-col gap-4">
+      <TimelineContent>
+        <Typography color="textSecondary">{time}</Typography>
+        <List disablePadding>
           {animes.map((anime, index) => (
-            <li key={index}>
-              <Card sx={{ gap: 1, flexWrap: 'wrap', display: 'flex', height: '12.5rem' }}>
-                <ImageAndEpisodeAired src={anime.picture} episodeAired={anime.mainPlatform.episodeAired}/>
+            <ListItem key={index} disableGutters>
+              <Card className="flex flex-col md:flex-row overflow-hidden md:h-35">
+                <AnimeImage 
+                  picture={anime.picture} 
+                  title={anime.title} 
+                  episodeAired={anime.mainPlatform.episodeAired} 
+                  progress={anime.myListStatus.progress} 
+                />
+                <Box className="flex flex-col justify-between p-1 px-2">
+                  <Typography 
+                    sx={{ 
+                      display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', 
+                      fontWeight: 'bold', fontSize: 'small',
+                    }}
+                    className="overflow-hidden"
+                  >
+                    {anime.title}
+                  </Typography>
 
-                <div className="flex-1 flex flex-col items-end justify-between h-full">
-                  <AnimeTitle title={anime.title}/>
-
-                  <AnimePlatform platforms={anime.platforms}/>
-
-                  {/* Episode not watch yet */}
-                  <AnimeButton 
-                    backgroundColor="yellow" content={anime.mainPlatform.episodeAired - anime.myListStatus.progress} 
-                    icon={<AccessTime />} to={'/anime/:1/my-list-status'}
-                  />
-                </div>
+                  <AnimePlatform platforms={anime.platforms} />
+                </Box>
               </Card>
-            </li>
+            </ListItem>
           ))}
-        </ul>
+        </List>
         <Box padding={2} />
       </TimelineContent>
     </TimelineItem>
+  )
+}
+
+function AnimeImage({ picture, title, episodeAired, progress }) {
+  return (
+    <Box className="w-full h-25 md:h-full relative">
+      <CardMedia className="w-full h-full" component={'img'} image={picture} alt={title} />
+      <AnimeButton 
+        sx={{ position: 'absolute', bottom: 0, left: { xs: 'unset', md: '0' }, right: { xs: 0, md: 'unset ' } }}
+        icon={<CloudUpload />} backgroundColor={'green'} 
+        content={episodeAired}
+      />
+      <AnimeButton 
+        sx={{ position: 'absolute', top: 0, left: 0 }}
+        backgroundColor="yellow" content={episodeAired - progress} 
+        icon={<AccessTime />} to={'/anime/:1/my-list-status'}
+      />
+    </Box>
   )
 }
 
@@ -195,22 +223,9 @@ function ImageAndEpisodeAired({ src, episodeAired }) {
   )
 }
 
-function AnimeTitle({ title }) {
-  return (
-    <p className="max-w-full overflow-hidden p-1 overflow-ellipsis font-bold"
-      style={{
-        display: '-webkit-box',
-        WebkitLineClamp: 3,
-        WebkitBoxOrient: 'vertical',
-      }}>
-      {title}
-    </p>
-  )
-}
-
 function AnimePlatform({ platforms }) {
   return (
-    <ul className="flex flex-wrap justify-end overflow-hidden px-1">
+    <ul className="flex flex-wrap overflow-hidden">
       {platforms.map((platform, index) => (
         <li key={index}>
           <ButtonLink sx={{ height: '2rem', minWidth: 'unset' }}>

@@ -25,6 +25,7 @@ export default function DashboardUser() {
         { icon: '/images/netflix.png' },
         { icon: '/images/iqiyi.svg' },
         { icon: '/images/bstation.png' },
+        { icon: '/images/catchplay.png' },
       ],
       myListStatus: {
         progress: 3
@@ -68,9 +69,9 @@ export default function DashboardUser() {
             Lebih banyak
           </ButtonLink>
         </Box>
-        <Box sx={{ py: '1rem', maxHeight: '100vh', overflow: 'hidden', width: { xs: '100%', md: '30rem'} }}>
+        {/* <Box sx={{ py: '1rem', maxHeight: '100vh', overflow: 'hidden', width: { xs: '100%', md: '30rem'} }}>
           <AnimeTimeline animes={anime}/>
-        </Box>
+        </Box> */}
       </Container>
     </Wrapper>
   )
