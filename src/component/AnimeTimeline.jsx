@@ -3,6 +3,7 @@ import {
   List,
   ListItem,
   CardMedia,
+  Tooltip,
 } from "@mui/material";
 import PropTypes from 'prop-types';
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot, TimelineOppositeContent,  } from "@mui/lab";
@@ -163,15 +164,7 @@ function AnimeTimelineItem({ time, animes }) {
                   progress={anime.myListStatus.progress} 
                 />
                 <Box className="flex flex-col justify-between py-1 px-2 w-full gap-2 sm:gap-0">
-                  <Typography 
-                    sx={{ 
-                      display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', 
-                      fontWeight: 'bold', fontSize: 'small',
-                    }}
-                    className="overflow-hidden"
-                  >
-                    {anime.title}
-                  </Typography>
+                  <AnimeTitle title={anime.title} />
 
                   <AnimePlatform platforms={anime.platforms} />
                 </Box>
@@ -182,5 +175,21 @@ function AnimeTimelineItem({ time, animes }) {
         <Box padding={2} />
       </TimelineContent>
     </TimelineItem>
+  )
+}
+
+function AnimeTitle({ title }) {
+  return (
+    <Tooltip title={title} placement={'top'}>
+      <Typography 
+        sx={{ 
+          display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', 
+          fontWeight: 'bold', fontSize: 'small',
+        }}
+        className="overflow-hidden"
+      >
+        {title}
+      </Typography>
+    </Tooltip>
   )
 }

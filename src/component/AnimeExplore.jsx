@@ -1,5 +1,5 @@
 import { Autorenew, CalendarMonth, EmojiEvents, Lightbulb, Star } from "@mui/icons-material";
-import { Box, Button, Card, FormControl, Icon, IconButton, InputLabel, List, ListItem, ListItemIcon, Menu, MenuItem, MenuList, Select, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Button, Card, FormControl, Icon, IconButton, InputLabel, List, ListItem, ListItemIcon, Menu, MenuItem, MenuList, Select, Tab, Tabs, Tooltip, Typography } from "@mui/material";
 import { useState } from "react";
 import AnimeImage from "./AnimeImage";
 import Link from "./Link";
@@ -113,15 +113,17 @@ export default function AnimeExplore({ animes }) {
 function AnimeTitle({ title }) {
   return (
     <>
-      <Typography 
-        sx={{ 
-          display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', 
-          fontWeight: 'bold', fontSize: 'small'
-        }}
-        className="overflow-hidden"
-      >
-        {title}
-      </Typography>
+      <Tooltip title={title} placement="top">
+        <Typography 
+          sx={{ 
+            display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', 
+            fontWeight: 'bold', fontSize: 'small'
+          }}
+          className="overflow-hidden"
+        >
+          {title}
+        </Typography>
+      </Tooltip>
       <Typography sx={{ fontSize: 'small', textAlign: 'center' }}>Jan 1, 2025 | 13 eps, 23 min</Typography>
     </>
   )
