@@ -102,16 +102,17 @@ function AnimeTimelineItem({ time, animes }) {
         <List disablePadding>
           {animes.map((anime, index) => (
             <ListItem key={index} disableGutters>
-              <Card className="flex flex-col sm:flex-row overflow-hidden sm:h-35 gap-2 sm:gap-0">
-                <AnimeImage 
-                  picture={anime.picture} 
-                  title={anime.title} 
-                  episodeAired={anime.mainPlatform.episodeAired} 
-                  progress={anime.myListStatus.progress} 
-                />
-                <Box className="flex flex-col justify-between py-1 px-2 w-full gap-2 sm:gap-0">
+              <Card className="flex flex-row flex-wrap overflow-hidden w-full sm:h-30 gap-2 sm:gap-0">
+                <Box className="w-full sm:w-25 lg:w-35 h-full">
+                  <AnimeImage 
+                    picture={anime.picture} 
+                    title={anime.title} 
+                    episodeAired={anime.mainPlatform.episodeAired} 
+                    progress={anime.myListStatus.progress} 
+                  />
+                </Box>
+                <Box className="flex flex-col justify-between py-1 px-2 flex-1 gap-2 sm:gap-0">
                   <AnimeTitle title={anime.title} />
-
                   <AnimePlatform platforms={anime.platforms} />
                 </Box>
               </Card>

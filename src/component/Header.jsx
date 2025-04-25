@@ -48,11 +48,12 @@ export default function Header() {
     <>
       <HideOnScroll> 
         <AppBar> {/* Make nav static */}
-          <Toolbar className="flex gap-5"> {/* Basic styling for nav */}
-            <MobileMenu menuItem={menuItem} profileMenu={profileMenu} />
-            <Logo color="white" className="hidden md:flex"/>
-            <AnimeSearch />
-            <Box className="flex-1 hidden md:block" />
+          <Toolbar className="flex justify-between lg:gap-5"> {/* Basic styling for nav */}
+            <Box className="flex gap-5 w-full lg:w-auto">
+              <MobileMenu menuItem={menuItem} profileMenu={profileMenu} />
+              <Logo color="white" className="hidden md:flex"/>
+              <AnimeSearch />
+            </Box>
             <DekstopMenu menuItem={menuItem} profileMenu={profileMenu} isLoggedIn={isLoggedIn} />
           </Toolbar>
         </AppBar>
@@ -84,11 +85,11 @@ function AnimeSearch() {
     '&:hover': {
       backgroundColor: alpha(theme.palette.common.white, 0.25),
     },
-    // marginRight: theme.spacing(2),
-    // marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('md')]: {
-    //   marginLeft: theme.spacing(3),
+      width: '12rem',
+    },
+    [theme.breakpoints.up('lg')]: {
       width: 'auto',
     },
   }));
@@ -151,7 +152,7 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=false }) {
       {/* Navigation */}
       <List className="flex gap-2.5">
         {menuItem.map((menu, index) => (
-          <ListItem key={index}>
+          <ListItem key={index} disablePadding sx={{ px: { xs: '0.25rem', lg: '1rem'} }}>
             <Link color='white' className="flex gap-2.5 items-center">
               {menu.icon}
               {menu.text}
