@@ -5,6 +5,7 @@ import AnimeImage from "./AnimeImage";
 import Link from "./Link";
 import AnimeButton from "./AnimeButton";
 import AnimePlatform from "./AnimePlatform";
+import dayjs from "dayjs";
 
 export default function AnimeExplore() {
   return (
@@ -66,7 +67,7 @@ function AnimeExploreType() {
     {
       text: 'Musiman',
       icon: <CalendarMonth />,
-      element: <TopAnime />
+      element: <Seasons />
     },
   ]
 
@@ -196,6 +197,89 @@ function CurrentSeason() {
         { text: 'Movie' },
         { text: 'Special' },
       ]
+    },
+    {
+      name: 'Urutan',
+      isMultiple: false,
+      menus: [
+        { text: 'Anggota' },
+        { text: 'Skor' },
+        { text: 'Tanggal mulai' },
+        { text: 'Judul' },
+        { text: 'Studio' },
+        { text: 'Lisensor' },
+      ]
+    },
+    {
+      name: 'Tipe Akses',
+      isMultiple: false,
+      menus: [
+        { text: 'Tersedia gratis' },
+        { text: 'Waktu terbatas' },
+        { text: 'Wajib berlangganan' },
+      ]
+    },
+    {
+      name: 'List Saya',
+      isMultiple: true,
+      menus: [
+        { text: 'Berjalan' },
+        { text: 'Selesai' },
+        { text: 'Ditunda' },
+        { text: 'Ditinggalkan' },
+        { text: 'Direncanakan' },
+      ]
+    },
+    {
+      name: 'Platform',
+      isMultiple: true,
+      menus: [
+        { text: 'Muse - YouTube' },
+        { text: 'AniOne - YouTube' },
+        { text: 'Bstation' },
+        { text: 'Netflix' },
+        { text: 'Catchplay+' },
+        { text: 'Crunchyroll' },
+      ]
+    },
+  ]
+
+  return (
+    <AnimeExplorePanel filterAndSort={filterAndSort} />
+  )
+}
+
+function Seasons() {
+  // Generate 1917 until this year
+  const earlyYear = 1917;
+  const lastYear = dayjs().get('year');
+  const years = Array(lastYear-earlyYear+1).fill().map((_, i) => {
+    return {
+      text: (lastYear - i).toString()
+    }
+  })
+
+  const filterAndSort = [
+    {
+      name: 'Musim',
+      isMultiple: false,
+      menus: [
+        { text: 'Winter' },
+        { text: 'Spring' },
+        { text: 'Summer' },
+        { text: 'Fall' },
+      ]
+    },
+    {
+      name: 'Tahun',
+      isMultiple: false,
+      menus: years
+      // menus: [
+      //   { text: 'Winter' },
+      //   { text: 'Spring' },
+      //   { text: 'Summer' },
+      //   { text: 'Fall' },
+      // ]
     },
     {
       name: 'Urutan',
