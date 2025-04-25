@@ -55,11 +55,6 @@ export default function UserAnimeList() {
   ]
 
   const [value, setValue] = useState(0);
-  const [isOpen, setIsOpen] = useState(false)
-
-  function handleOpen() {
-    setIsOpen(!isOpen)
-  }
 
   const menu = [
     { 
@@ -139,17 +134,7 @@ export default function UserAnimeList() {
       </Tabs>
       
       <Box className="flex flex-col px-1 gap-2.5">
-        <Collapse in={isOpen} collapsedSize={45}>
-          <Box className="flex flex-wrap gap-5 pt-1.25">
-            {sortMenu.map((menu, i) => (
-              <SortAndFilter name={menu.name} menu={menu.menus} isMultiple={menu.isMultiple} key={i} />
-            ))}
-          </Box>
-        </Collapse>
-
-        <IconButton size="small" className="w-fit self-end" onClick={handleOpen}>
-          {isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-        </IconButton>
+        <SortAndFilter sortAndFilter={sortMenu} />
         
         {menu.map((menu, i) => (
           <CustomTabPanel value={value} index={i} key={i}>
@@ -166,16 +151,18 @@ function AnimeList({ animes }) {
     <List disablePadding>
       {animes.map((anime, i) => (
         <ListItem disableGutters key={i}>
-          <Card className="flex flex-col sm:flex-row overflow-hidden sm:h-50 gap-2 sm:gap-0">
-            <AnimeImage 
-              picture={anime.picture} 
-              title={anime.title} 
-              episodeAired={anime.mainPlatform.episodeAired} 
-              progress={anime.myListStatus.progress} 
-            />
+          <Card className="flex overflow-hidden h-41">
+            <Box className="w-25 sm:w-30 h-full">
+              <AnimeImage 
+                picture={anime.picture} 
+                title={anime.title} 
+                episodeAired={anime.mainPlatform.episodeAired} 
+                progress={anime.myListStatus.progress} 
+              />
+            </Box>
 
-            <Box className="flex flex-col justify-between py-1 px-2 w-full gap-2 sm:gap-0">
-              <Box className="flex flex-col gap-2">
+            <Box className="flex flex-col justify-between py-1 px-2 flex-1">
+              <Box className="flex flex-col gap-5">
                 <AnimeTitle title={anime.title} />
                 <AnimeProgress />
               </Box>
@@ -193,7 +180,7 @@ function AnimeTitle({ title }) {
     <Tooltip title={title} placement={'top'}>
       <Typography 
         sx={{ 
-          display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', 
+          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', 
           fontWeight: 'bold', fontSize: 'small',
         }}
         className="overflow-hidden"
@@ -220,7 +207,7 @@ function AnimeProgress() {
     <Box className="flex flex-col gap-1 items-end relative">
       <Box className="absolute -top-1 -translate-y-full flex items-center gap-1">
         <IconButton size="small"><Edit fontSize="small"/></IconButton>
-        <AnimeButton onClick={handleValue} icon={<Add fontSize="small"/>}></AnimeButton>
+        <AnimeButton onClick={handleValue} icon={Add}></AnimeButton>
       </Box>
       <LinearProgress variant="determinate" value={value} className="w-full"/>
       <Typography fontSize={'small'}>{Math.round(value / range)} / {episodeTotal} ep</Typography>

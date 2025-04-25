@@ -102,8 +102,8 @@ function AnimeTimelineItem({ time, animes }) {
         <List disablePadding>
           {animes.map((anime, index) => (
             <ListItem key={index} disableGutters>
-              <Card className="flex flex-row flex-wrap overflow-hidden w-full sm:h-30 gap-2 sm:gap-0">
-                <Box className="w-full sm:w-25 lg:w-35 h-full">
+              <Card className="flex flex-wrap overflow-hidden w-full sm:h-30 gap-2 sm:gap-0">
+                <Box className="w-full sm:w-25 lg:w-35 h-25 sm:h-full">
                   <AnimeImage 
                     picture={anime.picture} 
                     title={anime.title} 

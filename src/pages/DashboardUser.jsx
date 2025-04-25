@@ -74,10 +74,6 @@ export default function DashboardUser() {
         <AnimeWrap>
           <UserAnimeList />
         </AnimeWrap>
-
-        {/* <Box sx={{ py: '1rem', maxHeight: '100vh', overflow: 'hidden', width: { xs: '100%', md: '30rem'} }}>
-          <AnimeTimeline animes={anime}/>
-        </Box> */}
       </Container>
     </Wrapper>
   )

@@ -331,26 +331,9 @@ function AnimeExplorePanel({ filterAndSort }) {
     }
   ]
 
-  const [isOpen, setIsOpen] = useState(false)
-
-  function handleOpen() {
-    setIsOpen(!isOpen)
-  }
-
   return (
     <Box className="flex flex-col px-1 gap-2.5">
-      <Collapse in={isOpen} collapsedSize={45}>
-        <Box className="flex flex-wrap gap-5 pt-1.25">
-          {filterAndSort.map((filter, index) => (
-            <SortAndFilter name={filter.name} menu={filter.menus} isMultiple={filter.isMultiple} key={index}/>
-          ))}
-        </Box>
-      </Collapse>
-
-      <IconButton size="small" className="w-fit self-end" onClick={handleOpen}>
-        {isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-      </IconButton>
-      
+      <SortAndFilter sortAndFilter={filterAndSort} />
       <AnimeList animes={anime} />
     </Box>
   )
@@ -372,22 +355,24 @@ function AnimeList({ animes }) {
               <AnimeScore score={anime.score} />
             </Box>
 
-            <Box className="flex flex-col sm:flex-row overflow-hidden sm:h-60 gap-2 sm:gap-0">
-              <AnimeImage 
-                picture={anime.picture} 
-                title={anime.title} 
-                episodeAired={anime.mainPlatform.episodeAired} 
-                progress={anime.myListStatus.progress} 
-              />
+            <Box className="flex flex-wrap overflow-hidden w-full sm:h-40 gap-2 sm:gap-0">
+              <Box className="w-full sm:w-30 h-35 sm:h-full">
+                <AnimeImage 
+                  picture={anime.picture} 
+                  title={anime.title} 
+                  episodeAired={anime.mainPlatform.episodeAired} 
+                  progress={anime.myListStatus.progress} 
+                />
+              </Box>
 
-              <Box className="flex flex-col justify-between py-1 px-2 w-full sm:w-[150%] gap-2 sm:gap-0">
+              <Box className="flex flex-col justify-between pb-1 px-2 flex-1 gap-2 sm:gap-0">
                 <Box className="block sm:hidden">
                   <AnimeTitle title={anime.title} />
                 </Box>
                 <Box>
                   <Typography 
                     sx={{ 
-                      display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical',
+                      display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical',
                       fontSize: 'small', textAlign: 'left'
                     }}
                     className="overflow-y-scroll"
@@ -439,6 +424,6 @@ function AnimeTitle({ title }) {
 
 function AnimeScore({ score, sx }) {
   return (
-    <AnimeButton icon={<Star />} content={score} sx={{ ...sx }} />
+    <AnimeButton icon={Star} content={score} sx={{ ...sx }} />
   )
 }

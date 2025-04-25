@@ -12,8 +12,6 @@ import PropTypes from 'prop-types';
 import { AppContext } from "../context/AppContext";
 import underDevelopment from "../helper/underDevelopment";
 import ButtonLink from "./ButtonLink";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom"
 import Logo from "./Logo";
 
 export default function Header() {
