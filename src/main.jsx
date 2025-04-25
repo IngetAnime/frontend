@@ -95,6 +95,7 @@ const theme = createTheme({
     MuiTab: {
       styleOverrides: {
         root: {
+          padding: 0,
           paddingLeft: '0.5rem',
           paddingRight: '0.5rem',
           minWidth: '5rem',

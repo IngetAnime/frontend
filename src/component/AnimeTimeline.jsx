@@ -2,14 +2,10 @@ import {
   Typography, Box, Card, Tabs, Tab,
   List,
   ListItem,
-  CardMedia,
   Tooltip,
 } from "@mui/material";
-import PropTypes from 'prop-types';
-import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot, TimelineOppositeContent,  } from "@mui/lab";
+import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot,  } from "@mui/lab";
 import { timelineItemClasses } from '@mui/lab/TimelineItem';
-import { tabsClasses } from '@mui/material/Tabs';
-import ButtonLink from "../component/ButtonLink";
 import AnimePlatform from "./AnimePlatform";
 import AnimeImage from "./AnimeImage";
 import CustomTabPanel from "./CustomTabPanel";
@@ -41,23 +37,6 @@ export default function AnimeTimeline({ animes }) {
         <Tabs
           value={value}
           onChange={handleChange}
-          variant="scrollable"
-          scrollButtons
-          allowScrollButtonsMobile
-          aria-label="scrollable auto tabs example"
-          sx={{
-            width: '100%',
-            [`& .${tabsClasses.scrollButtons}`]: {
-              width: 'unset',
-              '&.Mui-disabled': { opacity: 0.3 },
-            },
-            [`& .${tabsClasses.scrollButtons}:first-of-type`]: {
-              pr: '0.5rem'
-            },
-            [`& .${tabsClasses.scrollButtons}:last-of-type`]: {
-              pl: '0.5rem'
-            },
-          }}
         >
           {days.map((day, index) => {
             const hari = dayjs(day.date).format('dddd')
@@ -65,10 +44,6 @@ export default function AnimeTimeline({ animes }) {
             return (
               <Tab
                 key={index}
-                sx={{
-                  p: 0,
-                  minWidth: '5rem'
-                }}
                 label={
                   <>
                   <Typography textTransform={'none'} fontSize={'small'} fontWeight={'bold'}>
@@ -78,8 +53,9 @@ export default function AnimeTimeline({ animes }) {
                     {hari === dayjs().format('dddd') ? hari : tanggal}
                   </Typography>
                   </>
-                } 
-                {...a11yProps(index)} 
+                }
+                id={`simple-tab-${index}`}
+                aria-controls={`simple-tabpanel-${index}`}
               />
             )
           })}
@@ -112,13 +88,6 @@ export default function AnimeTimeline({ animes }) {
       </Box>
     </Box>
   )
-}
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
 }
 
 function AnimeTimelineItem({ time, animes }) {

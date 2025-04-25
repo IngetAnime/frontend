@@ -1,5 +1,5 @@
 import { Autorenew, CalendarMonth, EmojiEvents, KeyboardArrowDown, KeyboardArrowUp, Lightbulb, Star } from "@mui/icons-material";
-import { Box, Button, Card, Collapse, FormControl, Icon, IconButton, InputLabel, List, ListItem, ListItemIcon, Menu, MenuItem, MenuList, Select, Tab, Tabs, tabsClasses, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Card, Collapse, IconButton, List, ListItem, Tab, Tabs, Tooltip, Typography } from "@mui/material";
 import { useState } from "react";
 import AnimeImage from "./AnimeImage";
 import Link from "./Link";
@@ -25,13 +25,6 @@ function AnimeExploreType() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-  function a11yProps(index) {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    };
-  }
 
   const animeExploreType = [
     {
@@ -61,39 +54,19 @@ function AnimeExploreType() {
       <Tabs
         value={value}
         onChange={handleChange}
-        variant="scrollable"
-        scrollButtons
-        allowScrollButtonsMobile
-        aria-label="scrollable auto tabs example"
-        sx={{
-          width: '100%',
-          [`& .${tabsClasses.scrollButtons}`]: {
-            width: 'unset',
-            '&.Mui-disabled': { opacity: 0.3 },
-          },
-          [`& .${tabsClasses.scrollButtons}:first-of-type`]: {
-            pr: '0.5rem'
-          },
-          [`& .${tabsClasses.scrollButtons}:last-of-type`]: {
-            pl: '0.5rem'
-          },
-        }}
       >
         {animeExploreType.map((type, index) => {
           return (
             <Tab
               key={index}
-              sx={{
-                px: '0.5rem',
-                minWidth: '5rem'
-              }}
               label={
                 <Typography textTransform={'none'} fontSize={'small'} fontWeight={'bold'} className="flex items-center gap-1">
                   {type.icon}
                   {type.text}
                 </Typography>
               } 
-              {...a11yProps(index)} 
+              id={`simple-tab-${index}`}
+              aria-controls={`simple-tabpanel-${index}`}
             />
           )
         })}
