@@ -68,7 +68,7 @@ export default function DashboardUser() {
         </AnimeWrap>
         <Divider orientation="vertical" flexItem />
         <AnimeWrap>
-          <AnimeExplore animes={anime} />
+          <AnimeExplore />
         </AnimeWrap>
 
         {/* <Box sx={{ py: '1rem', maxHeight: '100vh', overflow: 'hidden', width: { xs: '100%', md: '30rem'} }}>
