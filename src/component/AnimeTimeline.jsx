@@ -12,6 +12,7 @@ import { tabsClasses } from '@mui/material/Tabs';
 import ButtonLink from "../component/ButtonLink";
 import AnimePlatform from "./AnimePlatform";
 import AnimeImage from "./AnimeImage";
+import CustomTabPanel from "./CustomTabPanel";
 import { useState } from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/id'
@@ -48,7 +49,6 @@ export default function AnimeTimeline({ animes }) {
             width: '100%',
             [`& .${tabsClasses.scrollButtons}`]: {
               width: 'unset',
-
               '&.Mui-disabled': { opacity: 0.3 },
             },
             [`& .${tabsClasses.scrollButtons}:first-of-type`]: {
@@ -113,29 +113,6 @@ export default function AnimeTimeline({ animes }) {
     </Box>
   )
 }
-
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <Box
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      className="w-full min-h-[75vh]"
-      {...other}
-    >
-      {value === index && children}
-    </Box>
-  );
-}
-
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
 
 function a11yProps(index) {
   return {

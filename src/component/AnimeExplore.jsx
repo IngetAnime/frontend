@@ -5,6 +5,8 @@ import AnimeImage from "./AnimeImage";
 import Link from "./Link";
 import AnimeButton from "./AnimeButton";
 import AnimePlatform from "./AnimePlatform";
+import SortAndFilter from "./SortAndFilter";
+import CustomTabPanel from "./CustomTabPanel";
 import dayjs from "dayjs";
 
 export default function AnimeExplore() {
@@ -23,23 +25,6 @@ function AnimeExploreType() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-  function CustomTabPanel(props) {
-    const { children, value, index, ...other } = props;
-  
-    return (
-      <Box
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        className="w-full min-h-[75vh]"
-        {...other}
-      >
-        {value === index && children}
-      </Box>
-    );
-  }
 
   function a11yProps(index) {
     return {
@@ -274,12 +259,6 @@ function Seasons() {
       name: 'Tahun',
       isMultiple: false,
       menus: years
-      // menus: [
-      //   { text: 'Winter' },
-      //   { text: 'Spring' },
-      //   { text: 'Summer' },
-      //   { text: 'Fall' },
-      // ]
     },
     {
       name: 'Urutan',
@@ -401,44 +380,6 @@ function AnimeExplorePanel({ filterAndSort }) {
       
       <AnimeList animes={anime} />
     </Box>
-  )
-}
-
-function SortAndFilter({ name, menu, isMultiple=true }) {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const [sortType, setSortType] = useState(0);
-  const [filterType, setFilterType] = useState(menu.map((menu, index) => index));
-
-  const handleChangeSort = (event) => {
-    setSortType(event.target.value);
-  };
-
-  const handleChangeFilter = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setFilterType(
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
-
-  return (
-    <FormControl size="small" fullWidth={isMobile} sx={{ minWidth: { xs: 'unset', sm: '10rem' } }}>
-      <InputLabel id={name + menu[0].text}>{name}</InputLabel>
-      <Select
-        labelId={name + menu[0].text}
-        id={name}
-        value={isMultiple ? filterType : sortType}
-        label={name}
-        onChange={isMultiple ? handleChangeFilter : handleChangeSort}
-        multiple={isMultiple}
-      >
-        {menu.map((filter, index) => (
-          <MenuItem value={index} className="flex items-center" key={index}>{filter.text}</MenuItem>
-        ))}
-      </Select>
-    </FormControl>
   )
 }
 

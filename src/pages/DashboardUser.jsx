@@ -11,6 +11,7 @@ import ButtonLink from "../component/ButtonLink";
 import { KeyboardDoubleArrowRight } from "@mui/icons-material";
 import underDevelopment from "../helper/underDevelopment";
 import AnimeExplore from "../component/AnimeExplore";
+import UserAnimeList from "../component/UserAnimeList";
 
 export default function DashboardUser() {
   const anime = [
@@ -69,6 +70,9 @@ export default function DashboardUser() {
         <Divider orientation="vertical" flexItem />
         <AnimeWrap>
           <AnimeExplore />
+        </AnimeWrap>
+        <AnimeWrap>
+          <UserAnimeList />
         </AnimeWrap>
 
         {/* <Box sx={{ py: '1rem', maxHeight: '100vh', overflow: 'hidden', width: { xs: '100%', md: '30rem'} }}>
