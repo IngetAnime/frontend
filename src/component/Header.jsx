@@ -1,10 +1,9 @@
 import { 
-  Box, Avatar, Typography, IconButton, Menu, MenuItem, Divider, ListItemIcon, AppBar, Toolbar, InputBase, CssBaseline,
+  Box, Avatar, Typography, IconButton, Menu, MenuItem, Divider, ListItemIcon, AppBar, Toolbar,
   useScrollTrigger, Slide, List, ListItem, ListItemButton, ListItemText, Tooltip, SwipeableDrawer
 } from "@mui/material";
-import { styled, alpha } from "@mui/material/styles"
 import { 
-  Logout, Settings, Login, Menu as MenuIcon, Search as SearchIcon, DateRange, Explore, AccountCircle,
+  Logout, Settings, Login, Menu as MenuIcon, DateRange, Explore, AccountCircle,
 } from "@mui/icons-material";
 import Link from "./Link";
 import { useState, useContext } from "react";
@@ -13,6 +12,7 @@ import { AppContext } from "../context/AppContext";
 import underDevelopment from "../helper/underDevelopment";
 import ButtonLink from "./ButtonLink";
 import Logo from "./Logo";
+import AnimeSearch from "./Search";
 
 export default function Header() {
   const { isLoggedIn } = useContext(AppContext);
@@ -74,65 +74,6 @@ function HideOnScroll({ children }) {
 HideOnScroll.propTypes = {
   children: PropTypes.element,
 };
-
-function AnimeSearch() {
-  const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '12rem',
-    },
-    [theme.breakpoints.up('lg')]: {
-      width: 'auto',
-    },
-  }));
-
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      width: '100%',
-      [theme.breakpoints.up('md')]: {
-        width: '20ch',
-      },
-    },
-  }));
-
-  function handleSearch(e) {
-    if (e.key === 'Enter') {
-      underDevelopment(e);
-    }
-  }
-  return (
-    <Search onKeyDown={(e) => handleSearch(e)}>
-      <SearchIconWrapper>
-        <SearchIcon />
-      </SearchIconWrapper>
-      <StyledInputBase sx={{ width: '100%' }}
-        placeholder="Cari judul anime…"
-        inputProps={{ 'aria-label': 'search' }}
-      />
-    </Search>
-  )
-}
 
 function DekstopMenu({ menuItem, profileMenu, isLoggedIn=false }) {
   const [anchorEl, setAnchorEl] = useState(null)

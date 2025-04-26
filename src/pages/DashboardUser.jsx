@@ -1,5 +1,6 @@
 import { 
   Box,
+  Card,
   Container,
   Divider,
   Typography
@@ -12,6 +13,7 @@ import { KeyboardDoubleArrowRight } from "@mui/icons-material";
 import underDevelopment from "../helper/underDevelopment";
 import AnimeExplore from "../component/AnimeExplore";
 import UserAnimeList from "../component/UserAnimeList";
+import AnimeSearch from "../component/Search";
 
 export default function DashboardUser() {
   const anime = [
@@ -63,7 +65,7 @@ export default function DashboardUser() {
   return (
     <Wrapper>
       <Header />
-      <Container className="flex flex-wrap justify-between overflow-hidden">
+      <Container className="flex flex-wrap justify-between overflow-hidden" component={'main'}>
         <AnimeWrap>
           <AnimeTimeline animes={anime}/>
         </AnimeWrap>
@@ -75,6 +77,15 @@ export default function DashboardUser() {
           <UserAnimeList />
         </AnimeWrap>
       </Container>
+      {/* <Box bgcolor={'primary.main'} color={'white'}>
+        <Container className="flex justify-center">
+          <Box className="flex flex-col justify-center align-middle gap-5 p-4 text-center max-w-[50rem]">
+            <AnimeSearch />
+            <Typography>Temukan platform terbaik buat nonton anime favorit kamu disini!</Typography>
+            <Typography color="white" fontSize={'small'} fontWeight={'thin'}>2025 - IngetAnime <br /> asdcode123@gmail.com</Typography>
+          </Box>
+        </Container>
+      </Box> */}
     </Wrapper>
   )
 }
