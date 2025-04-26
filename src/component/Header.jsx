@@ -13,19 +13,25 @@ import underDevelopment from "../helper/underDevelopment";
 import ButtonLink from "./ButtonLink";
 import Logo from "./Logo";
 import AnimeSearch from "./Search";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { isLoggedIn } = useContext(AppContext);
+  const navigate = useNavigate()
   const menuItem = [
     {
       text: 'Timeline',
       icon: <DateRange />,
-      onClick: underDevelopment,
+      onClick: () => {
+        navigate('/anime/timeline')
+      },
     },
     {
       text: 'Eksplorasi',
       icon: <Explore />,
-      onClick: underDevelopment,
+      onClick: () => {
+        navigate('/anime')
+      },
     },
   ]
 
