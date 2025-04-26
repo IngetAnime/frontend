@@ -1,23 +1,38 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import IndexPage from './pages/Index'
 import AuthPage from './pages/auth/AuthPage';
 import LoginPage from './pages/auth/Login';
 import RegisterPage from './pages/auth/Register';
-import DashboardUser from './pages/DashboardUser';
+import Dashboard from './pages/Dashboard';
 import DashboardAdmin from './pages/DashboardAdmin';
 import ForgotPasswordPage from './pages/auth/ForgotPassword';
 import ResetPasswordPage from './pages/auth/ResetPassword';
 import EmailVerificationPage from './pages/auth/EmailVerification';
 import ErrorPage from './pages/Error';
+import AnimePage from './pages/anime/AnimePage';
+import Timeline from './pages/anime/timeline';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <DashboardUser />,
-    errorElement: <ErrorPage />
-  },
-  {
-    path: '/admin/dashboard',
-    element: <DashboardAdmin />
+    element: <IndexPage />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />
+      },
+      {
+        path: 'anime',
+        element: <AnimePage />,
+        children: [
+          {
+            path: 'timeline',
+            element: <Timeline />
+          }
+        ]
+      }
+    ]
   },
   {
     path: '/auth',
@@ -48,16 +63,6 @@ const router = createBrowserRouter([
         element: <ResetPasswordPage />
       },
     ]
-    // children: [
-    //   {
-    //     path: '/auth/register',
-    //     element: <RegisterPage />
-    //   },
-    //   // {
-    //   //   path: '/auth/email-verification',
-    //   //   element: <EmailVerification />
-    //   // },
-    // ]
   },
 ])
 

@@ -3,3 +3,7 @@
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif
 }
+
+.slick-slide>div {
+  margin: 0 1rem;
+}

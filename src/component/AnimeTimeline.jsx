@@ -3,6 +3,9 @@ import {
   List,
   ListItem,
   Tooltip,
+  CardHeader,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot,  } from "@mui/lab";
 import { timelineItemClasses } from '@mui/lab/TimelineItem';
@@ -12,10 +15,14 @@ import CustomTabPanel from "./CustomTabPanel";
 import { useState } from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/id'
+import Slider from "./Slider";
 
 dayjs.locale('id')
 
-export default function AnimeTimeline({ animes }) {
+export default function AnimeTimeline({ animes, isMobile=true }) {
+  const theme = useTheme()
+  const isSmall = useMediaQuery(theme.breakpoints.down('xl'))
+
   const initialDay = dayjs().subtract(3, 'day');
   const days = []
   for (let i=0; i < 7; i++) {
@@ -30,42 +37,85 @@ export default function AnimeTimeline({ animes }) {
     setValue(newValue);
   };
 
-  return (
-    <Box className="flex flex-col gap-4">
-      <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
-      <Box className="flex flex-col items-center gap-2">
-        <Tabs
-          value={value}
-          onChange={handleChange}
-        >
+  if (isMobile) {
+    return (
+      <Box className="flex flex-col gap-4">
+        <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
+        <Box className="flex flex-col items-center gap-2">
+          <Tabs
+            value={value}
+            onChange={handleChange}
+          >
+            {days.map((day, index) => {
+              const hari = dayjs(day.date).format('dddd')
+              const tanggal = dayjs(day.date).format('D')
+              return (
+                <Tab
+                  key={index}
+                  label={
+                    <>
+                    <Typography textTransform={'none'} fontSize={'small'} fontWeight={'bold'}>
+                      {hari === dayjs().format('dddd') ? 'Hari ini' : hari}
+                    </Typography>
+                    <Typography textTransform={'none'} fontSize={'small'}>
+                      {hari === dayjs().format('dddd') ? hari : tanggal}
+                    </Typography>
+                    </>
+                  }
+                  id={`simple-tab-${index}`}
+                  aria-controls={`simple-tabpanel-${index}`}
+                />
+              )
+            })}
+          </Tabs>
+  
+          {days.map((day, index) => {
+            return (
+              <CustomTabPanel value={value} index={index} key={index}>
+                {
+                  (index === 3 || index === 0 || index === 6) ? (
+                    <Timeline key={index} sx={{
+                      [`& .${timelineItemClasses.root}:before`]: {
+                        flex: 0,
+                        padding: 0,
+                      },
+                    }}>
+                      <AnimeTimelineItem time={'10:00'} animes={animes} key={1}/>
+                      <AnimeTimelineItem time={'10:00'} animes={animes} key={2}/>
+                      <AnimeTimelineItem time={'10:00'} animes={animes} key={3}/>
+                      <AnimeTimelineItem time={'10:00'} animes={animes} key={4}/>
+                    </Timeline>
+                  ) : (
+                    <Typography className="py-15 text-center">Tidak ada anime yang tayang hari ini</Typography>
+                  )
+                }
+                
+              </CustomTabPanel>
+            )
+          })}
+        </Box>
+      </Box>
+    )
+  } else {
+    return (
+      <Box className="flex flex-col items-center gap-5 w-full">
+        <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
+        <Slider slidesToShow={isSmall ? 2 : 3}>
           {days.map((day, index) => {
             const hari = dayjs(day.date).format('dddd')
             const tanggal = dayjs(day.date).format('D')
+            const isToday = (hari === dayjs().format('dddd'))
             return (
-              <Tab
-                key={index}
-                label={
-                  <>
-                  <Typography textTransform={'none'} fontSize={'small'} fontWeight={'bold'}>
-                    {hari === dayjs().format('dddd') ? 'Hari ini' : hari}
-                  </Typography>
-                  <Typography textTransform={'none'} fontSize={'small'}>
-                    {hari === dayjs().format('dddd') ? hari : tanggal}
-                  </Typography>
-                  </>
-                }
-                id={`simple-tab-${index}`}
-                aria-controls={`simple-tabpanel-${index}`}
-              />
-            )
-          })}
-        </Tabs>
-
-        {days.map((day, index) => {
-          return (
-            <CustomTabPanel value={value} index={index} key={index}>
-              {
-                (index === 3 || index === 0 || index === 6) ? (
+              <Card className="flex flex-col items-center gap-2.5">
+                <Box 
+                  className={
+                    `flex flex-col items-center py-5 w-full 
+                    ${isToday && 'bg-linear-to-t from-white to-[rgba(0,188,125,0.25)]'}`
+                  }>
+                  <Typography fontWeight={'bold'}>{ isToday ? 'Hari ini': hari }</Typography>
+                  <Typography>{tanggal}</Typography>
+                </Box>
+                <Box className="w-full">
                   <Timeline key={index} sx={{
                     [`& .${timelineItemClasses.root}:before`]: {
                       flex: 0,
@@ -77,17 +127,14 @@ export default function AnimeTimeline({ animes }) {
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={3}/>
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={4}/>
                   </Timeline>
-                ) : (
-                  <Typography className="py-15 text-center">Tidak ada anime yang tayang hari ini</Typography>
-                )
-              }
-              
-            </CustomTabPanel>
-          )
-        })}
+                </Box>
+              </Card>
+            )
+          })}
+        </Slider>
       </Box>
-    </Box>
-  )
+    )
+  }
 }
 
 function AnimeTimelineItem({ time, animes }) {
@@ -97,7 +144,7 @@ function AnimeTimelineItem({ time, animes }) {
         <TimelineDot />
         <TimelineConnector />
       </TimelineSeparator>
-      <TimelineContent>
+      <TimelineContent sx={{ pr: 0 }}>
         <Typography color="textSecondary">{time}</Typography>
         <List disablePadding>
           {animes.map((anime, index) => (

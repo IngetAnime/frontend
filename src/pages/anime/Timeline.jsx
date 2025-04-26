@@ -1,21 +1,7 @@
-import { 
-  Box,
-  Card,
-  Container,
-  Divider,
-  Typography
-} from "@mui/material";
-import Header from "../component/Header";
-import Wrapper from "../component/Wrapper";
-import AnimeTimeline from "../component/AnimeTimeline";
-import ButtonLink from "../component/ButtonLink";
-import { KeyboardDoubleArrowRight } from "@mui/icons-material";
-import underDevelopment from "../helper/underDevelopment";
-import AnimeExplore from "../component/AnimeExplore";
-import UserAnimeList from "../component/UserAnimeList";
-import AnimeSearch from "../component/Search";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
+import AnimeTimeline from "../../component/AnimeTimeline";
 
-export default function DashboardUser() {
+export default function Timeline() {
   const anime = [
     {
       title: 'Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni',
@@ -62,49 +48,12 @@ export default function DashboardUser() {
     }
   ]
 
-  return (
-    <Wrapper>
-      <Header />
-      <Container className="flex flex-wrap justify-between overflow-hidden" component={'main'}>
-        <AnimeWrap>
-          <AnimeTimeline animes={anime}/>
-        </AnimeWrap>
-        <Divider orientation="vertical" flexItem />
-        <AnimeWrap>
-          <AnimeExplore />
-        </AnimeWrap>
-        <AnimeWrap>
-          <UserAnimeList />
-        </AnimeWrap>
-      </Container>
-      {/* <Box bgcolor={'primary.main'} color={'white'}>
-        <Container className="flex justify-center">
-          <Box className="flex flex-col justify-center align-middle gap-5 p-4 text-center max-w-[50rem]">
-            <AnimeSearch />
-            <Typography>Temukan platform terbaik buat nonton anime favorit kamu disini!</Typography>
-            <Typography color="white" fontSize={'small'} fontWeight={'thin'}>2025 - IngetAnime <br /> asdcode123@gmail.com</Typography>
-          </Box>
-        </Container>
-      </Box> */}
-    </Wrapper>
-  )
-}
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-function AnimeWrap({ children }) {
   return (
-    <Box className="flex flex-col w-full md:max-w-[48%] pt-4">
-      <Box className="max-h-[75vh] overflow-hidden">
-        {children}
-      </Box>
-      <ButtonLink
-        onClick={(e) => underDevelopment(e)} 
-        variant="contained" endIcon={<KeyboardDoubleArrowRight />} 
-        sx={{ 
-          width: 'fit-content', alignSelf: 'flex-end', my: '1rem'
-        }}
-      >
-        Lebih banyak
-      </ButtonLink>
+    <Box className="w-full pt-5">
+      <AnimeTimeline animes={anime} isMobile={isMobile}/>
     </Box>
   )
 }
