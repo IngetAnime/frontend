@@ -22,6 +22,7 @@ export default function Header() {
     {
       text: 'Timeline',
       icon: <DateRange />,
+      link: '/anime/timeline',
       onClick: () => {
         navigate('/anime/timeline')
       },
@@ -29,6 +30,7 @@ export default function Header() {
     {
       text: 'Eksplorasi',
       icon: <Explore />,
+      link: '/anime',
       onClick: () => {
         navigate('/anime')
       },
@@ -98,7 +100,7 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=false }) {
       <List className="flex gap-2.5">
         {menuItem.map((menu, index) => (
           <ListItem key={index} disablePadding sx={{ px: { xs: '0.25rem', lg: '1rem'} }}>
-            <Link color='white' className="flex gap-2.5 items-center">
+            <Link color='white' className="flex gap-2.5 items-center" to={menu.link}>
               {menu.icon}
               {menu.text}
             </Link>
@@ -197,7 +199,7 @@ function MobileMenu({ menuItem, profileMenu }) {
       <List disablePadding>
         {menuItem.map((menu, index) => (
           <ListItem key={index} disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={menu.onClick}>
               <ListItemIcon>
                 {menu.icon}
               </ListItemIcon>
