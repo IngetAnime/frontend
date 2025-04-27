@@ -6,6 +6,9 @@ import {
   CardHeader,
   useTheme,
   useMediaQuery,
+  Switch,
+  FormGroup,
+  FormControlLabel,
 } from "@mui/material";
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot,  } from "@mui/lab";
 import { timelineItemClasses } from '@mui/lab/TimelineItem';
@@ -98,25 +101,36 @@ export default function AnimeTimeline({ animes, isMobile=true }) {
     )
   } else {
     return (
-      <Box className="flex flex-col items-center gap-5 w-full">
+      <Box className="flex flex-col gap-5 w-full">
         <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
+        <FormGroup className="flex flex-row gap-5" sx={{ flexDirection: 'row' }}>
+          <FormControlLabel 
+            control={<Switch size="small" />} 
+            label={<Typography fontSize={'small'}>Hanya tampilkan yang ada di list saya</Typography>}
+          />
+          <FormControlLabel 
+            control={<Switch size="small" defaultChecked />} 
+            label={<Typography fontSize={'small'}>Tampilkan jadwal sesuai platform yang saya pilih</Typography>}
+          />
+        </FormGroup>
         <Slider slidesToShow={isSmall ? 2 : 3}>
           {days.map((day, index) => {
             const hari = dayjs(day.date).format('dddd')
             const tanggal = dayjs(day.date).format('D')
             const isToday = (hari === dayjs().format('dddd'))
             return (
-              <Card className="flex flex-col items-center gap-2.5">
+              <Card className="flex flex-col items-center" key={index}>
                 <Box 
                   className={
-                    `flex flex-col items-center py-5 w-full 
+                    `flex flex-col items-center py-2.5 w-full 
                     ${isToday && 'bg-linear-to-t from-white to-[rgba(0,188,125,0.25)]'}`
                   }>
-                  <Typography fontWeight={'bold'}>{ isToday ? 'Hari ini': hari }</Typography>
-                  <Typography>{tanggal}</Typography>
+                  <Typography fontWeight={'bold'} fontSize={'small'}>{ isToday ? 'Hari ini': hari }</Typography>
+                  <Typography fontSize={'small'}>{tanggal}</Typography>
                 </Box>
-                <Box className="w-full">
+                <Box className="w-full px-2.5">
                   <Timeline key={index} sx={{
+                    p: 0,
                     [`& .${timelineItemClasses.root}:before`]: {
                       flex: 0,
                       padding: 0,
@@ -166,7 +180,7 @@ function AnimeTimelineItem({ time, animes }) {
             </ListItem>
           ))}
         </List>
-        <Box padding={2} />
+        <Box height={'0.5rem'} />
       </TimelineContent>
     </TimelineItem>
   )

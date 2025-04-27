@@ -29,6 +29,7 @@ const NextArrow = ({ onClick, currentSlide, totalSlides, slidesToShow=2 }) => {
 
   return (
     <IconButton
+      size="small"
       onClick={onClick}
       sx={{
         backgroundColor: "white",
@@ -36,7 +37,7 @@ const NextArrow = ({ onClick, currentSlide, totalSlides, slidesToShow=2 }) => {
         right: 0,
         top: 0,
         position: "absolute",
-        transform: "translate(-75%, 25%)",
+        transform: "translate(-75%, 50%)",
         zIndex: 2,
         boxShadow: 2,
         "&:hover": {
@@ -55,13 +56,14 @@ const PrevArrow = ({ onClick, currentSlide }) => {
   return (
     <IconButton
       onClick={onClick}
+      size="small"
       sx={{
         backgroundColor: "white",
         color: "black",
         position: "absolute",
         left: 0,
         top: 0,
-        transform: "translate(75%, 25%)",
+        transform: "translate(75%, 50%)",
         zIndex: 2,
         boxShadow: 2,
         "&:hover": {
