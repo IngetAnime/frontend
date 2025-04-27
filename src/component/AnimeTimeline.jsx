@@ -1,20 +1,28 @@
 import { 
-  Typography, Box, Card, Tabs, Tab
+  Typography, Box, Card, Tabs, Tab,
+  List,
+  ListItem,
+  Tooltip,
+  CardHeader,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
-import PropTypes from 'prop-types';
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot,  } from "@mui/lab";
 import { timelineItemClasses } from '@mui/lab/TimelineItem';
-import { tabsClasses } from '@mui/material/Tabs';
-import ButtonLink from "../component/ButtonLink";
-import { AccessTime, CloudUpload, KeyboardDoubleArrowRight } from "@mui/icons-material";
-import AnimeButton from "../component/AnimeButton";
+import AnimePlatform from "./AnimePlatform";
+import AnimeImage from "./AnimeImage";
+import CustomTabPanel from "./CustomTabPanel";
 import { useState } from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/id'
+import Slider from "./Slider";
 
 dayjs.locale('id')
 
-export default function AnimeTimeline({ animes }) {
+export default function AnimeTimeline({ animes, isMobile=true }) {
+  const theme = useTheme()
+  const isSmall = useMediaQuery(theme.breakpoints.down('xl'))
+
   const initialDay = dayjs().subtract(3, 'day');
   const days = []
   for (let i=0; i < 7; i++) {
@@ -29,32 +37,14 @@ export default function AnimeTimeline({ animes }) {
     setValue(newValue);
   };
 
-  return (
-    <div>
-      <Typography variant="h2" sx={{ pb: 1 }}>Jadwal Rilis Anime Mingguan!</Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <Box sx={{ width: '100%', bgcolor: 'background.paper', display: 'flex', alignItems: 'center', p: 0 }}>
+  if (isMobile) {
+    return (
+      <Box className="flex flex-col gap-4">
+        <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
+        <Box className="flex flex-col items-center gap-2">
           <Tabs
             value={value}
             onChange={handleChange}
-            variant="scrollable"
-            scrollButtons
-            allowScrollButtonsMobile
-            aria-label="scrollable auto tabs example"
-            sx={{
-              width: '100%',
-              [`& .${tabsClasses.scrollButtons}`]: {
-                width: 'unset',
-
-                '&.Mui-disabled': { opacity: 0.3 },
-              },
-              [`& .${tabsClasses.scrollButtons}:first-of-type`]: {
-                pr: '0.5rem'
-              },
-              [`& .${tabsClasses.scrollButtons}:last-of-type`]: {
-                pl: '0.5rem'
-              },
-            }}
           >
             {days.map((day, index) => {
               const hari = dayjs(day.date).format('dddd')
@@ -62,10 +52,6 @@ export default function AnimeTimeline({ animes }) {
               return (
                 <Tab
                   key={index}
-                  sx={{
-                    p: 0,
-                    minWidth: '5rem'
-                  }}
                   label={
                     <>
                     <Typography textTransform={'none'} fontSize={'small'} fontWeight={'bold'}>
@@ -75,73 +61,80 @@ export default function AnimeTimeline({ animes }) {
                       {hari === dayjs().format('dddd') ? hari : tanggal}
                     </Typography>
                     </>
-                  } 
-                  {...a11yProps(index)} 
+                  }
+                  id={`simple-tab-${index}`}
+                  aria-controls={`simple-tabpanel-${index}`}
                 />
               )
             })}
           </Tabs>
-        </Box>
-        {days.map((day, index) => {
-          return (
-            <CustomTabPanel value={value} index={index} key={index}>
-              {
-                (index === 3 || index === 0 || index === 6) ? (
-                  <Timeline
-                    key={index}
-                    sx={{
+  
+          {days.map((day, index) => {
+            return (
+              <CustomTabPanel value={value} index={index} key={index}>
+                {
+                  (index === 3 || index === 0 || index === 6) ? (
+                    <Timeline key={index} sx={{
                       [`& .${timelineItemClasses.root}:before`]: {
                         flex: 0,
                         padding: 0,
                       },
-                      px: 0
-                    }}
-                  >
+                    }}>
+                      <AnimeTimelineItem time={'10:00'} animes={animes} key={1}/>
+                      <AnimeTimelineItem time={'10:00'} animes={animes} key={2}/>
+                      <AnimeTimelineItem time={'10:00'} animes={animes} key={3}/>
+                      <AnimeTimelineItem time={'10:00'} animes={animes} key={4}/>
+                    </Timeline>
+                  ) : (
+                    <Typography className="py-15 text-center">Tidak ada anime yang tayang hari ini</Typography>
+                  )
+                }
+                
+              </CustomTabPanel>
+            )
+          })}
+        </Box>
+      </Box>
+    )
+  } else {
+    return (
+      <Box className="flex flex-col items-center gap-5 w-full">
+        <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
+        <Slider slidesToShow={isSmall ? 2 : 3}>
+          {days.map((day, index) => {
+            const hari = dayjs(day.date).format('dddd')
+            const tanggal = dayjs(day.date).format('D')
+            const isToday = (hari === dayjs().format('dddd'))
+            return (
+              <Card className="flex flex-col items-center gap-2.5">
+                <Box 
+                  className={
+                    `flex flex-col items-center py-5 w-full 
+                    ${isToday && 'bg-linear-to-t from-white to-[rgba(0,188,125,0.25)]'}`
+                  }>
+                  <Typography fontWeight={'bold'}>{ isToday ? 'Hari ini': hari }</Typography>
+                  <Typography>{tanggal}</Typography>
+                </Box>
+                <Box className="w-full">
+                  <Timeline key={index} sx={{
+                    [`& .${timelineItemClasses.root}:before`]: {
+                      flex: 0,
+                      padding: 0,
+                    },
+                  }}>
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={1}/>
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={2}/>
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={3}/>
                     <AnimeTimelineItem time={'10:00'} animes={animes} key={4}/>
                   </Timeline>
-                ) : (
-                  <Typography marginTop={'5rem'}>Tidak ada anime yang tayang hari ini</Typography>
-                )
-              }
-              
-            </CustomTabPanel>
-          )
-        })}
+                </Box>
+              </Card>
+            )
+          })}
+        </Slider>
       </Box>
-    </div>
-  )
-}
-
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ minHeight: '75vh' }}>{children}</Box>}
-    </div>
-  );
-}
-
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
+    )
+  }
 }
 
 function AnimeTimelineItem({ time, animes }) {
@@ -151,73 +144,46 @@ function AnimeTimelineItem({ time, animes }) {
         <TimelineDot />
         <TimelineConnector />
       </TimelineSeparator>
-      <TimelineContent sx={{px: '0.5rem'}}>
-        <Typography color="textSecondary" pb={1}>{time}</Typography>
-        <ul className="flex flex-col gap-4">
+      <TimelineContent sx={{ pr: 0 }}>
+        <Typography color="textSecondary">{time}</Typography>
+        <List disablePadding>
           {animes.map((anime, index) => (
-            <li key={index}>
-              <Card sx={{ gap: 1, flexWrap: 'wrap', display: 'flex', height: '12.5rem' }}>
-                <ImageAndEpisodeAired src={anime.picture} episodeAired={anime.mainPlatform.episodeAired}/>
-
-                <div className="flex-1 flex flex-col items-end justify-between h-full">
-                  <AnimeTitle title={anime.title}/>
-
-                  <AnimePlatform platforms={anime.platforms}/>
-
-                  {/* Episode not watch yet */}
-                  <AnimeButton 
-                    backgroundColor="yellow" content={anime.mainPlatform.episodeAired - anime.myListStatus.progress} 
-                    icon={<AccessTime />} to={'/anime/:1/my-list-status'}
+            <ListItem key={index} disableGutters>
+              <Card className="flex flex-wrap overflow-hidden w-full sm:h-30 gap-2 sm:gap-0">
+                <Box className="w-full sm:w-25 lg:w-35 h-25 sm:h-full">
+                  <AnimeImage 
+                    picture={anime.picture} 
+                    title={anime.title} 
+                    episodeAired={anime.mainPlatform.episodeAired} 
+                    progress={anime.myListStatus.progress} 
                   />
-                </div>
+                </Box>
+                <Box className="flex flex-col justify-between py-1 px-2 flex-1 gap-2 sm:gap-0">
+                  <AnimeTitle title={anime.title} />
+                  <AnimePlatform platforms={anime.platforms} />
+                </Box>
               </Card>
-            </li>
+            </ListItem>
           ))}
-        </ul>
+        </List>
         <Box padding={2} />
       </TimelineContent>
     </TimelineItem>
   )
 }
 
-function ImageAndEpisodeAired({ src, episodeAired }) {
-  return(
-    <div className="rounded-l-md overflow-hidden w-30 h-full relative">
-      {/* Image */}
-      <img src={src} className="w-full h-full object-cover"/>
-
-      {/* Episode aired */}
-      <AnimeButton 
-        sx={{ position: 'absolute', bottom: 0, left: 0 }} icon={<CloudUpload />} backgroundColor={'green'} 
-        content={episodeAired}
-      />
-    </div>
-  )
-}
-
 function AnimeTitle({ title }) {
   return (
-    <p className="max-w-full overflow-hidden p-1 overflow-ellipsis font-bold"
-      style={{
-        display: '-webkit-box',
-        WebkitLineClamp: 3,
-        WebkitBoxOrient: 'vertical',
-      }}>
-      {title}
-    </p>
-  )
-}
-
-function AnimePlatform({ platforms }) {
-  return (
-    <ul className="flex flex-wrap justify-end overflow-hidden px-1">
-      {platforms.map((platform, index) => (
-        <li key={index}>
-          <ButtonLink sx={{ height: '2rem', minWidth: 'unset' }}>
-            <img src={platform.icon} className="h-full object-contain" />
-          </ButtonLink>
-        </li>
-      ))}
-    </ul>
+    <Tooltip title={title} placement={'top'}>
+      <Typography 
+        sx={{ 
+          display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', 
+          fontWeight: 'bold', fontSize: 'small',
+        }}
+        className="overflow-hidden"
+      >
+        {title}
+      </Typography>
+    </Tooltip>
   )
 }

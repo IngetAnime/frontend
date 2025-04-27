@@ -7,6 +7,16 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 
 const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      '2xl': 1536, // optional: bisa abaikan jika tidak butuh
+    },
+  },
   palette: {
     primary: {
       main: '#00BC7D',
@@ -38,6 +48,15 @@ const theme = createTheme({
     }
   },
   components: {
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+          paddingBottom: 0,
+          margin: 0
+        }
+      }
+    },
     MuiLink: {
       defaultProps: {
         underline: 'hover',
@@ -49,6 +68,41 @@ const theme = createTheme({
         },
       },
     },
+    MuiTabs: {
+      defaultProps: {
+        variant: 'scrollable',
+        scrollButtons: true,
+        allowScrollButtonsMobile: true,
+      },
+      styleOverrides: {
+        root: {
+          width: '100%'
+        },
+        scrollButtons: {
+          width: 'unset',
+          '&.Mui-disabled': {
+            opacity: 0.3,
+          },
+          '&:first-of-type': {
+            paddingRight: '0.5rem',
+          },
+          '&:last-of-type': {
+            paddingLeft: '0.5rem',
+          },
+        },
+      }
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+          paddingLeft: '0.5rem',
+          paddingRight: '0.5rem',
+          minWidth: '5rem',
+          textTransform: 'none'
+        }
+      }
+    }
   }
 })
 
