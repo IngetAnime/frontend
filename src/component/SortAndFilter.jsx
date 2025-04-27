@@ -1,28 +1,16 @@
-import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
-import { Box, Collapse, FormControl, IconButton, InputLabel, MenuItem, Select, useMediaQuery, useTheme } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select, useMediaQuery, useTheme } from "@mui/material";
 import { useState } from "react";
+import Collapse from "./Collapse";
 
 export default function SortAndFilter({ sortAndFilter }) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  function handleOpen() {
-    setIsOpen(!isOpen)
-  }
-
   return (
-    <Box className="flex flex-col">
-      <Collapse in={isOpen} collapsedSize={45}>
-        <Box className="flex flex-wrap gap-5 py-1.25">
-          {sortAndFilter.map((menu, index) => (
-            <InputSelect name={menu.name} menu={menu.menus} isMultiple={menu.isMultiple} key={index}/>
-          ))}
-        </Box>
-      </Collapse>
-
-      <IconButton size="small" className="w-fi  t self-end" onClick={handleOpen}>
-        {isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-      </IconButton>
-    </Box>
+    <Collapse collapsedSize={50}>
+      <Box className="flex flex-wrap gap-5 py-1.25">
+        {sortAndFilter.map((menu, index) => (
+          <InputSelect name={menu.name} menu={menu.menus} isMultiple={menu.isMultiple} key={index}/>
+        ))}
+      </Box>
+    </Collapse>
   )
 }
 
