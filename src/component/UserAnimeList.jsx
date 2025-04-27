@@ -7,8 +7,8 @@ import AnimeImage from "./AnimeImage";
 import AnimePlatform from "./AnimePlatform";
 import AnimeButton from "./AnimeButton";
 
-export default function UserAnimeList() {
-  const anime = [
+export default function UserAnimeList({ isMobile }) {
+  const anime = Array(15).fill(
     {
       title: 'Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni',
       description: `In role-playing games, slimes are usually the easiest monster to kill, and because of that, they yield few experience points. But what would happen if you live long enough to keep defeating them for 300 years? After many years of being a corporate slave, Azusa Aizawa abruptly passes away due to severe exhaustion. Seemingly headed for the afterlife, she meets a goddess who bestows her with immortality alongside a peaceful life in another world. There, Azusa enjoys her days tending to her farm, protecting the nearby village, and killing about 25 slimes per day—a routine that continues for at least three centuries.`,
@@ -31,28 +31,7 @@ export default function UserAnimeList() {
         progress: 3
       }
     },
-    {
-      title: 'Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni',
-      description: 'Centuries ago, mankind was slaughtered to near extinction by monstrous humanoid creatures called Titans, forcing humans to hide in fear behind enormous concentric walls. What makes these giants truly terrifying is that their taste for human flesh is not born out of hunger but what appears to be out of pleasure.',
-      picture: 'https://cdn.myanimelist.net/images/anime/1074/147339l.jpg',
-      genres: ['Action', 'Drama', 'Gore', 'Military', 'Shounen', 'Survival'],
-      score: 7.12,
-      mainPlatform: {
-        episodeAired: 12
-      },
-      platforms: [
-        { icon: '/images/bstation.png' },
-        { icon: '/images/catchplay.png' },
-        { icon: '/images/iqiyi.svg' },
-        { icon: '/images/netflix.png' },
-        { icon: '/images/iqiyi.svg' },
-        { icon: '/images/bstation.png' },
-      ],
-      myListStatus: {
-        progress: 3
-      }
-    }
-  ]
+  )
 
   const [value, setValue] = useState(0);
 
@@ -138,7 +117,7 @@ export default function UserAnimeList() {
         
         {menu.map((menu, i) => (
           <CustomTabPanel value={value} index={i} key={i}>
-            <AnimeList animes={anime} />
+            <AnimeList animes={anime} isMobile={isMobile} />
           </CustomTabPanel>
         ))}
       </Box>
@@ -146,11 +125,11 @@ export default function UserAnimeList() {
   )
 }
 
-function AnimeList({ animes }) {
+function AnimeList({ animes, isMobile }) {
   return (
-    <List disablePadding>
+    <List disablePadding className={`flex flex-col gap-5 ${ !isMobile && 'flex-row flex-wrap justify-center'}`}>
       {animes.map((anime, i) => (
-        <ListItem disableGutters key={i}>
+        <ListItem disablePadding key={i} className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
           <Card className="flex overflow-hidden h-41">
             <Box className="w-25 sm:w-30 h-full">
               <AnimeImage 

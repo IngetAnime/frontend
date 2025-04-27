@@ -10,8 +10,9 @@ import ResetPasswordPage from './pages/auth/ResetPassword';
 import EmailVerificationPage from './pages/auth/EmailVerification';
 import ErrorPage from './pages/Error';
 import AnimePage from './pages/anime/AnimePage';
-import Timeline from './pages/anime/timeline';
+import Timeline from './pages/anime/Timeline';
 import Explore from './pages/anime/Explore';
+import List from './pages/anime/List';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
           {
             path: 'timeline',
             element: <Timeline />
+          },
+          {
+            path: 'myliststatus',
+            element: <List />
           }
         ]
       }
