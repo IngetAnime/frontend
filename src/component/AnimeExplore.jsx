@@ -9,17 +9,17 @@ import SortAndFilter from "./SortAndFilter";
 import CustomTabPanel from "./CustomTabPanel";
 import dayjs from "dayjs";
 
-export default function AnimeExplore() {
+export default function AnimeExplore({ isMobile=true }) {
   return (
-    <Box className="flex flex-col gap-5">
+    <Box className={`flex flex-col gap-5 $`}>
       <Typography variant="h2">Eksplorasi Judul Anime!</Typography>
 
-      <AnimeExploreType />
+      <AnimeExploreType isMobile={isMobile} />
     </Box>
   )
 }
 
-function AnimeExploreType() {
+function AnimeExploreType({ isMobile }) {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -30,12 +30,12 @@ function AnimeExploreType() {
     {
       text: 'Anime Terbaik',
       icon: <EmojiEvents />,
-      element: <TopAnime />
+      element: <TopAnime isMobile={isMobile} />
     },
     {
       text: 'Musim Ini',
       icon: <Autorenew />,
-      element: <CurrentSeason />
+      element: <CurrentSeason isMobile={isMobile} />
     },
     {
       text: 'Rekomendasi',
@@ -45,7 +45,7 @@ function AnimeExploreType() {
     {
       text: 'Musiman',
       icon: <CalendarMonth />,
-      element: <Seasons />
+      element: <Seasons isMobile={isMobile} />
     },
   ]
 
@@ -85,7 +85,7 @@ function AnimeExploreType() {
 
 // List anime explore type
 
-function TopAnime() {
+function TopAnime({ isMobile }) {
   const filterAndSort = [
     {
       name: 'Jenis Peringkat',
@@ -138,11 +138,11 @@ function TopAnime() {
   ]
 
   return (
-    <AnimeExplorePanel filterAndSort={filterAndSort} />
+    <AnimeExplorePanel filterAndSort={filterAndSort} isMobile={isMobile} />
   )
 }
 
-function CurrentSeason() {
+function CurrentSeason({ isMobile }) {
   const filterAndSort = [
     {
       name: 'Jenis Anime',
@@ -203,11 +203,11 @@ function CurrentSeason() {
   ]
 
   return (
-    <AnimeExplorePanel filterAndSort={filterAndSort} />
+    <AnimeExplorePanel filterAndSort={filterAndSort} isMobile={isMobile} />
   )
 }
 
-function Seasons() {
+function Seasons({ isMobile }) {
   // Generate 1917 until this year
   const earlyYear = 1917;
   const lastYear = dayjs().get('year');
@@ -280,12 +280,12 @@ function Seasons() {
   ]
 
   return (
-    <AnimeExplorePanel filterAndSort={filterAndSort} />
+    <AnimeExplorePanel filterAndSort={filterAndSort} isMobile={isMobile} />
   )
 }
 
-function AnimeExplorePanel({ filterAndSort }) {
-  const anime = [
+function AnimeExplorePanel({ filterAndSort, isMobile }) {
+  const anime = Array(15).fill(
     {
       title: 'Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni',
       description: `In role-playing games, slimes are usually the easiest monster to kill, and because of that, they yield few experience points. But what would happen if you live long enough to keep defeating them for 300 years? After many years of being a corporate slave, Azusa Aizawa abruptly passes away due to severe exhaustion. Seemingly headed for the afterlife, she meets a goddess who bestows her with immortality alongside a peaceful life in another world. There, Azusa enjoys her days tending to her farm, protecting the nearby village, and killing about 25 slimes per day—a routine that continues for at least three centuries.`,
@@ -308,44 +308,23 @@ function AnimeExplorePanel({ filterAndSort }) {
         progress: 3
       }
     },
-    {
-      title: 'Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni',
-      description: 'Centuries ago, mankind was slaughtered to near extinction by monstrous humanoid creatures called Titans, forcing humans to hide in fear behind enormous concentric walls. What makes these giants truly terrifying is that their taste for human flesh is not born out of hunger but what appears to be out of pleasure.',
-      picture: 'https://cdn.myanimelist.net/images/anime/1074/147339l.jpg',
-      genres: ['Action', 'Drama', 'Gore', 'Military', 'Shounen', 'Survival'],
-      score: 7.12,
-      mainPlatform: {
-        episodeAired: 12
-      },
-      platforms: [
-        { icon: '/images/bstation.png' },
-        { icon: '/images/catchplay.png' },
-        { icon: '/images/iqiyi.svg' },
-        { icon: '/images/netflix.png' },
-        { icon: '/images/iqiyi.svg' },
-        { icon: '/images/bstation.png' },
-      ],
-      myListStatus: {
-        progress: 3
-      }
-    }
-  ]
+  )
 
   return (
     <Box className="flex flex-col px-1 gap-2.5">
       <SortAndFilter sortAndFilter={filterAndSort} />
-      <AnimeList animes={anime} />
+      <AnimeList animes={anime} isMobile={isMobile} />
     </Box>
   )
 }
 
 // List anime item
 
-function AnimeList({ animes }) {
+function AnimeList({ animes, isMobile  }) {
   return (
-    <List disablePadding>
+    <List disablePadding className={`flex flex-col gap-5 ${ !isMobile && 'flex-row flex-wrap justify-center'}`}>
       {animes.map((anime, index) => (
-        <ListItem key={index} disableGutters>
+        <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
           <Card>
             {/* Dekstop Mode */}
             <Box className="hidden sm:flex p-2 gap-2 justify-between">

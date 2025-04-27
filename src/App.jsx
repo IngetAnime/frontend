@@ -11,6 +11,7 @@ import EmailVerificationPage from './pages/auth/EmailVerification';
 import ErrorPage from './pages/Error';
 import AnimePage from './pages/anime/AnimePage';
 import Timeline from './pages/anime/timeline';
+import Explore from './pages/anime/Explore';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
         path: 'anime',
         element: <AnimePage />,
         children: [
+          {
+            index: true,
+            element: <Explore />
+          },
           {
             path: 'timeline',
             element: <Timeline />
