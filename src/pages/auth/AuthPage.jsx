@@ -10,11 +10,11 @@ import Wrapper from "../../component/Wrapper.jsx";
 
 export default function AuthPage() {
   return (
-    <Wrapper className={'flex flex-col gap-10'}>
+    <Wrapper className={'flex flex-col gap-5'}>
       <BackgroundForDekstop />
       <Header />
       <Container>
-        <Box component={'main'} className="flex flex-col gap-5 max-w-100">
+        <Box component={'main'} className="flex flex-col gap-7.5 max-w-100">
           <Outlet />
           <LoginPlatform />
         </Box>
@@ -77,7 +77,7 @@ export function TitleAndSubtitle({ title, subtitle }) {
 export function Form({ children, onSubmit }) {
   return (
     <Box 
-      className="flex flex-col gap-2.5"
+      className="flex flex-col gap-5"
       component={'form'} 
       onSubmit={(e) => onSubmit(e)}
     >
