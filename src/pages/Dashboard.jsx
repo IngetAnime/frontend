@@ -14,6 +14,7 @@ import underDevelopment from "../helper/underDevelopment";
 import AnimeExplore from "../component/AnimeExplore";
 import UserAnimeList from "../component/UserAnimeList";
 import AnimeSearch from "../component/Search";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const anime = [
@@ -64,14 +65,14 @@ export default function Dashboard() {
 
   return (
       <Container className="flex flex-wrap justify-between overflow-hidden" component={'main'}>
-        <AnimeWrap>
+        <AnimeWrap to={'/anime/timeline'}>
           <AnimeTimeline animes={anime}/>
         </AnimeWrap>
         <Divider orientation="vertical" flexItem />
-        <AnimeWrap>
+        <AnimeWrap to={'/anime'}>
           <AnimeExplore />
         </AnimeWrap>
-        <AnimeWrap>
+        <AnimeWrap to={'/anime/myliststatus'}>
           <UserAnimeList />
         </AnimeWrap>
     {/* <Box bgcolor={'primary.main'} color={'white'}>
@@ -87,14 +88,15 @@ export default function Dashboard() {
   )
 }
 
-function AnimeWrap({ children }) {
+function AnimeWrap({ children, to }) {
+  const navigate = useNavigate();
   return (
     <Box className="flex flex-col w-full md:max-w-[48%] pt-4">
       <Box className="max-h-[75vh] overflow-hidden">
         {children}
       </Box>
       <ButtonLink
-        onClick={(e) => underDevelopment(e)} 
+        onClick={() => navigate(to)} 
         variant="contained" endIcon={<KeyboardDoubleArrowRight />} 
         sx={{ 
           width: 'fit-content', alignSelf: 'flex-end', my: '1rem'

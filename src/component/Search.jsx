@@ -14,9 +14,9 @@ export default function AnimeSearch({ isHeader=true }) {
     width: '100%',
     ...( isHeader &&
       {
-        [theme.breakpoints.up('md')]: {
-          width: '12rem',
-        },
+        // [theme.breakpoints.up('md')]: {
+        //   width: '12rem',
+        // },
         [theme.breakpoints.up('lg')]: {
           width: 'auto',
         },

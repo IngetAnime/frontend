@@ -1,9 +1,14 @@
 import { 
   Box, Avatar, Typography, IconButton, Menu, MenuItem, Divider, ListItemIcon, AppBar, Toolbar,
-  useScrollTrigger, Slide, List, ListItem, ListItemButton, ListItemText, Tooltip, SwipeableDrawer
+  useScrollTrigger, Slide, List, ListItem, ListItemButton, ListItemText, Tooltip, SwipeableDrawer,
+  Button,
+  Tabs,
+  Tab
 } from "@mui/material";
 import { 
   Logout, Settings, Login, Menu as MenuIcon, DateRange, Explore, AccountCircle,
+  PlaylistAdd,
+  LibraryBooks,
 } from "@mui/icons-material";
 import Link from "./Link";
 import { useState, useContext } from "react";
@@ -35,6 +40,14 @@ export default function Header() {
         navigate('/anime')
       },
     },
+    {
+      text: 'List',
+      icon: <LibraryBooks />,
+      link: '/anime/myliststatus',
+      onClick: () => {
+        navigate('/anime/myliststatus')
+      }
+    }
   ]
 
   const profileMenu = [
@@ -54,8 +67,8 @@ export default function Header() {
     <>
       <HideOnScroll> 
         <AppBar> {/* Make nav static */}
-          <Toolbar className="flex justify-between lg:gap-5"> {/* Basic styling for nav */}
-            <Box className="flex gap-5 w-full lg:w-auto">
+          <Toolbar className="flex justify-between gap-5"> {/* Basic styling for nav */}
+            <Box className="flex gap-5 w-full">
               <MobileMenu menuItem={menuItem} profileMenu={profileMenu} />
               <Logo color="white" className="hidden md:flex"/>
               <AnimeSearch />
@@ -83,7 +96,7 @@ HideOnScroll.propTypes = {
   children: PropTypes.element,
 };
 
-function DekstopMenu({ menuItem, profileMenu, isLoggedIn=false }) {
+function DekstopMenu({ menuItem, profileMenu, isLoggedIn=true }) {
   const [anchorEl, setAnchorEl] = useState(null)
 
   function handleOpenMenu(event) {
@@ -95,11 +108,11 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=false }) {
   }
 
   return (
-    <Box className="hidden md:flex gap-5">
+    <Box className="hidden md:flex gap-7.5">
       {/* Navigation */}
-      <List className="flex gap-2.5">
+      <List className="hidden gap-5 lg:flex">
         {menuItem.map((menu, index) => (
-          <ListItem key={index} disablePadding sx={{ px: { xs: '0.25rem', lg: '1rem'} }}>
+          <ListItem key={index} disablePadding>
             <Link color='white' className="flex gap-2.5 items-center" to={menu.link}>
               {menu.icon}
               {menu.text}
@@ -107,6 +120,21 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=false }) {
           </ListItem>
         ))}
       </List>
+      <Tabs 
+        className="items-center" variant="scrollable" 
+        sx={{ display: { xs: 'flex', lg: 'none' }, maxWidth: '11rem' }}
+      >
+        {menuItem.map((menu, index) => (
+          <Tab key={index} sx={{ minWidth: '7rem' }}
+            label={
+              <Link color='white' className="flex gap-2.5 items-center" to={menu.link}>
+                {menu.icon}
+                {menu.text}
+              </Link>
+            }
+          />
+        ))}
+      </Tabs>
 
       {/* Profile */}
       <Box className={`${isLoggedIn ? 'flex' : 'hidden'}`}>
@@ -195,11 +223,10 @@ function MobileMenu({ menuItem, profileMenu }) {
 
   function NavMenu() {
     return (
-
       <List disablePadding>
         {menuItem.map((menu, index) => (
           <ListItem key={index} disablePadding>
-            <ListItemButton onClick={menu.onClick}>
+            <ListItemButton onClick={() => { menu.onClick(); toogleDrawer(false); }}>
               <ListItemIcon>
                 {menu.icon}
               </ListItemIcon>
@@ -249,6 +276,9 @@ function MobileMenu({ menuItem, profileMenu }) {
         anchor={'left'} open={Boolean(isOpen)} 
         onClose={() => toogleDrawer(false)} onOpen={() => toogleDrawer(true)}
       >
+        <Box className="p-2.5" sx={{ textTransform: 'none' }} onClick={() => toogleDrawer(false)}>
+          <Logo />
+        </Box>
         <ProfileMenu />
         <Divider />
         <NavMenu />
