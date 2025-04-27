@@ -107,6 +107,12 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=true }) {
     setAnchorEl(null)
   }
 
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
   return (
     <Box className="hidden md:flex gap-7.5">
       {/* Navigation */}
@@ -121,6 +127,7 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=true }) {
         ))}
       </List>
       <Tabs 
+        value={value} onChange={handleChange}
         className="items-center" variant="scrollable" 
         sx={{ display: { xs: 'flex', lg: 'none' }, maxWidth: '11rem' }}
       >

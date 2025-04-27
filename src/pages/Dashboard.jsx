@@ -91,7 +91,7 @@ export default function Dashboard() {
 function AnimeWrap({ children, to }) {
   const navigate = useNavigate();
   return (
-    <Box className="flex flex-col w-full md:max-w-[48%] pt-4">
+    <Box className="flex flex-col w-full md:max-w-[48%] pt-5">
       <Box className="max-h-[75vh] overflow-hidden">
         {children}
       </Box>
