@@ -2,7 +2,12 @@ import { Box, CardMedia } from "@mui/material";
 import AnimeButton from "./AnimeButton";
 import { AccessTime, CloudUpload } from "@mui/icons-material";
 
-export default function AnimeImage({ picture, title, episodeAired, progress }) {
+export default function AnimeImage({ 
+  picture='https://cdn.myanimelist.net/images/anime/1074/147339l.jpg', 
+  title="Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni", 
+  episodeAired=12, 
+  progress=3 
+}) {
   return (
     <Box className="w-full h-full relative">
       <CardMedia className="w-full h-full" component={'img'} image={picture} alt={title} />

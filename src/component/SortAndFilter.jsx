@@ -14,7 +14,7 @@ export default function SortAndFilter({ sortAndFilter }) {
   )
 }
 
-export function InputSelect({ name, menu, isMultiple=true }) {
+export function InputSelect({ name, menu, isMultiple=true, sx }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [sortType, setSortType] = useState(0);
@@ -34,7 +34,7 @@ export function InputSelect({ name, menu, isMultiple=true }) {
   };
 
   return (
-    <FormControl size="small" fullWidth={isMobile} sx={{ minWidth: { xs: 'unset', sm: '10rem' } }}>
+    <FormControl size="small" fullWidth={isMobile} sx={{ minWidth: { xs: 'unset', sm: '10rem' }, ...sx }}>
       <InputLabel id={name + menu[0].text}>{name}</InputLabel>
       <Select
         labelId={name + menu[0].text}

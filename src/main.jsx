@@ -5,6 +5,8 @@ import App from './App.jsx'
 import { AppContextProvider } from './context/AppContext.jsx'
 import { createTheme, ThemeProvider } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 const theme = createTheme({
   breakpoints: {
@@ -102,17 +104,28 @@ const theme = createTheme({
           textTransform: 'none'
         }
       }
-    }
+    },
+    MuiDatePicker: {
+      defaultProps: {
+        slotProps: {
+          textField: {
+            size: 'small',
+          },
+        },
+      },
+    },
   }
 })
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
-      <AppContextProvider>
-        <App />
-        <ToastContainer />
-      </AppContextProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <AppContextProvider>
+          <App />
+          <ToastContainer />
+        </AppContextProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   </StrictMode>,
 )

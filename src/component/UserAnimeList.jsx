@@ -6,6 +6,7 @@ import { Add, AssignmentTurnedIn, Edit, EditCalendar, EventAvailable, EventBusy,
 import AnimeImage from "./AnimeImage";
 import AnimePlatform from "./AnimePlatform";
 import AnimeButton from "./AnimeButton";
+import AnimeEdit from "./AnimeEdit";
 
 export default function UserAnimeList({ isMobile }) {
   const anime = Array(15).fill(
@@ -185,7 +186,7 @@ function AnimeProgress() {
   return (
     <Box className="flex flex-col gap-1 items-end relative">
       <Box className="absolute -top-1 -translate-y-full flex items-center gap-1">
-        <IconButton size="small"><Edit fontSize="small"/></IconButton>
+        <AnimeEdit />
         <AnimeButton onClick={handleValue} icon={Add}></AnimeButton>
       </Box>
       <LinearProgress variant="determinate" value={value} className="w-full"/>
