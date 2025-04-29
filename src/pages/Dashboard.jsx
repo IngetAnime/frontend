@@ -1,19 +1,13 @@
 import { 
   Box,
-  Card,
   Container,
   Divider,
-  Typography
 } from "@mui/material";
-import Header from "../component/Header";
-import Wrapper from "../component/Wrapper";
 import AnimeTimeline from "../component/AnimeTimeline";
 import ButtonLink from "../component/ButtonLink";
 import { KeyboardDoubleArrowRight } from "@mui/icons-material";
-import underDevelopment from "../helper/underDevelopment";
 import AnimeExplore from "../component/AnimeExplore";
 import UserAnimeList from "../component/UserAnimeList";
-import AnimeSearch from "../component/Search";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -73,7 +67,7 @@ export default function Dashboard() {
           <AnimeExplore />
         </AnimeWrap>
         <AnimeWrap to={'/anime/myliststatus'}>
-          <UserAnimeList />
+          <UserAnimeList isMobile={'true'}/>
         </AnimeWrap>
     {/* <Box bgcolor={'primary.main'} color={'white'}>
           <Container className="flex justify-center">
