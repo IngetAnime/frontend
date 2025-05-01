@@ -1,6 +1,9 @@
 import { Box, CardMedia } from "@mui/material";
 import AnimeButton from "./AnimeButton";
-import { AccessTime, CloudUpload } from "@mui/icons-material";
+import { AccessTime, CloudUpload, Settings } from "@mui/icons-material";
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
+import AnimeSettings from "./AnimeSettings";
 
 export default function AnimeImage({ 
   picture='https://cdn.myanimelist.net/images/anime/1074/147339l.jpg', 
@@ -8,6 +11,8 @@ export default function AnimeImage({
   episodeAired=12, 
   progress=3 
 }) {
+  const { isAdmin } = useContext(AppContext)
+
   return (
     <Box className="w-full h-full relative">
       <CardMedia className="w-full h-full" component={'img'} image={picture} alt={title} />
@@ -21,6 +26,7 @@ export default function AnimeImage({
         backgroundColor="yellow" content={episodeAired - progress} 
         icon={AccessTime} to={'/anime/:1/my-list-status'}
       />
+      {isAdmin && <AnimeSettings sx={{ position: 'absolute', top: 0, right: 0 }}/>}
     </Box>
   )
 }

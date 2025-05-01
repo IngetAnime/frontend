@@ -9,7 +9,7 @@ export const AppContext = createContext();
 export const AppContextProvider = (props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
 
   const value = {
     axios,
@@ -18,20 +18,20 @@ export const AppContextProvider = (props) => {
     isAdmin, setIsAdmin
   }
 
-  const validateUser = async () => {
-    try {
-      const { data } = await axios.get('api/v1/user/me')
-      if (data.role === 'admin') {
-        setIsAdmin(true)
-      }
-      setIsLoggedIn(true)
-      setUserData(data)
-    } catch(err) {
-      console.log(err);
-      setIsLoggedIn(false)
-      setIsAdmin(false)
-    }
-  }
+  // const validateUser = async () => {
+  //   try {
+  //     const { data } = await axios.get('api/v1/user/me')
+  //     if (data.role === 'admin') {
+  //       setIsAdmin(true)
+  //     }
+  //     setIsLoggedIn(true)
+  //     setUserData(data)
+  //   } catch(err) {
+  //     console.log(err);
+  //     setIsLoggedIn(false)
+  //     setIsAdmin(false)
+  //   }
+  // }
 
   // useEffect(() => {
     // validateUser()

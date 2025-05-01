@@ -69,15 +69,6 @@ export default function Dashboard() {
         <AnimeWrap to={'/anime/myliststatus'}>
           <UserAnimeList isMobile={'true'}/>
         </AnimeWrap>
-    {/* <Box bgcolor={'primary.main'} color={'white'}>
-          <Container className="flex justify-center">
-            <Box className="flex flex-col justify-center align-middle gap-5 p-4 text-center max-w-[50rem]">
-              <AnimeSearch />
-              <Typography>Temukan platform terbaik buat nonton anime favorit kamu disini!</Typography>
-              <Typography color="white" fontSize={'small'} fontWeight={'thin'}>2025 - IngetAnime <br /> asdcode123@gmail.com</Typography>
-            </Box>
-          </Container>
-        </Box> */}
       </Container>
   )
 }
