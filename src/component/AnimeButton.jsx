@@ -11,7 +11,7 @@ export default function AnimeButton({ backgroundColor, sx, icon: Icon, content, 
     '#00BC7D'
 
   return (
-    <ButtonLink to={to} variant="contained" size="small" onClick={onClick}
+    <ButtonLink to={to} variant="contained" size="small" onClick={onClick} {...(to ? { target: '_blank', rel: 'noopener' } : {})}
       sx={{ 
         backgroundColor, justifyContent: 'space-around', gap: '0.5rem', px: '0.5rem', 
         minWidth: 'unset', width: 'fit-content', height: 'fit-content',

@@ -54,11 +54,11 @@ export default function AnimeSettings({ sx }) {
         aria-labelledby="anime-title"
         aria-describedby="anime-description"
       >
-        <DialogContent dividers={true} className="flex flex-wrap flex-col md:flex-row gap-5 md:justify-between">
-          <Box className="hidden md:block md:w-[27%]">
-            <AnimeImage />
+        <DialogContent dividers={true} className="flex flex-wrap flex-col md:flex-row gap-5">
+          <Box className="hidden md:block max-w-50">
+            <AnimeImage isDialog={true} />
           </Box>
-          <Box className="flex flex-col gap-5 md:w-[70%]">
+          <Box className="flex flex-col gap-5 w-full md:max-w-100 lg:max-w-125">
             <Box textAlign={'center'}>
               <Typography 
                 sx={{ 
@@ -118,45 +118,27 @@ function EditAnime({ handleClose, handleIsPlatform }) {
       type: 'number',
       endAdornment: 'Eps'
     },
+    {
+      name: 'Berjalan',
+      isTextField: true,
+      type: 'dateTime',
+    },
+    {
+      name: 'Tamat',
+      isTextField: true,
+      type: 'dateTime',
+    },
   ]
 
   return (
     <>
     <Box className="flex flex-wrap flex-col md:flex-row justify-between gap-2.5">
       {menuSelect.map((menu, i) => {
-        return menu.type === 'date' ? (
-          <DatePicker label={menu.name} defaultValue={dayjs()} key={i} size="small"
-            sx={{ width: { md: '49%'}, marginTop: '0.5rem' }}
-          />
-        ) : menu.isTextField ? (
-          <TextField key={i}
-            size="small"
-            label={menu.name}
-            id="outlined-start-adornment"
-            type={menu.type && menu.type}
-            fullWidth
-            sx={{ width: { md: '49%'}, marginTop: '0.5rem' }}
-            slotProps={ menu.endAdornment && {
-              input: {
-                endAdornment: <InputAdornment position="end">{menu.endAdornment}</InputAdornment>,
-              },
-            }}
-          />
-        ) : (
-          <InputSelect name={menu.name} menu={menu.menus} isMultiple={menu.isMultiple} sx={{ width: { md: '49%'}, marginTop: '0.5rem' }} key={i} />
-        )
+        return <InputField menu={menu} key={i} />
       })}
     </Box>
 
-    <Box className="flex flex-col md:flex-row justify-between gap-5 md:gap-2.5">
-      {['Berjalan', 'Tamat'].map((status, i) => (
-        <DateTimePicker label={status} defaultValue={dayjs()} key={i} slotProps={{ textField: {size: 'small'} }}
-          sx={{ width: { md: '49%'} }}
-        />
-      ))}
-    </Box>
-
-    <Box className="flex flex-col md:flex-row items-center justify-between gap-5">
+    <Box className="flex flex-col lg:flex-row items-center justify-between gap-5">
       <Button onClick={handleClose} startIcon={<CloudDownloadOutlined />} variant="contained" size="small" sx={{ 
         textTransform: 'none', bgcolor: '#2e51a2'
       }}>
@@ -172,7 +154,7 @@ function EditAnime({ handleClose, handleIsPlatform }) {
   )
 }
 
-function EditPlatform({ handleClose, handleIsPlatform }) {
+function EditPlatform({ handleIsPlatform }) {
   const menus = [
     {
       name: 'Pilih platform',
@@ -209,43 +191,23 @@ function EditPlatform({ handleClose, handleIsPlatform }) {
     {
       name: 'Episode sebelumnya',
       isTextField: true,
-      type: 'date',
+      type: 'dateTime',
     },
     {
       name: 'Episode berikutnya',
       isTextField: true,
-      type: 'date',
+      type: 'dateTime',
     },
   ]
   return (
     <>
     <Box className="flex flex-wrap flex-col md:flex-row justify-between gap-2.5">
       {menus.map((menu, i) => {
-        return menu.type === 'date' ? (
-          <DateTimePicker label={menu.name} defaultValue={dayjs()} key={i}
-            sx={{ width: { md: '49%'}, marginTop: '0.5rem' }} slotProps={{ textField: {size: 'small'} }}
-          />
-        ) : menu.isTextField ? (
-          <TextField key={i}
-            size="small"
-            label={menu.name}
-            id="outlined-start-adornment"
-            type={menu.type && menu.type}
-            fullWidth
-            sx={{ width: { md: '49%'}, marginTop: '0.5rem' }}
-            slotProps={ menu.endAdornment && {
-              input: {
-                endAdornment: <InputAdornment position="end">{menu.endAdornment}</InputAdornment>,
-              },
-            }}
-          />
-        ) : (
-          <InputSelect name={menu.name} menu={menu.menus} isMultiple={menu.isMultiple} sx={{ width: { md: '49%'}, marginTop: '0.5rem' }} key={i} />
-        )
+        return <InputField menu={menu} key={i} />
       })}
     </Box>
 
-    <Box className="flex flex-col md:flex-row items-center justify-between gap-5">
+    <Box className="flex flex-col md:flex-col-reverse lg:flex-row items-center justify-between gap-5">
       <Button onClick={() => handleIsPlatform(false)} startIcon={<ArrowBack />} variant="contained" size="small" sx={{ 
         textTransform: 'none',
       }}>
@@ -256,5 +218,33 @@ function EditPlatform({ handleClose, handleIsPlatform }) {
       </Box>
     </Box>
     </>
+  )
+}
+
+function InputField({ menu }) {
+  return menu.type === 'date' ? (
+    <DatePicker label={menu.name} defaultValue={dayjs()} size="small"
+      sx={{ width: { md: 'calc(50% - 0.4rem)' }, marginTop: '0.5rem' }}
+    />
+  ) : menu.type === 'dateTime' ? (
+    <DateTimePicker label={menu.name} defaultValue={dayjs()} size="small"
+      sx={{ width: { md: 'calc(50% - 0.4rem)' }, marginTop: '0.5rem' }} slotProps={{ textField: { size: 'small' } }}
+    />
+  ) : menu.isTextField ? (
+    <TextField
+      size="small"
+      label={menu.name}
+      id="outlined-start-adornment"
+      type={menu.type && menu.type}
+      fullWidth
+      sx={{ width: { md: 'calc(50% - 0.4rem)' }, marginTop: '0.5rem' }}
+      slotProps={ menu.endAdornment && {
+        input: {
+          endAdornment: <InputAdornment position="end">{menu.endAdornment}</InputAdornment>,
+        },
+      }}
+    />
+  ) : (
+    <InputSelect name={menu.name} menu={menu.menus} isMultiple={menu.isMultiple} sx={{ width: { md: 'calc(50% - 0.4rem)' }, marginTop: '0.5rem' }} />
   )
 }

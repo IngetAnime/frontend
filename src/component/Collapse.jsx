@@ -12,12 +12,10 @@ export default function Collapse({ children, collapsedSize=50 }) {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      if (contentRef.current) {
-        const contentHeight = contentRef.current.scrollHeight;
-        setShowButton(contentHeight > collapsedSize);
-      }
-    }, 500);
+    if (contentRef.current) {
+      const contentHeight = contentRef.current.scrollHeight;
+      setShowButton(contentHeight > collapsedSize);
+    }
   }, [children, collapsedSize]);
 
   return (
