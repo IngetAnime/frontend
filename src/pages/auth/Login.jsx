@@ -13,12 +13,12 @@ import { identifier, loginPassword } from "../../validators/index.validator.js";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { login } from "../../services/auth.service.js";
 
-const schema = z.object({
-  identifier: identifier,
-  password: loginPassword
-})
-
 export default function LoginPage() {
+  const schema = z.object({
+    identifier: identifier,
+    password: loginPassword
+  })
+  
   const navigate = useNavigate();
   const { setIsLoggedIn, setUserData } = useContext(AppContext);
   const { register, handleSubmit, setError, clearErrors, formState: { errors, isSubmitting } } = useForm({ 
@@ -38,6 +38,7 @@ export default function LoginPage() {
 
       toast.error(message)
       if (res) 
+        console.log(res.message);
         setError('root', { message: message })
     }
   }

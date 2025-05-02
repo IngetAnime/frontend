@@ -8,58 +8,76 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import getLastPath from "../../helper/getLastPath.js";
 import { Form, TitleAndSubtitle } from "./AuthPage.jsx";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { confirmPassword, email, password, username } from "../../validators/index.validator.js";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { register as registerUser } from "../../services/auth.service.js";
 
 export default function RegisterPage() {
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const schema = z.object({
+    username: username,
+    email: email,
+    password: password,
+    confirmPassword: confirmPassword
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "Password tidak sama",
+    path: ["confirmPassword"],
+  })
 
-  const { setIsLoggedIn, setUserData } = useContext(AppContext)
-  const navigate = useNavigate()
+  const { register, setError, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(schema), mode: 'onChange'
+  })
 
-  function handleSubmit(e) {
-      // underDevelopment(e)
-      e.preventDefault()
-  
-      setUserData({ username: username })
-      setIsLoggedIn(true)
-  
-      toast.success(`Yōkoso ${username}-san`)
-      navigate(getLastPath())
+  async function onSubmit(req) {
+    try {
+      const { data } = await registerUser(req.username, req.email, req.password, req.confirmPassword)
+      toast.success(`Tautan verifikasi telah dikirimkan ke email: ${data.email}`)
+    } catch(err) {
+      const res = err.response;
+      const message = res && res.status === 409 ? 'Username atau email telah digunakan' : 'Terjadi kesalahan';
+      toast.error(message)
+      if (res) 
+        console.log(res.message);
+        setError('root', { message: message })
     }
+  }
 
   return (
     <>
       {/* Title and subtitle */}
-      <TitleAndSubtitle title={'Yōkoso!!!'} subtitle={'Cari tempat nonton anime terbaik? Yuk eksplor disini!'}/>
+      <TitleAndSubtitle title={'Yōkoso!!!'} subtitle={'Cari tempat nonton anime terbaik? Yuk eksplor disini!'} />
 
       {/* Register form */}
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <TextField
           id="username"
           label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          autoComplete="username"
+          {...register('username')}
+          {...(errors.username && { error: true, helperText: errors.username.message })}
+          {...(errors.root && {error: true, helperText: 'Username atau email telah digunakan'})}
         />
         <TextField
           required
           type="email"
           id="email"
           label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          {...register('email')}
+          {...((errors.email) && {error: true, helperText: errors.email.message})}
+          {...(errors.root && {error: true, helperText: 'Username atau email telah digunakan'})}
         />
         <PasswordField 
           required
-          password={password} 
-          setPassword={setPassword}
+          register={register('password')}
+          error={errors.password}
         />
         <PasswordField 
           required
-          password={confirmPassword} 
-          setPassword={setConfirmPassword}
           label="Konfirmasi password"
+          register={register('confirmPassword')}
+          error={errors.confirmPassword}
         />
         <Button variant="contained" color="primary" endIcon={<Login />} type="submit" size="large">Daftar</Button>
         <Typography textAlign={'center'}>

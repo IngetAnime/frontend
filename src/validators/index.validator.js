@@ -1,18 +1,23 @@
 import { z } from "zod";
 
 // Authentication
-export const email = z.string().email().nonempty()
+export const email = z.string().email('Email tidak valid').nonempty('Tidak boleh kosong')
 export const loginPassword = z
   .string()
   .min(8, "Minimal 8 karakter")
   .max(64, "Maksimal 64 karakter")
-export const confirmPassword = z.string().min(8, "Password must be at least 8 characters long")
+export const password = loginPassword
+  .regex(/[A-Z]/, "Minimal satu huruf besar [A-Z]")
+  .regex(/[a-z]/, "Minimal satu huruf kecil [a-z]")
+  .regex(/[0-9]/, "Minimal satu angka [0-9]")
+  .regex(/[@$!%*?&]/, "Minimal satu karakter spesial [@$!%*?&]")
+export const confirmPassword = z.string().min(8, "Minimal 8 karakter")
 export const username = z
   .string()
-  .min(3, "Username must be at least 3 characters long")
-  .max(20, "Username must not exceed 20 characters")
+  .min(3, "Minimal 3 karakter")
+  .max(20, "Maksimal 20 karakter")
   .regex(/^(?!_)(?!.*__)[a-zA-Z0-9_]+(?<!_)$/, 
-    "Username can only contain letters, numbers, and underscores, but cannot start or end with an underscore"
+    "Username hanya terdiri dari huruf, angka, dan garis bawah, tetapi tidak dapat dimulai atau diakhiri dengan garis bawah"
   )
 export const identifier = z
   .string()

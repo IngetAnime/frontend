@@ -3,9 +3,9 @@ import { AppContext } from "./AppContext.jsx";
 import { isAuthenticated, isAdmin as checkPermission } from "../services/auth.service.js";
 
 export const AppContextProvider = (props) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [userData, setUserData] = useState({});
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(null);
 
   const value = {
     isLoggedIn, setIsLoggedIn,
