@@ -38,3 +38,17 @@ export const verifyEmail = async (token) => {
   })
   return data;
 }
+
+export const forgotPassword = async (identifier) => {
+  const data = await axios.post('/api/v1/auth/forgot-password', { identifier })
+  return data;
+}
+
+export const resetPassword = async (token, newPassword, confirmPassword) => {
+  const data = await axios.post('/api/v1/auth/reset-password', { newPassword, confirmPassword }, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  return data;
+}
