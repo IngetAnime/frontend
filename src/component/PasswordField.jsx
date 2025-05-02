@@ -6,8 +6,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { FormHelperText } from '@mui/material';
 
-export default function PasswordField({ password, setPassword, label="Password" }) { 
+export default function PasswordField({ register, error, rootError, isSubmitting, label="Password" }) { 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -19,7 +20,7 @@ export default function PasswordField({ password, setPassword, label="Password" 
   };
 
   return (
-    <FormControl fullWidth variant="outlined">
+    <FormControl fullWidth variant="outlined" error={Boolean(error || rootError)} disabled={isSubmitting} >
       <InputLabel htmlFor={"outlined-adornment-password" + label}>{label}</InputLabel>
       <OutlinedInput
         required
@@ -41,9 +42,11 @@ export default function PasswordField({ password, setPassword, label="Password" 
           </InputAdornment>
         }
         label={label}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        autoComplete={ label === "Password" ? 'current-password' : 'new-password'}
+        {...register}
       />
+      {error && <FormHelperText>{error.message}</FormHelperText>}
+      {rootError && <FormHelperText>Password tidak cocok</FormHelperText>}
     </FormControl>
   )
 }

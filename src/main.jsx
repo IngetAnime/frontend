@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { AppContextProvider } from './context/AppContext.jsx'
+import { AppContextProvider } from './context/AppContextProvider.jsx'
 import { createTheme, ThemeProvider } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'

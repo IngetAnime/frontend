@@ -1,14 +1,10 @@
 import { 
   Box, Avatar, Typography, IconButton, Menu, MenuItem, Divider, ListItemIcon, AppBar, Toolbar,
   useScrollTrigger, Slide, List, ListItem, ListItemButton, ListItemText, Tooltip, SwipeableDrawer,
-  Button,
-  Tabs,
-  Tab
+  Tabs, Tab
 } from "@mui/material";
 import { 
-  Logout, Settings, Login, Menu as MenuIcon, DateRange, Explore, AccountCircle,
-  PlaylistAdd,
-  LibraryBooks,
+  Logout, Settings, Login, Menu as MenuIcon, DateRange, Explore, AccountCircle, LibraryBooks,
 } from "@mui/icons-material";
 import Link from "./Link";
 import { useState, useContext } from "react";
@@ -19,9 +15,11 @@ import ButtonLink from "./ButtonLink";
 import Logo from "./Logo";
 import AnimeSearch from "./Search";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { logout } from "../services/auth.service";
 
 export default function Header() {
-  const { isLoggedIn } = useContext(AppContext);
+  const { isLoggedIn, userData, setIsLoggedIn, setUserData, setIsAdmin } = useContext(AppContext);
   const navigate = useNavigate()
   const menuItem = [
     {
@@ -50,6 +48,19 @@ export default function Header() {
     }
   ]
 
+  async function handleLogout() {
+    try {
+      await logout();
+      toast.success(`Matane, ${userData.username}-san!`)
+      setIsAdmin(false)
+      setIsLoggedIn(false)
+      setUserData(null)
+    } catch(err) {
+      console.log(err.message);
+      toast.error('Terjadi kesalahan')
+    }
+  }
+
   const profileMenu = [
     {
       text: 'Pengaturan',
@@ -59,9 +70,13 @@ export default function Header() {
     {
       text: 'Keluar',
       icon: <Logout />,
-      onClick: underDevelopment,
+      onClick: handleLogout,
     },
   ]
+
+  const avatarProps = userData
+  ? { src: userData.picture, alt: userData.username }
+  : {};
 
   return (
     <>
@@ -69,11 +84,11 @@ export default function Header() {
         <AppBar> {/* Make nav static */}
           <Toolbar className="flex justify-between gap-5"> {/* Basic styling for nav */}
             <Box className="flex gap-5 w-full">
-              <MobileMenu menuItem={menuItem} profileMenu={profileMenu} />
+              <MobileMenu menuItem={menuItem} profileMenu={profileMenu} isLoggedIn={isLoggedIn} avatarProps={avatarProps} />
               <Logo color="white" className="hidden md:flex"/>
               <AnimeSearch />
             </Box>
-            <DekstopMenu menuItem={menuItem} profileMenu={profileMenu} isLoggedIn={isLoggedIn} />
+            <DekstopMenu menuItem={menuItem} profileMenu={profileMenu} isLoggedIn={isLoggedIn} avatarProps={avatarProps} />
           </Toolbar>
         </AppBar>
       </HideOnScroll>
@@ -96,7 +111,7 @@ HideOnScroll.propTypes = {
   children: PropTypes.element,
 };
 
-function DekstopMenu({ menuItem, profileMenu, isLoggedIn=true }) {
+function DekstopMenu({ menuItem, profileMenu, isLoggedIn=true, avatarProps }) {
   const [anchorEl, setAnchorEl] = useState(null)
 
   function handleOpenMenu(event) {
@@ -112,6 +127,83 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=true }) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const profile = (
+    <Box className={`flex`}>
+      <Tooltip title="Buka pengaturan">
+        <IconButton size="medium" onClick={handleOpenMenu} color="inherit">
+          <Avatar {...avatarProps} sx={{ width: 35, height: 35 }} />
+        </IconButton>
+      </Tooltip>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseMenu}
+        slotProps={{
+          paper: {
+            elevation: 0,
+            sx: {
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.25))',
+              mt: 1.5,
+              '& .MuiAvatar-root': { // Image profile style
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+              '&::before': { // Arrow up style
+                content: '""',
+                display: 'block',
+                position: 'absolute',
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
+                zIndex: 0,
+              },
+            },
+          },
+        }}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <MenuItem>
+          <Avatar {...avatarProps} /> {avatarProps?.alt}
+        </MenuItem>
+        <Divider />
+        {profileMenu.map((menu, index) => (
+          <MenuItem key={index} onClick={() => { menu.onClick(); handleCloseMenu(); }}>
+            <ListItemIcon>
+              {menu.icon}
+            </ListItemIcon>
+            {menu.text}
+          </MenuItem>
+        ))}
+      </Menu>
+    </Box>
+  )
+
+  const login = (
+    <ButtonLink variant="contained" 
+      endIcon={<Login />} 
+      sx={{ 
+        display: 'flex',
+        my: 1,
+        backgroundColor: 'white',
+        color: 'primary.main',
+        '&:hover': {
+          backgroundColor: '#f0f0f0',
+        },
+      }}
+      to={'/auth/login'} 
+    >
+      <Box>Masuk</Box>
+    </ButtonLink>
+  )
 
   return (
     <Box className="hidden md:flex gap-7.5">
@@ -143,86 +235,14 @@ function DekstopMenu({ menuItem, profileMenu, isLoggedIn=true }) {
         ))}
       </Tabs>
 
-      {/* Profile */}
-      <Box className={`${isLoggedIn ? 'flex' : 'hidden'}`}>
-        <Tooltip title="Buka pengaturan">
-          <IconButton size="medium" onClick={handleOpenMenu} color="inherit">
-            <Avatar src="/images/logo.jpg" sx={{ width: 35, height: 35 }} />
-          </IconButton>
-        </Tooltip>
-
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleCloseMenu}
-          slotProps={{
-            paper: {
-              elevation: 0,
-              sx: {
-                overflow: 'visible',
-                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.25))',
-                mt: 1.5,
-                '& .MuiAvatar-root': { // Image profile style
-                  width: 32,
-                  height: 32,
-                  ml: -0.5,
-                  mr: 1,
-                },
-                '&::before': { // Arrow up style
-                  content: '""',
-                  display: 'block',
-                  position: 'absolute',
-                  top: 0,
-                  right: 14,
-                  width: 10,
-                  height: 10,
-                  bgcolor: 'background.paper',
-                  transform: 'translateY(-50%) rotate(45deg)',
-                  zIndex: 0,
-                },
-              },
-            },
-          }}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        >
-          <MenuItem>
-            <Avatar src="/images/logo.jpg" /> asdcode123
-          </MenuItem>
-          <Divider />
-          {profileMenu.map((menu, index) => (
-            <MenuItem key={index} onClick={() => { menu.onClick(); handleCloseMenu() }}>
-              <ListItemIcon>
-                {menu.icon}
-              </ListItemIcon>
-              {menu.text}
-            </MenuItem>
-          ))}
-        </Menu>
-      </Box>
-
-      {/* Login button */}
-      <ButtonLink variant="contained" 
-        endIcon={<Login />} 
-        sx={{ 
-          display: isLoggedIn ? 'none' : 'flex',
-          my: 1,
-          backgroundColor: 'white',
-          color: 'primary.main',
-          '&:hover': {
-            backgroundColor: '#f0f0f0',
-          },
-        }}
-        to={'/auth/login'} 
-      >
-        <Box>Masuk</Box>
-      </ButtonLink>
+      {isLoggedIn ? profile : login}
     </Box>
   )
 }
 
-function MobileMenu({ menuItem, profileMenu }) {
+function MobileMenu({ menuItem, profileMenu, isLoggedIn=true, avatarProps }) {
   const [isOpen, setisOpen] = useState(null)
+  const navigate = useNavigate()
 
   function toogleDrawer(open) {
     setisOpen(open)
@@ -249,19 +269,21 @@ function MobileMenu({ menuItem, profileMenu }) {
     return (
       <>
         <Box className="h-35 w-70 relative">
-          <img src="/images/bg.jpg" alt="" className="w-full h-full object-cover"/>
+          {avatarProps.src && (
+            <img {...avatarProps} className="w-full h-full object-cover"/>
+          )}
           <Box 
             className="absolute w-fit px-4 py-2 bottom-0 text-white rounded-tr-md flex gap-3" 
             sx={{ bgcolor: 'primary.main' }}>
             <AccountCircle />
-            <Typography>asdcode123</Typography>
+            <Typography>{avatarProps.alt}</Typography>
           </Box>
         </Box>
 
         <List disablePadding>
           {profileMenu.map((menu, index) => (
             <ListItem key={index} disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={() => { menu.onClick(); toogleDrawer(false); }}>
                 <ListItemIcon>
                   {menu.icon}
                 </ListItemIcon>
@@ -271,6 +293,21 @@ function MobileMenu({ menuItem, profileMenu }) {
           ))}
         </List>
       </>
+    )
+  }
+
+  function LoginMenu() {
+    return (
+      <List disablePadding>
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => navigate('/auth/login')}>
+            <ListItemIcon>
+              <Login />
+            </ListItemIcon>
+            <ListItemText primary={'Masuk'} />
+          </ListItemButton>
+        </ListItem>
+      </List>
     )
   }
 
@@ -286,7 +323,7 @@ function MobileMenu({ menuItem, profileMenu }) {
         <Box className="p-2.5" sx={{ textTransform: 'none' }} onClick={() => toogleDrawer(false)}>
           <Logo />
         </Box>
-        <ProfileMenu />
+        { isLoggedIn ? <ProfileMenu /> : <LoginMenu />}
         <Divider />
         <NavMenu />
       </SwipeableDrawer>
