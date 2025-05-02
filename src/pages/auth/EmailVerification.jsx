@@ -1,26 +1,29 @@
 import { Typography, Button, CircularProgress } from '@mui/material';
 import { Send } from '@mui/icons-material';
 import { Form, TitleAndSubtitle } from './AuthPage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { resendVerification, verifyEmail } from '../../services/auth.service';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useRequireLogin } from '../../hooks/useRequireLogin';
 import { useResendCountdown } from '../../hooks/useResendCountdown';
 
 export default function EmailVerificationPage() {
   const navigate = useNavigate();
+  const [ searchParam ] = useSearchParams();
   const { isLoggedIn } = useRequireLogin();
   const { seconds, canResend, start } = useResendCountdown(60)
 
+  const [hasExchanged, setHasExchanged] = useState(false);
   useEffect(() => {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString)
-    const token = urlParams.get('token')
+    const token = searchParam.get('token')
+
+    if (hasExchanged) return;
 
     const verifyEmailUser = async () => {
       try {
+        setHasExchanged(true)
         await verifyEmail(token)
         toast.success(`Email berhasil di verifikasi`)
         navigate('/')
@@ -30,8 +33,9 @@ export default function EmailVerificationPage() {
         toast.error(message)
       }
     }
+    
     if (token) verifyEmailUser();
-  }, [navigate])
+  }, [navigate, hasExchanged, searchParam])
 
   const { handleSubmit, formState: { isSubmitting } } = useForm()
 

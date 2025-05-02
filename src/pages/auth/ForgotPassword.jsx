@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
 
   const { seconds, canResend, start } = useResendCountdown()
 
-  const { register, handleSubmit, setError, formState: { errors } } = useForm({
+  const { register, handleSubmit, setError, clearErrors, formState: { errors } } = useForm({
     resolver: zodResolver(schema), mode: 'onChange'
   })
 
@@ -29,8 +29,7 @@ export default function ForgotPasswordPage() {
       const res = err.response;
       const message = res && res.status === 404 ? 'Username atau email tidak ditemukan' : 'Terjadi kesalahan';
       toast.error(message)
-      if (res) {
-        console.log(res.message);
+      if (res.status === 404) {
         setError('root', { message: message })
       }
     }
@@ -46,7 +45,7 @@ export default function ForgotPasswordPage() {
         <TextField
           id="identifier"
           label="Username atau email"
-          {...register('identifier')}
+          {...register('identifier', { onChange: () => clearErrors('root') })}
           {...errors.identifier && { error: true, helperText: errors.identifier.message }}
           {...errors.root && { error: true, helperText: errors.root.message }}
         />

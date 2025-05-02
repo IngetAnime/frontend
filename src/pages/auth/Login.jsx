@@ -1,10 +1,7 @@
-import { useContext } from "react";
 import { Typography, TextField, Button } from "@mui/material";
 import { Login } from '@mui/icons-material';
-import { useNavigate } from "react-router-dom";
 import PasswordField from "../../component/PasswordField";
 import Link from "../../component/Link";
-import { AppContext } from "../../context/AppContext.jsx";
 import { toast } from "react-toastify";
 import { Form, TitleAndSubtitle } from "./AuthPage.jsx";
 import { useForm } from 'react-hook-form';
@@ -12,6 +9,7 @@ import { z } from "zod";
 import { identifier, loginPassword } from "../../validators/index.validator.js";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { login } from "../../services/auth.service.js";
+import useLogin from "../../hooks/useLogin.js";
 
 export default function LoginPage() {
   const schema = z.object({
@@ -19,8 +17,7 @@ export default function LoginPage() {
     password: loginPassword
   })
   
-  const navigate = useNavigate();
-  const { setIsLoggedIn, setUserData } = useContext(AppContext);
+  const loginUser = useLogin()
   const { register, handleSubmit, setError, clearErrors, formState: { errors, isSubmitting } } = useForm({ 
     resolver: zodResolver(schema), mode: 'onChange'
   })
@@ -28,17 +25,12 @@ export default function LoginPage() {
   async function onSubmit(req) {
     try {
       const { data } = await login(req.identifier, req.password)
-      setIsLoggedIn(true)
-      setUserData(data)
-      navigate('/')
-      toast.success(`Okaerinasai, ${data.username}-san!`)
+      loginUser(data)
     } catch(err) {
       const res = err.response;
       const message = res && res.status === 400 ? 'Username, email, atau password yang dimasukkan salah' : 'Terjadi kesalahan';
-
       toast.error(message)
-      if (res) 
-        console.log(res.message);
+      if (res.status === 400) 
         setError('root', { message: message })
     }
   }

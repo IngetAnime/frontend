@@ -9,6 +9,7 @@ import { z } from "zod";
 import { confirmPassword, email, password, username } from "../../validators/index.validator.js";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { register as registerUser } from "../../services/auth.service.js";
+import useLogin from "../../hooks/useLogin.js";
 
 export default function RegisterPage() {
   const schema = z.object({
@@ -21,20 +22,22 @@ export default function RegisterPage() {
     path: ["confirmPassword"],
   })
 
-  const { register, setError, handleSubmit, formState: { errors } } = useForm({
+  const { register, setError, clearErrors, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema), mode: 'onChange'
   })
+
+  const login = useLogin()
 
   async function onSubmit(req) {
     try {
       const { data } = await registerUser(req.username, req.email, req.password, req.confirmPassword)
       toast.success(`Tautan verifikasi telah dikirimkan ke email: ${data.email}`)
+      login(data)
     } catch(err) {
       const res = err.response;
       const message = res && res.status === 409 ? 'Username atau email telah digunakan' : 'Terjadi kesalahan';
       toast.error(message)
-      if (res) 
-        console.log(res.message);
+      if (res.status === 409) 
         setError('root', { message: message })
     }
   }
@@ -50,7 +53,7 @@ export default function RegisterPage() {
           id="username"
           label="Username"
           autoComplete="username"
-          {...register('username')}
+          {...register('username', { onChange: () => clearErrors('root') })}
           {...(errors.username && { error: true, helperText: errors.username.message })}
           {...(errors.root && {error: true, helperText: 'Username atau email telah digunakan'})}
         />
@@ -60,7 +63,7 @@ export default function RegisterPage() {
           id="email"
           label="Email"
           autoComplete="email"
-          {...register('email')}
+          {...register('email', { onChange: () => clearErrors('root') })}
           {...((errors.email) && {error: true, helperText: errors.email.message})}
           {...(errors.root && {error: true, helperText: 'Username atau email telah digunakan'})}
         />

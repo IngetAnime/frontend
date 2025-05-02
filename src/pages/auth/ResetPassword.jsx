@@ -1,17 +1,14 @@
 import { Button } from "@mui/material"
-import { useContext } from "react"
-// import underDevelopment from "../../helper/underDevelopment"
 import PasswordField from "../../component/PasswordField"
 import { Key } from "@mui/icons-material"
 import { toast } from "react-toastify"
-import { useNavigate } from "react-router-dom"
-import { AppContext } from "../../context/AppContext.jsx"
 import { Form, TitleAndSubtitle } from "./AuthPage.jsx"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from 'zod'
 import { confirmPassword, password } from "../../validators/index.validator.js"
 import { resetPassword } from "../../services/auth.service.js"
+import useLogin from "../../hooks/useLogin.js"
 
 export default function ResetPasswordPage() {
   const schema = z.object({
@@ -22,8 +19,7 @@ export default function ResetPasswordPage() {
     path: ["confirmPassword"],
   })
 
-  const navigate = useNavigate()
-  const { setIsLoggedIn, setUserData } = useContext(AppContext)
+  const login = useLogin();
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString)
   const token = urlParams.get('token')
@@ -35,17 +31,13 @@ export default function ResetPasswordPage() {
   const onSubmit = async (req) => {
     try {
       const { data } = await resetPassword(token, req.newPassword, req.confirmPassword)
-      setIsLoggedIn(true)
-      setUserData(data)
-      navigate('/')
       toast.success('Password berhasil diperbarui')
-      toast.success(`Okaerinasai, ${data.username}-san!`)
+      login(data)
     } catch(err) {
       const res = err.response;
       const message = res && res.status === 400 ? 'Token tidak valid atau sudah kedaluwarsa' : 'Terjadi kesalahan';
       toast.error(message)
-      if (res) 
-        console.log(res.message);
+      if (res.status === 400) 
         setError('root', { message: message })
     }
   }

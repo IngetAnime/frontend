@@ -52,3 +52,23 @@ export const resetPassword = async (token, newPassword, confirmPassword) => {
   })
   return data;
 }
+
+export const loginWithGoogle = async (code) => {
+  const data = await axios.post('/api/v1/auth/google', { code })
+  return data;
+}
+
+export const loginWithMal = async (code) => {
+  const data = await axios.post('/api/v1/auth/mal', { code })
+  return data;
+}
+
+export const getGoogleAuthUrl = async () => {
+  const data = await axios.get('/api/v1/auth/google')
+  return data;
+}
+
+export const getMALAuthUrl = async () => {
+  const data = await axios.get('/api/v1/auth/mal')
+  return data;
+}

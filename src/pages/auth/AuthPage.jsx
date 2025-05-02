@@ -5,8 +5,9 @@ import {
 import { Outlet } from "react-router-dom";
 import ButtonLink from "../../component/ButtonLink.jsx"
 import Logo from "../../component/Logo.jsx";
-import underDevelopment from "../../helper/underDevelopment.js";
 import Wrapper from "../../component/Wrapper.jsx";
+import { toast } from "react-toastify";
+import { getGoogleAuthUrl, getMALAuthUrl } from "../../services/auth.service.js";
 
 export default function AuthPage() {
   return (
@@ -47,7 +48,15 @@ function LoginPlatform() {
         fullWidth sx={{ textTransform: 'none' }}
         variant="contained" color="default" 
         startIcon={<img src="/images/google.png" alt="MAL" style={{ height: 15 }}/>}
-        onClick={underDevelopment}
+        onClick={async () => {
+          try {
+            const { data } = await getGoogleAuthUrl()
+            window.location.href = data.authorizationUrl
+          } catch(err) {
+            console.log(err.message);
+            toast.error('Terjadi kesalahan')
+          }
+        }}
       >
         Google
       </ButtonLink>
@@ -55,7 +64,15 @@ function LoginPlatform() {
         fullWidth sx={{ textTransform: 'none', background: '#2E51A2' }} 
         variant="contained" color="primary" 
         startIcon={<img src="/images/mal.png" alt="MAL" style={{ height: 25 }}/>}
-        onClick={underDevelopment}      
+        onClick={async () => {
+          try {
+            const { data } = await getMALAuthUrl()
+            window.location.href = data.authorizationUrl
+          } catch(err) {
+            console.log(err.message);
+            toast.error('Terjadi kesalahan')
+          }
+        }}  
       >
         MyAnimeList
       </ButtonLink>

@@ -13,6 +13,8 @@ import AnimePage from './pages/anime/AnimePage';
 import Timeline from './pages/anime/Timeline';
 import Explore from './pages/anime/Explore';
 import List from './pages/anime/List';
+import GoogleCallback from './pages/auth/GoogleCallback';
+import MyAnimeListCallback from './pages/auth/MyAnimeListCallback';
 
 const router = createBrowserRouter([
   {
@@ -71,6 +73,14 @@ const router = createBrowserRouter([
       {
         path: 'reset-password',
         element: <ResetPasswordPage />
+      },
+      {
+        path: 'google/callback',
+        element: <GoogleCallback />
+      },
+      {
+        path: 'mal/callback',
+        element: <MyAnimeListCallback />
       },
     ]
   },
