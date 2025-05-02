@@ -1,12 +1,8 @@
-import { useContext, useState } from "react";
-import { Typography, Box, TextField, Button } from "@mui/material";
+import { Typography, TextField, Button } from "@mui/material";
 import { Login } from '@mui/icons-material';
 import PasswordField from "../../component/PasswordField";
 import Link from "../../component/Link";
-import { AppContext } from "../../context/AppContext.jsx";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import getLastPath from "../../helper/getLastPath.js";
 import { Form, TitleAndSubtitle } from "./AuthPage.jsx";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

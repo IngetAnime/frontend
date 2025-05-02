@@ -1,17 +1,18 @@
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
-import { ArrowBack, Send } from '@mui/icons-material';
-import ButtonLink from '../../component/ButtonLink';
+import { Typography, Button, CircularProgress } from '@mui/material';
+import { Send } from '@mui/icons-material';
 import { Form, TitleAndSubtitle } from './AuthPage';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { resendVerification, verifyEmail } from '../../services/auth.service';
 import { toast } from 'react-toastify';
-import { AppContext } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useRequireLogin } from '../../hooks/useRequireLogin';
+import { useResendCountdown } from '../../hooks/useResendCountdown';
 
 export default function EmailVerificationPage() {
-  // Handle email verification
   const navigate = useNavigate();
+  const { isLoggedIn } = useRequireLogin();
+  const { seconds, canResend, start } = useResendCountdown(60)
 
   useEffect(() => {
     const queryString = window.location.search;
@@ -20,59 +21,17 @@ export default function EmailVerificationPage() {
 
     const verifyEmailUser = async () => {
       try {
-        console.log(token);
         await verifyEmail(token)
         toast.success(`Email berhasil di verifikasi`)
         navigate('/')
       } catch(err) {
         const res = err.response;
-        if (res) {
-          console.log(res);
-        }
         const message = res && res.status === 400 ? 'Token tidak valid atau sudah kedaluwarsa' : 'Terjadi kesalahan';
         toast.error(message)
       }
     }
-    if (token) {
-      verifyEmailUser()
-    }
+    if (token) verifyEmailUser();
   }, [navigate])
-
-  // Handle countdown for request resend link
-
-  const [seconds, setSeconds] = useState(0);
-  const [canResend, setCanResend] = useState(true);
-
-  const expiryTime = 60;
-
-  useEffect(() => {
-    const expireAt = parseInt(localStorage.getItem('resendExpireAt')) || 0;
-    const now = Date.now();
-    const remaining = Math.ceil((expireAt - now) / 1000);
-
-    if (remaining > 0) {
-      setSeconds(remaining);
-      setCanResend(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let timer;
-    if (!canResend && seconds > 0) {
-      timer = setTimeout(() => {
-        setSeconds(prev => {
-          const next = prev - 1;
-          if (next <= 0) {
-            setCanResend(true);
-            localStorage.removeItem('resendExpireAt');
-          }
-          return next;
-        });
-      }, 1000);
-    }
-
-    return () => clearTimeout(timer);
-  }, [seconds, canResend]);
 
   const { handleSubmit, formState: { isSubmitting } } = useForm()
 
@@ -81,26 +40,13 @@ export default function EmailVerificationPage() {
     try {
       const { data } = await resendVerification();
       toast.success(`Tautan verifikasi telah dikirimkan ke email: ${data.email}`);
-      const expireAt = Date.now() + expiryTime * 1000;
-      localStorage.setItem('resendExpireAt', String(expireAt));
-      setSeconds(expiryTime);
-      setCanResend(false);
+      start()
     } catch(err) {
       const res = err.response;
       const message = res && res.status === 404 ? 'Token tidak valid, silakan login ulang' : 'Terjadi kesalahan';
       toast.error(message)
     }
-  };
-
-  // This site need user logged in
-
-  const { isLoggedIn } = useContext(AppContext);
-
-  useEffect(() => {
-    if (isLoggedIn === false) {
-      navigate('/auth/login');
-    }
-  }, [isLoggedIn, navigate]);
+  };  
 
   return (
     <>
