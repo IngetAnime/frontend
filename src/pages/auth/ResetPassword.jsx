@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { confirmPassword, password } from "../../validators/index.validator.js"
 import { resetPassword } from "../../services/auth.service.js"
 import useLogin from "../../hooks/useLogin.js"
+import { useSearchParams } from "react-router-dom"
 
 export default function ResetPasswordPage() {
   const schema = z.object({
@@ -20,25 +21,22 @@ export default function ResetPasswordPage() {
   })
 
   const login = useLogin();
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString)
-  const token = urlParams.get('token')
-
+  const [ searchParam ] = useSearchParams()
   const { register, handleSubmit, setError, formState: { errors } } = useForm({
     resolver: zodResolver(schema), mode: 'onChange'
   })
 
   const onSubmit = async (req) => {
-    try {
-      const { data } = await resetPassword(token, req.newPassword, req.confirmPassword)
-      toast.success('Password berhasil diperbarui')
+    const token = searchParam.get('token')
+    const { success, data, status, message } = await resetPassword(token, req.newPassword, req.confirmPassword)
+    if (success) {
+      toast.success(message);
       login(data)
-    } catch(err) {
-      const res = err.response;
-      const message = res && res.status === 400 ? 'Token tidak valid atau sudah kedaluwarsa' : 'Terjadi kesalahan';
-      toast.error(message)
-      if (res.status === 400) 
-        setError('root', { message: message })
+    } else {
+      toast.error(message);
+      if (status === 400) {
+        setError('root', { message: message });
+      }
     }
   }
   

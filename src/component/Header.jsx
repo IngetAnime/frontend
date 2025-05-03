@@ -15,12 +15,12 @@ import ButtonLink from "./ButtonLink";
 import Logo from "./Logo";
 import AnimeSearch from "./Search";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { logout } from "../services/auth.service";
+import useLogout from "../hooks/useLogout.js";
 
 export default function Header() {
-  const { isLoggedIn, userData, setIsLoggedIn, setUserData, setIsAdmin } = useContext(AppContext);
+  const { isLoggedIn, userData } = useContext(AppContext);
   const navigate = useNavigate()
+  const logoutUser = useLogout()
   const menuItem = [
     {
       text: 'Timeline',
@@ -48,19 +48,6 @@ export default function Header() {
     }
   ]
 
-  async function handleLogout() {
-    try {
-      await logout();
-      toast.success(`Matane, ${userData.username}-san!`)
-      setIsAdmin(false)
-      setIsLoggedIn(false)
-      setUserData(null)
-    } catch(err) {
-      console.log(err.message);
-      toast.error('Terjadi kesalahan')
-    }
-  }
-
   const profileMenu = [
     {
       text: 'Pengaturan',
@@ -70,7 +57,7 @@ export default function Header() {
     {
       text: 'Keluar',
       icon: <Logout />,
-      onClick: handleLogout,
+      onClick: logoutUser,
     },
   ]
 

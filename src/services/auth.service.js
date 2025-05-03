@@ -1,13 +1,43 @@
 import axios from "./axiosConfig.js";
 
 export const login = async (identifier, password) => {
-  const data = await axios.post('/api/v1/auth/login', { identifier, password });
-  return data;
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/login', { identifier, password });
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = 'Login berhasil';
+  } catch(err) {
+    if (err.response && err.response.status === 400) {
+      status = err.response.status;
+      success = false;
+      message = 'Username, email, atau password yang dimasukkan salah'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+
+  return { success, data, status, message };
 }
 
 export const logout = async () => {
-  const data = await axios.post('/api/v1/auth/logout');
-  return data;
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/logout');
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = 'Logout berhasil';
+  } catch(err) {
+    status = err.status;
+    success = false;
+    message = 'Terjadi kesalahan'
+  }
+
+  return { success, data, status, message };
 }
 
 export const isAuthenticated = async () => {
@@ -21,46 +51,172 @@ export const isAdmin = async () => {
 }
 
 export const register = async (username, email, password, confirmPassword) => {
-  const data = await axios.post('/api/v1/auth/register', { username, email, password, confirmPassword })
-  return data;
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/register', { username, email, password, confirmPassword })
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Tautan verifikasi telah dikirim ke email Anda`;
+  } catch(err) {
+    if (err.response && err.response.status === 409) {
+      status = err.response.status;
+      success = false;
+      message = 'Username atau email telah digunakan'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+
+  return { success, data, status, message };
 }
 
 export const resendVerification = async () => {
-  const data = await axios.post('/api/v1/auth/resend-verification');
-  return data;
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/resend-verification');
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Tautan verifikasi telah dikirim ulang ke email Anda`;
+  } catch(err) {
+    if (err.response && err.response.status === 404) {
+      status = err.response.status;
+      success = false;
+      message = 'Akun tidak valid, silakan login ulang'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+
+  return { success, data, status, message };
 }
 
 export const verifyEmail = async (token) => {
-  const data = await axios.post('/api/v1/auth/verify-email', {}, {
-    headers: {
-      Authorization: `Bearer ${token}`
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/verify-email', {}, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Email berhasil di verifikasi`;
+  } catch(err) {
+    if (err.response && err.response.status === 400) {
+      status = err.response.status;
+      success = false;
+      message = 'Token tidak valid atau sudah kedaluwarsa'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
     }
-  })
-  return data;
+  }
+
+  return { success, data, status, message };
 }
 
 export const forgotPassword = async (identifier) => {
-  const data = await axios.post('/api/v1/auth/forgot-password', { identifier })
-  return data;
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/forgot-password', { identifier })
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Tautan reset password telah dikirim ke email Anda`;
+  } catch(err) {
+    if (err.response && err.response.status === 404) {
+      status = err.response.status;
+      success = false;
+      message = 'Username atau email tidak ditemukan'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+
+  return { success, data, status, message };
 }
 
 export const resetPassword = async (token, newPassword, confirmPassword) => {
-  const data = await axios.post('/api/v1/auth/reset-password', { newPassword, confirmPassword }, {
-    headers: {
-      Authorization: `Bearer ${token}`
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/reset-password', { newPassword, confirmPassword }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Password berhasil diperbarui`;
+  } catch(err) {
+    if (err.response && err.response.status === 400) {
+      status = err.response.status;
+      success = false;
+      message = 'Token tidak valid atau sudah kedaluwarsa'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
     }
-  })
-  return data;
+  }
+
+  return { success, data, status, message };
 }
 
 export const loginWithGoogle = async (code) => {
-  const data = await axios.post('/api/v1/auth/google', { code })
-  return data;
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/google', { code })
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Login dengan Google berhasil`;
+  } catch(err) {
+    if (err.response && err.response.status === 400) {
+      status = err.response.status;
+      success = false;
+      message = 'Code tidak valid atau sudah kedaluwarsa'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+
+  return { success, data, status, message };
 }
 
 export const loginWithMal = async (code) => {
-  const data = await axios.post('/api/v1/auth/mal', { code })
-  return data;
+  let data, success, message, status;
+  try {
+    const response = await axios.post('/api/v1/auth/mal', { code })
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Login dengan MyAnimeList berhasil`;
+  } catch(err) {
+    if (err.response && err.response.status === 400) {
+      status = err.response.status;
+      success = false;
+      message = 'Code tidak valid atau sudah kedaluwarsa'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+
+  return { success, data, status, message };
 }
 
 export const getGoogleAuthUrl = async () => {

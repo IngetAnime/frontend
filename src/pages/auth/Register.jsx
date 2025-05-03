@@ -29,16 +29,15 @@ export default function RegisterPage() {
   const login = useLogin()
 
   async function onSubmit(req) {
-    try {
-      const { data } = await registerUser(req.username, req.email, req.password, req.confirmPassword)
-      toast.success(`Tautan verifikasi telah dikirimkan ke email: ${data.email}`)
-      login(data)
-    } catch(err) {
-      const res = err.response;
-      const message = res && res.status === 409 ? 'Username atau email telah digunakan' : 'Terjadi kesalahan';
-      toast.error(message)
-      if (res.status === 409) 
-        setError('root', { message: message })
+    const { success, data, status, message } = await registerUser(req.username, req.email, req.password, req.confirmPassword)
+    if (success) {
+      toast.success(message);
+      login(data);
+    } else {
+      toast.error(message);
+      if (status === 409) {
+        setError('root', { message: message });
+      }
     }
   }
 

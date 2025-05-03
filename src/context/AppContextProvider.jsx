@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AppContext } from "./AppContext.jsx";
-import { isAuthenticated, isAdmin as checkPermission } from "../services/auth.service.js";
+import useValidateUser from "../hooks/useValidateUser.js";
 
 export const AppContextProvider = (props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [userData, setUserData] = useState({});
   const [isAdmin, setIsAdmin] = useState(null);
+  const validateUser = useValidateUser()
+  const didRun = useRef(false)
 
   const value = {
     isLoggedIn, setIsLoggedIn,
@@ -13,32 +15,12 @@ export const AppContextProvider = (props) => {
     isAdmin, setIsAdmin
   }
 
-  const validateUser = async () => {
-    try {
-      const { data } = await isAuthenticated();
-      setIsLoggedIn(true)
-      setUserData(data)
-    } catch(err) {
-      console.log(err.message);
-      setIsLoggedIn(false)
-      setUserData({})
-    }
-  }
-
-  const validateAdmin = async () => {
-    try {
-      await checkPermission()
-      setIsAdmin(true)
-    } catch(err) {
-      console.log(err.message);
-      setIsAdmin(false)
-    }
-  }
-
   useEffect(() => {
-    validateUser()
-    validateAdmin()
-  }, [isLoggedIn])
+    if (didRun.current) return;
+    didRun.current = true;
+    
+    validateUser(setIsLoggedIn, setUserData, setIsAdmin)
+  }, [validateUser])
 
   return (
     <AppContext.Provider value={value}>

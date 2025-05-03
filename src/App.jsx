@@ -4,7 +4,6 @@ import AuthPage from './pages/auth/AuthPage';
 import LoginPage from './pages/auth/Login';
 import RegisterPage from './pages/auth/Register';
 import Dashboard from './pages/Dashboard';
-import DashboardAdmin from './pages/DashboardAdmin';
 import ForgotPasswordPage from './pages/auth/ForgotPassword';
 import ResetPasswordPage from './pages/auth/ResetPassword';
 import EmailVerificationPage from './pages/auth/EmailVerification';

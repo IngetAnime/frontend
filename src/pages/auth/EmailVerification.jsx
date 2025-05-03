@@ -1,53 +1,39 @@
 import { Typography, Button, CircularProgress } from '@mui/material';
 import { Send } from '@mui/icons-material';
 import { Form, TitleAndSubtitle } from './AuthPage';
-import { useEffect, useState } from 'react';
-import { resendVerification, verifyEmail } from '../../services/auth.service';
+import { useEffect, useRef } from 'react';
+import { resendVerification } from '../../services/auth.service';
 import { toast } from 'react-toastify';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useRequireLogin } from '../../hooks/useRequireLogin';
 import { useResendCountdown } from '../../hooks/useResendCountdown';
+import useVerifyEmail from '../../hooks/useVerifyEmail';
 
 export default function EmailVerificationPage() {
-  const navigate = useNavigate();
+  const verifyEmailUser = useVerifyEmail()
+  const didRun = useRef(false)
   const [ searchParam ] = useSearchParams();
   const { isLoggedIn } = useRequireLogin();
   const { seconds, canResend, start } = useResendCountdown(60)
 
-  const [hasExchanged, setHasExchanged] = useState(false);
   useEffect(() => {
-    const token = searchParam.get('token')
-
-    if (hasExchanged) return;
-
-    const verifyEmailUser = async () => {
-      try {
-        setHasExchanged(true)
-        await verifyEmail(token)
-        toast.success(`Email berhasil di verifikasi`)
-        navigate('/')
-      } catch(err) {
-        const res = err.response;
-        const message = res && res.status === 400 ? 'Token tidak valid atau sudah kedaluwarsa' : 'Terjadi kesalahan';
-        toast.error(message)
-      }
-    }
+    if (didRun.current) return;
+    didRun.current = true;
     
-    if (token) verifyEmailUser();
-  }, [navigate, hasExchanged, searchParam])
+    const token = searchParam.get('token');
+    if (token) verifyEmailUser(token);
+  }, [searchParam, verifyEmailUser])
 
   const { handleSubmit, formState: { isSubmitting } } = useForm()
 
   const handleResend = async () => {
     if (!canResend) return;
-    try {
-      const { data } = await resendVerification();
-      toast.success(`Tautan verifikasi telah dikirimkan ke email: ${data.email}`);
+    const { success, message } = await resendVerification();
+    if (success) {
+      toast.success(message);
       start()
-    } catch(err) {
-      const res = err.response;
-      const message = res && res.status === 404 ? 'Token tidak valid, silakan login ulang' : 'Terjadi kesalahan';
+    } else {
       toast.error(message)
     }
   };  

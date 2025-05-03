@@ -23,15 +23,14 @@ export default function LoginPage() {
   })
 
   async function onSubmit(req) {
-    try {
-      const { data } = await login(req.identifier, req.password)
+    const { success, data, status, message } = await login(req.identifier, req.password)
+    if (success) {
       loginUser(data)
-    } catch(err) {
-      const res = err.response;
-      const message = res && res.status === 400 ? 'Username, email, atau password yang dimasukkan salah' : 'Terjadi kesalahan';
+    } else {
       toast.error(message)
-      if (res.status === 400) 
+      if (status === 400) {
         setError('root', { message: message })
+      }
     }
   }
 
