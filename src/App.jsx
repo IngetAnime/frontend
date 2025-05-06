@@ -5,7 +5,6 @@ import LoginPage from './pages/auth/Login';
 import RegisterPage from './pages/auth/Register';
 import Dashboard from './pages/Dashboard';
 import ForgotPasswordPage from './pages/auth/ForgotPassword';
-import ResetPasswordPage from './pages/auth/ResetPassword';
 import EmailVerificationPage from './pages/auth/EmailVerification';
 import ErrorPage from './pages/Error';
 import AnimePage from './pages/anime/AnimePage';
@@ -68,10 +67,6 @@ const router = createBrowserRouter([
       {
         path: 'forgot-password',
         element: <ForgotPasswordPage />
-      },
-      {
-        path: 'reset-password',
-        element: <ResetPasswordPage />
       },
       {
         path: 'google/callback',
