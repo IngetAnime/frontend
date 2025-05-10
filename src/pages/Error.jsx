@@ -23,7 +23,7 @@ export default function ErrorPage() {
           >
             Halaman <br /> Tidak Ditemukan
           </Typography>
-          <Typography variant="subtitle1">Gomennasai, kami tidak bisa menemukan halaman yang Anda cari :( </Typography>
+          <Typography variant="subtitle1">{'Gomennasai, kami tidak dapat menemukan halaman yang Anda cari :('} </Typography>
           <ButtonLink variant="contained" startIcon={<ArrowBack />} sx={{ my: 5 }} to={'/'}>Kembali ke halaman utama</ButtonLink>
 
           <div className="top-0 right-0 absolute flex-1 hidden md:block overflow-hidden h-full -z-1">

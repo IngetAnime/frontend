@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from "react"
-import { Box, Button, Dialog, DialogActions, DialogContent, InputAdornment, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, Typography, useMediaQuery, useTheme } from "@mui/material";
 import AnimeButton from "./AnimeButton";
-import { ArrowBack, ArrowForward, Check, Close, CloudDownloadOutlined, Settings } from "@mui/icons-material";
 import AnimeImage from "./AnimeImage";
-import { InputSelect } from "./SortAndFilter";
-import { DatePicker, DateTimePicker } from '@mui/x-date-pickers';
+import InputField from "./InputField";
+import { ArrowBack, ArrowForward, Check, Close, CloudDownloadOutlined, Settings } from "@mui/icons-material";
 import Switch from "./Switch";
 import dayjs from "dayjs";
+import convertAnimeStatus from "../helper/convertAnimeStatus.js";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
+import { booleanB, dateTime, idB, link, num_watched_episodes, oneAccessType, oneAnimeStatus, q } from "../validators/index.validator.js";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getPlatforms } from "../services/explore.service.js";
 
-export default function AnimeSettings({ sx }) {
-
+export default function AnimeSettings({ sx, anime }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -54,9 +58,9 @@ export default function AnimeSettings({ sx }) {
         aria-labelledby="anime-title"
         aria-describedby="anime-description"
       >
-        <DialogContent dividers={true} className="flex flex-wrap flex-col md:flex-row gap-5">
+        <DialogContent dividers={true} className="flex flex-col md:flex-row gap-5">
           <Box className="hidden md:block max-w-50">
-            <AnimeImage isDialog={true} />
+            <AnimeImage isDialog={true} anime={anime} />
           </Box>
           <Box className="flex flex-col gap-5 w-full md:max-w-100 lg:max-w-125">
             <Box textAlign={'center'}>
@@ -67,15 +71,21 @@ export default function AnimeSettings({ sx }) {
                 }}
                 className="overflow-hidden"
               >
-                Slime Taoshite 300-nen, Shiranai Uchi ni Level Max ni Nattemashita: Sono Ni
+                {anime.title}
               </Typography>
-              <Typography fontWeight={'normal'} fontSize={'small'}>On going, 12 eps</Typography>
+              <Typography fontWeight={'normal'} fontSize={'small'}>
+                {anime.status && `${
+                  convertAnimeStatus(anime.status)
+                }`}
+                {(anime.status && anime.num_episodes) ? ', ' : ''}
+                {anime.num_episodes ? `${anime.num_episodes} eps` : ''}
+              </Typography>
             </Box>
             <Box className="flex flex-col gap-5">
               {
                 isPlatform ? 
-                <EditPlatform handleClose={handleClose} handleIsPlatform={handleIsPlatform}/> :
-                <EditAnime handleClose={handleClose} handleIsPlatform={handleIsPlatform}/> 
+                <EditPlatform handleClose={handleClose} handleIsPlatform={handleIsPlatform} platforms={anime.platforms} /> :
+                <EditAnime handleClose={handleClose} handleIsPlatform={handleIsPlatform} anime={anime} /> 
               }
             </Box>
           </Box>
@@ -89,44 +99,63 @@ export default function AnimeSettings({ sx }) {
   )
 }
 
-function EditAnime({ handleClose, handleIsPlatform }) {
+function EditAnime({ handleClose, handleIsPlatform, anime }) {
+  const schema = z.object({
+    picture: link,
+    title: q,
+    titleID: q.nullable(),
+    titleEN: q.nullable(),
+    releaseAt: dateTime.nullable(),
+    episodeTotal: num_watched_episodes,
+    status: oneAnimeStatus,
+  })
+  const { register, control } = useForm({
+    resolver: zodResolver(schema), mode: 'onChange', defaultValues: {
+      picture: anime.picture,
+      title: anime.title,
+      titleID: anime.titleID,
+      titleEN: anime.titleEN,
+      releaseAt: dayjs(anime.releaseAt),
+      episodeTotal: anime.num_episodes,
+    }
+  })
   const menuSelect = [
     {
       name: 'Judul utama (Romaji)',
-      isTextField: true,
+      id: 'title',
+      type: 'textField',
+      register: register('title')
     },
     {
       name: 'Judul Inggris',
-      isTextField: true,
+      id: 'titleEN',
+      type: 'textField',
+      register: register('titleEN')
     },
     {
       name: 'Judul Indonesia',
-      isTextField: true,
+      id: 'titleID',
+      type: 'textField',
+      register: register('titleID')
     },
     {
       name: 'Link gambar',
-      isTextField: true,
+      id: 'picture',
+      type: 'textField',
+      register: register('picture')
     },
     {
       name: 'Tanggal rilis',
-      isTextField: true,
+      id: 'releaseAt',
       type: 'date',
+      register: register('releaseAt')
     },
     {
       name: 'Total episode',
-      isTextField: true,
-      type: 'number',
-      endAdornment: 'Eps'
-    },
-    {
-      name: 'Berjalan',
-      isTextField: true,
-      type: 'dateTime',
-    },
-    {
-      name: 'Tamat',
-      isTextField: true,
-      type: 'dateTime',
+      id: 'episodeTotal',
+      type: 'fieldIcon',
+      endAdornment: 'Eps',
+      register: register('episodeTotal')
     },
   ]
 
@@ -134,7 +163,7 @@ function EditAnime({ handleClose, handleIsPlatform }) {
     <>
     <Box className="flex flex-wrap flex-col md:flex-row justify-between gap-2.5">
       {menuSelect.map((menu, i) => {
-        return <InputField menu={menu} key={i} />
+        return <InputField menu={menu} key={i} control={control} />
       })}
     </Box>
 
@@ -154,56 +183,121 @@ function EditAnime({ handleClose, handleIsPlatform }) {
   )
 }
 
-function EditPlatform({ handleIsPlatform }) {
-  const menus = [
+function EditPlatform({ handleIsPlatform, platforms }) {
+  const schema = z.object({
+    platformId: idB,
+    link: link, 
+    accessType: oneAccessType, 
+    nextEpisodeAiringAt: dateTime, 
+    lastEpisodeAiredAt: dateTime.nullable(), 
+    intervalInDays: idB, 
+    episodeAired: num_watched_episodes, 
+    isMainPlatform: booleanB,
+  })
+  const { register, control, setValue } = useForm({
+    resolver: zodResolver(schema), mode: 'onChange', defaultValues: {
+      platformId: platforms[0]?.platform.id || '',
+      link: platforms[0]?.link || '', 
+      accessType: platforms[0]?.accessType || '', 
+      nextEpisodeAiringAt: platforms[0]?.nextEpisodeAiringAt ? dayjs(platforms[0]?.nextEpisodeAiringAt) : null, 
+      lastEpisodeAiredAt: platforms[0]?.lastEpisodeAiredAt ? dayjs(platforms[0]?.lastEpisodeAiredAt) : null, 
+      intervalInDays: platforms[0]?.intervalInDays || '', 
+      episodeAired: platforms[0]?.episodeAired || '', 
+      isMainPlatform: platforms[0]?.isMainPlatform || '',
+    }
+  })
+
+  const [menus, setMenus] = useState([
+    { text: 'Muse - YouTube' },
+    { text: 'AniOne - YouTube' },
+    { text: 'Bstation' },
+  ])
+  
+  const menuSelect = [
     {
       name: 'Pilih platform',
-      isMultiple: false,
-      menus: [
-        { text: 'Muse - YouTube' },
-        { text: 'AniOne - YouTube' },
-        { text: 'Bstation' },
-        { text: 'Netflix' },
-        { text: 'Catchplay+' },
-        { text: 'Crunchyroll' },
-        { text: 'Platform baru' },
-      ]
+      id: 'platformId',
+      type: 'select',
+      register: register('platformId'),
+      menus: menus
     },
     {
       name: 'Link',
+      id: 'link',
+      type: 'textField',
       isTextField: true,
+      register: register('link')
     },
     {
       name: 'Tipe akses',
-      isMultiple: false,
+      id: 'accessType',
+      type: 'select',
+      register: register('accessType'),
       menus: [
-        { text: 'Gratis' },
-        { text: 'Waktu terbatas' },
-        { text: 'Langganan' },
+        { text: 'Gratis', value: 'free' },
+        { text: 'Waktu terbatas', value: 'limited_time' },
+        { text: 'Langganan', value: 'subscription' },
       ]
     },
     {
       name: 'Episode tayang',
-      isTextField: true,
-      type: 'number',
-      endAdornment: 'Eps'
+      id: 'episodeAired',
+      type: 'fieldIcon',
+      endAdornment: 'Eps',
+      register: register('episodeAired')
     },
     {
       name: 'Episode sebelumnya',
-      isTextField: true,
+      id: 'lastEpisodeAiredAt',
       type: 'dateTime',
+      register: register('lastEpisodeAiredAt')
     },
     {
       name: 'Episode berikutnya',
-      isTextField: true,
+      id: 'nextEpisodeAiringAt',
       type: 'dateTime',
+      register: register('nextEpisodeAiringAt')
     },
   ]
+
+  const platformId = useWatch({
+    control,
+    name: 'platformId',
+    defaultValue: platforms[0]?.platform.id || '',
+  })
+  const platformMap = new Map(
+    platforms.map((platform) => [platform.platform.id, platform])
+  )
+  useEffect(() => {
+    const selectedPlatform = platformMap.get(platformId)
+    setValue('platformId', platformId || null)
+    setValue('link', selectedPlatform?.link || null)
+    setValue('accessType', selectedPlatform?.accessType || '')
+    setValue('nextEpisodeAiringAt', selectedPlatform?.nextEpisodeAiringAt ? dayjs(selectedPlatform.nextEpisodeAiringAt) : null)
+    setValue('lastEpisodeAiredAt', selectedPlatform?.lastEpisodeAiredAt ? dayjs(selectedPlatform.lastEpisodeAiredAt) : null)
+    setValue('intervalInDays', selectedPlatform?.intervalInDays || '')
+    setValue('episodeAired', selectedPlatform?.episodeAired || '')
+    setValue('isMainPlatform', selectedPlatform?.isMainPlatform || '')
+  }, [platformId, setValue, platformMap])
+
+  useEffect(() => {
+    const getPlatformsProvider = async () => {
+      const { data } = await getPlatforms();
+      setMenus(data.map((menu) => {
+        return {
+          text: menu.name,
+          value: menu.id,
+        }
+      }))
+    }
+    getPlatformsProvider()
+  }, [])
+
   return (
     <>
     <Box className="flex flex-wrap flex-col md:flex-row justify-between gap-2.5">
-      {menus.map((menu, i) => {
-        return <InputField menu={menu} key={i} />
+      {menuSelect.map((menu, i) => {
+        return <InputField menu={menu} key={i} control={control} />
       })}
     </Box>
 
@@ -214,37 +308,15 @@ function EditPlatform({ handleIsPlatform }) {
         Pengaturan anime
       </Button>
       <Box className="pr-5 md:pr-2">
-        <Switch text={'Jadikan sebagai platform utama'} labelPlacement="start"/>
+        <Controller 
+          name="isMainPlatform"
+          control={control}
+          render={({ field }) => (
+            <Switch text={'Jadikan sebagai platform utama'} labelPlacement="start" field={field} />
+          )}
+        />
       </Box>
     </Box>
     </>
-  )
-}
-
-function InputField({ menu }) {
-  return menu.type === 'date' ? (
-    <DatePicker label={menu.name} defaultValue={dayjs()} size="small"
-      sx={{ width: { md: 'calc(50% - 0.4rem)' }, marginTop: '0.5rem' }}
-    />
-  ) : menu.type === 'dateTime' ? (
-    <DateTimePicker label={menu.name} defaultValue={dayjs()} size="small"
-      sx={{ width: { md: 'calc(50% - 0.4rem)' }, marginTop: '0.5rem' }} slotProps={{ textField: { size: 'small' } }}
-    />
-  ) : menu.isTextField ? (
-    <TextField
-      size="small"
-      label={menu.name}
-      id="outlined-start-adornment"
-      type={menu.type && menu.type}
-      fullWidth
-      sx={{ width: { md: 'calc(50% - 0.4rem)' }, marginTop: '0.5rem' }}
-      slotProps={ menu.endAdornment && {
-        input: {
-          endAdornment: <InputAdornment position="end">{menu.endAdornment}</InputAdornment>,
-        },
-      }}
-    />
-  ) : (
-    <InputSelect name={menu.name} menu={menu.menus} isMultiple={menu.isMultiple} sx={{ width: { md: 'calc(50% - 0.4rem)' }, marginTop: '0.5rem' }} />
   )
 }

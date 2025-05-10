@@ -10,7 +10,7 @@ export default function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      className="w-full min-h-[75vh]"
+      className="w-full min-h-[70vh]"
       {...other}
     >
       {value === index && children}

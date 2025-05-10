@@ -8,10 +8,11 @@ export default function useLogin() {
   const { setIsLoggedIn, setUserData, setIsAdmin } = useContext(AppContext)
   const navigate = useNavigate()
   const validateUser = useValidateUser()
+  const lastPath = localStorage.getItem('lastPath');
 
   const loginUser = async (userData) => {
     await validateUser(setIsLoggedIn, setUserData, setIsAdmin)
-    navigate('/')
+    navigate(lastPath || '/')
     toast.success(`Okaerinasai, ${userData.username}-san!`)
   }
 
