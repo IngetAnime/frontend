@@ -31,11 +31,11 @@ export const identifier = z
   )
 
 // Explore
-export const link = z.string().url('Tautan tidak valid')
+export const link = z.string({ message: 'Tautan tidak valid' }).url('Tautan tidak valid')
 export const q = z
   .string().min(3, 'Minimal 3 karakter')
 export const dateTime = z
-  .string()
+  .string({ message: 'Wajib diisi' })
   .refine(
     (value) => !isNaN(Date.parse(value)),
     "Invalid datetime. Value must be ISO String format"
@@ -54,7 +54,7 @@ export const anime_type = z
   })
 export const oneAccessType = z
   .enum(["limited_time", "subscription", "free"], {
-    errorMap: () => ({ message: "accessType must be one of: limited_time, subscription, or free" })
+    errorMap: () => ({ message: "Wajib memilih salah satu" })
   })
 export const num_watched_episodes = z.number({ message: 'Harus berupa angka' }).int('Harus berupa bilangan bulat').nonnegative('Tidak boleh negatif')
 export const oneAnimeStatus = z
@@ -74,11 +74,11 @@ export const sortAnime = z.enum(["anime_score", "anime_num_list_users"], {
       message: "sort must be one of: anime_score or anime_num_list_users"
     })
   })
-export const idB = z.number().int().nonnegative()
+export const idB = z.number({ message: 'Wajib dipilih' }).int().nonnegative()
 export const booleanB = z.boolean()
 export const score = z.number().int().min(0).max(10)
 export const date = z
-  .string()
+  .string({ message: 'Wajib diisi' })
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid format. Valid format: YYYY-MM-DD")
   .refine(
     (value) => !isNaN(Date.parse(value)),

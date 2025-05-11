@@ -10,4 +10,5 @@ export const updateAnimePlatformSchema = z.object({
   intervalInDays: idB, 
   episodeAired: num_watched_episodes, 
   isMainPlatform: booleanB,
+  isHiatus: booleanB,
 })

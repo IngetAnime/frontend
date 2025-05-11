@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from "react"
-import { Box, Button, Dialog, DialogActions, DialogContent, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import AnimeButton from "./AnimeButton";
 import AnimeImage from "./AnimeImage";
 import InputField from "./InputField";
-import { ArrowBack, ArrowForward, Check, Close, CloudDownloadOutlined, Settings } from "@mui/icons-material";
+import { ArrowBack, ArrowForward, Check, Close, CloudDownloadOutlined, Delete, Settings } from "@mui/icons-material";
 import Switch from "./Switch";
 import dayjs from "dayjs";
 import convertAnimeStatus from "../helper/convertAnimeStatus.js";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
-import { booleanB, dateTime, idB, link, num_watched_episodes, oneAccessType, oneAnimeStatus, q } from "../validators/index.validator.js";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateAnime } from "../services/anime.service.js";
 import { getPlatforms, updateAnimePlatform } from "../services/platform.service.js";
@@ -78,7 +76,7 @@ export default function AnimeSettings({ sx, anime, setAnime }) {
 
 function AnimeWrapper({ anime, handleClose, children, onSubmit, isSubmitting }) {
   return (
-    <Box component={'form'} onSubmit={onSubmit}>
+    <Box component={'form'} onSubmit={onSubmit} className="w-full h-full flex flex-col justify-between">
       <DialogContent dividers={true} className="flex flex-col md:flex-row gap-5">
         <Box className="hidden md:block max-w-50">
           <AnimeImage isDialog={true} anime={anime} />
@@ -108,13 +106,12 @@ function AnimeWrapper({ anime, handleClose, children, onSubmit, isSubmitting }) 
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button 
-          onClick={handleClose} disabled={isSubmitting}
-          startIcon={<Close />} variant="contained" color="secondary"
-        >
+        <Button onClick={handleClose} disabled={isSubmitting} startIcon={<Close />} variant="contained" color="secondary">
           Batal
         </Button>
-        <Button endIcon={<Check />} variant="contained" type="submit" disabled={isSubmitting}>Simpan</Button>
+        <Button endIcon={<Check />} variant="contained" type="submit" disabled={isSubmitting}>
+          Simpan
+        </Button>
       </DialogActions>
     </Box>
   )
@@ -250,7 +247,7 @@ function EditAnime({ handleClose, handleIsPlatform, anime, setAnime }) {
           Cek status di MyAnimeList
         </Button>
         <Button onClick={() => handleIsPlatform(true)} endIcon={<ArrowForward />} variant="contained" size="small" sx={{ 
-          textTransform: 'none',
+          textTransform: 'none', my: '0.55rem'
         }}>
           Jadwal platform
         </Button>
@@ -259,7 +256,7 @@ function EditAnime({ handleClose, handleIsPlatform, anime, setAnime }) {
   )
 }
 
-function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
+function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {  
   // Form
 
   // Settings
@@ -274,6 +271,7 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
       intervalInDays: platforms[0]?.intervalInDays || 7, 
       episodeAired: platforms[0]?.episodeAired || null, 
       isMainPlatform: platforms[0]?.isMainPlatform || false,
+      isHiatus: platforms[0]?.isHiatus || false,
     }
   })
 
@@ -384,13 +382,14 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
     setValue('intervalInDays', selectedPlatform?.intervalInDays || 7, { shouldValidate: true })
     setValue('episodeAired', selectedPlatform?.episodeAired || null, { shouldValidate: true })
     setValue('isMainPlatform', selectedPlatform?.isMainPlatform || false, { shouldValidate: true })
+    setValue('isHiatus', selectedPlatform?.isHiatus || false, { shouldValidate: true })
   }, [platformId])
 
   // Submit edit anime platform
   const onSubmit = async (req) => {    
     const { success, message, data: newPlatform } = await updateAnimePlatform(
       anime.id, req.platformId, req.link, req.accessType, req.nextEpisodeAiringAt, req.lastEpisodeAiredAt, 
-      req.intervalInDays, req.episodeAired, req.isMainPlatform
+      req.intervalInDays, req.episodeAired, req.isMainPlatform, req.isHiatus
     );
     if (success) {
       const platformAnime = [...platforms]
@@ -416,18 +415,25 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
         })}
       </Box>
 
-      <Box className="flex flex-col md:flex-col-reverse lg:flex-row items-center justify-between gap-5">
+      <Box className="flex flex-col-reverse md:flex-col-reverse lg:flex-row items-center justify-between gap-5">
         <Button onClick={() => handleIsPlatform(false)} startIcon={<ArrowBack />} variant="contained" size="small" sx={{ 
-          textTransform: 'none',
+          textTransform: 'none', my: '0.55rem'
         }}>
           Pengaturan anime
         </Button>
-        <Box className="pr-5 md:pr-2">
+        <Box className="pr-5 md:pr-2 flex flex-col justify-end">
           <Controller 
             render={({ field }) => (
               <Switch text={'Jadikan sebagai platform utama'} labelPlacement="start" field={field} />
             )}
             name={'isMainPlatform'}
+            control={control}
+          />
+          <Controller 
+            render={({ field }) => (
+              <Switch text={'Update tidak berjalan'} labelPlacement="start" field={field} />
+            )}
+            name={'isHiatus'}
             control={control}
           />
         </Box>

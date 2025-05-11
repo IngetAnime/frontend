@@ -25,12 +25,12 @@ export const getPlatforms = async () => {
 
 export const updateAnimePlatform = async (
   animeId, platformId, link, accessType, nextEpisodeAiringAt, 
-  lastEpisodeAiredAt, intervalInDays, episodeAired, isMainPlatform
+  lastEpisodeAiredAt, intervalInDays, episodeAired, isMainPlatform, isHiatus
 ) => {
   let data, success, message, status;
   try {
     const response = await axios.patch(`/api/v1/anime/${animeId}/platform/${platformId}`, {
-      link, accessType, nextEpisodeAiringAt, lastEpisodeAiredAt, intervalInDays, episodeAired, isMainPlatform
+      link, accessType, nextEpisodeAiringAt, lastEpisodeAiredAt, intervalInDays, episodeAired, isMainPlatform, isHiatus
     });
     data = response.data;
     status = response.status;

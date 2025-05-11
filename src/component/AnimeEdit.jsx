@@ -1,5 +1,5 @@
 import { Check, Close, CloudDownloadOutlined, Delete, Save } from "@mui/icons-material";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import Switch from "./Switch";
@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import { deleteAnimeListSchema, updateAnimeListSchema } from "../validators/animeList.validator";
 import { deleteAnimeList, updateAnimeList } from "../services/animeList.service";
 import { getMyAnimeListStatus } from "../services/mal.service";
+import { DatePicker } from "@mui/x-date-pickers";
 
 export default function AnimeEdit({ isOpen, handleClick, anime }) {
   // Form
@@ -256,16 +257,50 @@ export default function AnimeEdit({ isOpen, handleClick, anime }) {
                 <Typography fontSize={'small'}>Score: {score ? score : ' - '}</Typography>
                 <SlideNumber value={score} setValue={(value) => setValue('score', value)} menu={menuSelect[2].menus} />
               </Box>
+              <Box className="flex flex-col md:hidden justify-between gap-5 md:gap-2.5">
+                <Controller 
+                  render={({ field }) => (
+                    <DatePicker label={'Mulai nonton'} defaultValue={null} className="w-full"
+                      slotProps={{
+                        field: {
+                          clearable: true
+                        },
+                        textField: {
+                          variant: 'standard',
+                          error: errors.startDate,
+                          helperText: errors.startDate?.message,
+                        }
+                      }}
+                      value={field.value ? dayjs(field.value) : null}
+                      onChange={(date) => field.onChange(date ? dayjs(date).format('YYYY-MM-DD'): null)}
+                    />
+                  )}
+                  name={'startDate'}
+                  control={control}
+                />
+                <Controller 
+                  render={({ field }) => (
+                    <DatePicker label={'Selesai nonton'} defaultValue={null} className="w-full"
+                      slotProps={{
+                        field: {
+                          clearable: true
+                        },
+                        textField: {
+                          variant: 'standard',
+                          error: errors.finishDate,
+                          helperText: errors.finishDate?.message,
+                        }
+                      }}
+                      value={field.value ? dayjs(field.value) : null}
+                      onChange={(date) => field.onChange(date ? dayjs(date).format('YYYY-MM-DD'): null)}
+                    />
+                  )}
+                  name={'finishDate'}
+                  control={control}
+                />
+              </Box>
             </Box>
-
-            {/* <Box className="flex flex-col md:flex-row justify-between gap-5 md:gap-2.5">
-              <DatePicker label={'Mulai nonton'} defaultValue={dayjs()} className="w-full" slotProps={
-                isMobile && { textField: { variant: 'standard'} }
-              }/> 
-              <DatePicker label={'Selesai nonton'} defaultValue={dayjs()} className="w-full"slotProps={
-                isMobile && { textField: { variant: 'standard'} }
-              }/> 
-            </Box> */}
+            
 
             <Box className="flex flex-col lg:flex-row items-center justify-between gap-5">
               <Button 
@@ -290,16 +325,15 @@ export default function AnimeEdit({ isOpen, handleClick, anime }) {
           </Box>
         </Box>
       </DialogContent>
-      <DialogActions {...(isMobile && { sx: { justifyContent: 'space-between' } })}>
-        <Button 
-          onClick={() => handleOpen(true)} disabled={isSubmitting || !anime.myListStatus?.status}
-          startIcon={<Delete />} variant="contained" color="secondary" 
-        >
-          Hapus
-        </Button>
-        <Box className="flex gap-3">
-          {isMobile && <Button color="init" onClick={handleClose}>Batal</Button>}
-          <Button endIcon={<Save />} variant="contained" type="submit" disabled={isSubmitting}>
+      <DialogActions sx={{ justifyContent: 'space-between' }}>
+        <IconButton onClick={() => handleOpen(true)} disabled={isSubmitting || !anime.myListStatus?.status}>
+          <Delete />
+        </IconButton>
+        <Box className="flex gap-2">
+          <Button onClick={handleClose} disabled={isSubmitting} startIcon={<Close />} variant="contained" color="secondary">
+            Batal
+          </Button>
+          <Button endIcon={<Check />} variant="contained" type="submit" disabled={isSubmitting}>
             Simpan
           </Button>
         </Box>
