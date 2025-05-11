@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { Box, Button, Dialog, DialogActions, DialogContent, IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import AnimeButton from "./AnimeButton";
 import AnimeImage from "./AnimeImage";
 import InputField from "./InputField";
@@ -10,11 +10,11 @@ import convertAnimeStatus from "../helper/convertAnimeStatus.js";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateAnime } from "../services/anime.service.js";
-import { getPlatforms, updateAnimePlatform } from "../services/platform.service.js";
+import { deleteAnimePlatform, getPlatforms, updateAnimePlatform } from "../services/platform.service.js";
 import { updateAnimeSchema } from "../validators/anime.validator.js";
 import { toast } from "react-toastify";
 import { getAnimeDetail } from "../services/mal.service.js";
-import { updateAnimePlatformSchema } from "../validators/platform.validator.js";
+import { deleteAnimePlatformSchema, updateAnimePlatformSchema } from "../validators/platform.validator.js";
 
 export default function AnimeSettings({ sx, anime, setAnime }) {
   const theme = useTheme()
@@ -74,8 +74,14 @@ export default function AnimeSettings({ sx, anime, setAnime }) {
   )
 }
 
-function AnimeWrapper({ anime, handleClose, children, onSubmit, isSubmitting }) {
+function AnimeWrapper({ anime, handleClose, children, onSubmit, isSubmitting, platform, setAnime }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const handleIsOpen = (value) => {
+    setIsOpen(value)
+  }
+
   return (
+    <>
     <Box component={'form'} onSubmit={onSubmit} className="w-full h-full flex flex-col justify-between">
       <DialogContent dividers={true} className="flex flex-col md:flex-row gap-5">
         <Box className="hidden md:block max-w-50">
@@ -105,15 +111,24 @@ function AnimeWrapper({ anime, handleClose, children, onSubmit, isSubmitting }) 
           </Box>
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} disabled={isSubmitting} startIcon={<Close />} variant="contained" color="secondary">
-          Batal
-        </Button>
-        <Button endIcon={<Check />} variant="contained" type="submit" disabled={isSubmitting}>
-          Simpan
-        </Button>
+      <DialogActions sx={{ justifyContent: 'space-between' }}>
+        <IconButton 
+          onClick={() => handleIsOpen(true)} disabled={isSubmitting || !platform}
+        >
+          <Delete />
+        </IconButton>
+        <Box className="flex gap-2">
+          <Button onClick={handleClose} disabled={isSubmitting} startIcon={<Close />} variant="contained" color="secondary">
+            Batal
+          </Button>
+          <Button endIcon={<Check />} variant="contained" type="submit" disabled={isSubmitting}>
+            Simpan
+          </Button>
+        </Box>
       </DialogActions>
     </Box>
+    {platform && <DeletePlatform open={isOpen} handleIsOpen={handleIsOpen} platform={platform} anime={anime} setAnime={setAnime} />}
+    </>
   )
 }
 
@@ -408,7 +423,9 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
   }
 
   return (
-    <AnimeWrapper anime={anime} handleClose={handleClose} onSubmit={handleSubmit(onSubmit)} isSubmitting={isSubmitting}>
+    <AnimeWrapper anime={anime} handleClose={handleClose} onSubmit={handleSubmit(onSubmit)} isSubmitting={isSubmitting}
+      platform={platformMap.get(platformId)} setAnime={setAnime}
+    >
       <Box className="flex flex-wrap flex-col md:flex-row justify-between gap-2.5">
         {menuSelect.map((menu, i) => {
           return <InputField menu={menu} key={i} control={control} />
@@ -439,5 +456,61 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
         </Box>
       </Box>
     </AnimeWrapper>
+  )
+}
+
+function DeletePlatform({ open, handleIsOpen, platform, anime, setAnime }) {
+  // Settings
+  const { handleSubmit, formState: { isSubmitting } } = useForm({
+    resolver: zodResolver(deleteAnimePlatformSchema), mode: 'onChange', values: {
+      animeId: anime.id || 0, platformId: platform.platform?.id || 0
+    }
+  })
+
+  // Submit delete anime
+  const onSubmit = async (req) => {
+    const { success, message, data: newPlatform } = await deleteAnimePlatform(req.animeId, req.platformId);
+    if (success) {
+      const platformAnime = [...anime.platforms]
+      const index = platformAnime.findIndex(platform => platform.id === newPlatform.id)
+      if (index !== -1) {
+        platformAnime.splice(index, 1);
+        anime.platforms = platformAnime;
+        setAnime(anime)
+      } 
+      toast.success(message)
+    } else {
+      toast.error(message)
+    }
+  }
+  return (
+    <Dialog
+      open={open}
+      onClose={() => handleIsOpen(false)}
+      component={'form'}
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <DialogTitle>{`Hapus platform ${platform.platform.name} dari anime "${anime.title}"?`}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          {
+            `Tindakan ini akan mempengaruhi list anime pengguna.
+            Jika pengguna telah menandai platform ini dalam list anime mereka, 
+            informasi mengenai platform ini akan dihapus`
+          }
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button 
+          startIcon={<Close />} color="secondary" variant="contained" 
+          onClick={() => handleIsOpen(false)} disabled={isSubmitting} 
+        >
+          Batal
+        </Button>
+        <Button endIcon={<Check />} variant="contained" type="submit" disabled={isSubmitting}> 
+          Ya
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }

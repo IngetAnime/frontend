@@ -56,3 +56,31 @@ export const updateAnimePlatform = async (
 
   return { success, data, status, message };
 }
+
+export const deleteAnimePlatform = async(animeId, platformId) => {
+  let data, success, message, status;
+  try {
+    const response = await axios.delete(`/api/v1/anime/${animeId}/platform/${platformId}`)
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Berhasil menghapus platform ${data.platform.name} dari anime ${data.anime.title}`;
+  } catch(err) {
+    if (err.response?.status) {
+      status = err.response.status;
+      success = false;
+      if (status === 404)
+        message = 'Platform tidak ditemukan';
+      else if (status === 401 || status === 403)
+        message = 'Hanya boleh dilakukan oleh Admin';
+      else 
+        message = err.response.data.message;
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan';
+    }
+  }
+
+  return { success, data, status, message };
+}

@@ -12,3 +12,8 @@ export const updateAnimePlatformSchema = z.object({
   isMainPlatform: booleanB,
   isHiatus: booleanB,
 })
+
+export const deleteAnimePlatformSchema = z.object({
+  animeId: idB,
+  platformId: idB
+})

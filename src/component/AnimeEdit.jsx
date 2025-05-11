@@ -398,7 +398,7 @@ function AnimeListDelete({ anime, open, handleOpen, handleCloseEditAnime }) {
         <DialogContentText>
           {
             `Tindakan ini juga akan menghapus status di MyAnimeList Anda. 
-            Silakan matikan fitur sinkronisasi jika tetap ingin mempertahankan list di MyAnimeList`
+            Silakan matikan fitur sinkronisasi jika tetap ingin mempertahankan list di MyAnimeList.`
           }
         </DialogContentText>
         <Box className="mt-5 text-right ">
