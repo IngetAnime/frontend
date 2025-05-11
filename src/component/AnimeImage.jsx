@@ -7,7 +7,7 @@ import AnimeSettings from "./AnimeSettings";
 import AnimeEdit from "./AnimeEdit";
 import { toast } from "react-toastify";
 
-export default function AnimeImage({ isDialog, picture, episodeAired, anime }) {
+export default function AnimeImage({ isDialog, picture, episodeAired, anime, setAnime }) {
   const { isAdmin, isLoggedIn } = useContext(AppContext)
   const [isOpen, setIsOpen] = useState(false)
   function handleIsOpen() {
@@ -58,7 +58,7 @@ export default function AnimeImage({ isDialog, picture, episodeAired, anime }) {
             />
           )}
 
-          {isAdmin && <AnimeSettings sx={{ position: 'absolute', top: 0, right: 0 }} anime={anime} />}
+          {isAdmin && <AnimeSettings sx={{ position: 'absolute', top: 0, right: 0 }} anime={anime} setAnime={setAnime} />}
 
           <AnimeEdit isOpen={isOpen} handleClick={handleIsOpen} anime={anime} />
         </>

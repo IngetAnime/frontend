@@ -9,9 +9,7 @@ import SortAndFilter from "../../component/SortAndFilter";
 import CustomTabPanel from "../../component/CustomTabPanel";
 import dayjs from "dayjs";
 import { getAnimeRanking, getSeasonalAnime, getSuggestedAnime } from "../../services/mal.service";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
-import { oneAccessType, oneAnimeStatus, ranking_type, sortAnime, status } from "../../validators/index.validator";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppContext } from "../../context/AppContext";
 import { useLocation } from "react-router-dom";
@@ -106,6 +104,7 @@ function AnimeExploreType({ isMobile }) {
 function TopAnime({ isMobile, isLoggedIn }) {
   // Component
 
+  // State
   const [animes, setAnimes] = useState(Array(50).fill(null))
   const [isLoading, setIsLoading] = useState(true)
 
@@ -194,7 +193,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
   return (
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
-      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} />
+      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} />
     </AnimeWrapper>
   )
 }
@@ -202,6 +201,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
 function CurrentSeason({ isMobile, isLoggedIn  }) {
   // Component
 
+  // State
   const [animes, setAnimes] = useState(Array(50).fill(null))
   const [isLoading, setIsLoading] = useState(true)
 
@@ -211,7 +211,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   const { year, season } = getCurrentSeason()
   const { control, watch } = useForm({ 
     resolver: zodResolver(getSeasonalAnimeSchema), defaultValues: {
-      sort: 'anime_score', year, season,
+      sort: 'anime_num_list_users', year, season,
       animeType: '', 
       accessType: '',
       status: '',
@@ -242,8 +242,8 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
       id: 'sort',
       isMultiple: false,
       menus: [
-        { text: 'Skor', value: 'anime_score' },
         { text: 'Anggota', value: 'anime_num_list_users' },
+        { text: 'Skor', value: 'anime_score' },
         // { text: 'Tanggal mulai' },
         // { text: 'Judul' },
         // { text: 'Studio' },
@@ -301,7 +301,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   return (
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
-      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} />
+      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} />
     </AnimeWrapper>
   )
 }
@@ -328,7 +328,7 @@ function Seasons({ isMobile, isLoggedIn }) {
   const { year: initialYear, season: initialSeason } = getCurrentSeason()
   const { control, watch } = useForm({
     resolver: zodResolver(getSeasonalAnimeSchema), defaultValues: {
-      sort: 'anime_score', year: initialYear, season: initialSeason,
+      sort: 'anime_num_list_users', year: initialYear, season: initialSeason,
       animeType: '', 
       accessType: '',
       status: '',
@@ -365,8 +365,8 @@ function Seasons({ isMobile, isLoggedIn }) {
       id: 'sort',
       isMultiple: false,
       menus: [
-        { text: 'Skor', value: 'anime_score' },
         { text: 'Anggota', value: 'anime_num_list_users' },
+        { text: 'Skor', value: 'anime_score' },
         // { text: 'Tanggal mulai' },
         // { text: 'Judul' },
         // { text: 'Studio' },
@@ -424,7 +424,7 @@ function Seasons({ isMobile, isLoggedIn }) {
   return (
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
-      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} />
+      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} />
     </AnimeWrapper>
   )
 }
@@ -471,7 +471,7 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
           <Typography variant="subtitle1">{message} </Typography>
           <ButtonLink variant="contained" endIcon={<Login />} to={'/auth'} className="w-full sm:w-fit" sx={{ mt: 5 }}>Masuk</ButtonLink>
         </Container> :
-        <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} />
+        <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} />
       }
     </AnimeWrapper>
   )
@@ -487,7 +487,16 @@ function AnimeWrapper({ children }) {
 
 // List anime item
 
-function AnimeList({ animes, isMobile, isLoading  }) {
+function AnimeList({ animes, isMobile, isLoading, setAnimes }) {
+  const setAnime = (newAnime) => {
+    const newAnimes = animes.map(anime => {
+      if (anime.id === newAnime.id) {
+        return { ...anime, ...newAnime }
+      }
+      return anime
+    })
+    setAnimes(newAnimes)
+  }
   return (
     <List disablePadding className={`flex flex-col gap-5 ${ !isMobile && 'flex-row flex-wrap justify-center'}`}>
       {animes.map((anime, index) => (
@@ -511,7 +520,7 @@ function AnimeList({ animes, isMobile, isLoading  }) {
               <Box className="flex flex-wrap overflow-hidden w-full sm:h-40 gap-2 sm:gap-0">
                 <Box className="w-full sm:w-30 h-35 sm:h-full">
                   <AnimeImage 
-                    anime={anime}
+                    anime={anime} setAnime={setAnime}
                     episodeAired={anime.status === 'finished_airing' ? anime.num_episodes : anime.platforms[0]?.episodeAired} 
                   />
                 </Box>

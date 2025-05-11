@@ -129,3 +129,29 @@ export const getMyAnimeListStatus = async (malId) => {
 
   return { success, data, status, message };
 }
+
+export const getAnimeDetail = async (malId) => {
+  let data, success, message, status;
+  try {
+    const response = await axios.get(`/api/v1/anime/mal/${malId}`);
+    data = response.data;
+    status = response.status;
+    message = `Berhasil mendapatkan detail ${data.title} dari MyAnimeList`;
+    success = true;
+  } catch(err) {
+    if (err.response?.status) {
+      status = err.response.status;
+      success = false;
+      if (status === 400) 
+        message = 'Kesalahan input'
+      else 
+        message = err.response.data.message
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+  
+  return { success, data, status, message };
+}

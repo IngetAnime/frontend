@@ -9,7 +9,6 @@ import convertAnimeStatus from "../helper/convertAnimeStatus";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "./InputField";
-import { deleteAnime, updateAnime } from "../services/explore.service";
 import { toast } from "react-toastify";
 import { deleteAnimeListSchema, updateAnimeListSchema } from "../validators/animeList.validator";
 import { deleteAnimeList, updateAnimeList } from "../services/animeList.service";

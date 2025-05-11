@@ -31,9 +31,9 @@ export const identifier = z
   )
 
 // Explore
-export const link = z.string().url()
+export const link = z.string().url('Tautan tidak valid')
 export const q = z
-  .string().min(3)
+  .string().min(3, 'Minimal 3 karakter')
 export const dateTime = z
   .string()
   .refine(
@@ -56,7 +56,7 @@ export const oneAccessType = z
   .enum(["limited_time", "subscription", "free"], {
     errorMap: () => ({ message: "accessType must be one of: limited_time, subscription, or free" })
   })
-export const num_watched_episodes = z.number().int().nonnegative()
+export const num_watched_episodes = z.number({ message: 'Harus berupa angka' }).int('Harus berupa bilangan bulat').nonnegative('Tidak boleh negatif')
 export const oneAnimeStatus = z
   .enum(["currently_airing", "finished_airing", "not_yet_aired"], {
     errorMap: () => ({ message: "status must be one of: currently_airing, finished_airing, or not_yet_aired" })

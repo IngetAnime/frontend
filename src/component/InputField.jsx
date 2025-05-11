@@ -58,7 +58,7 @@ export default function InputField({ menu, control }) {
             }
           }}
           value={field.value ? dayjs(field.value) : null}
-          onChange={(date) => field.onChange(date ? dayjs(date).format('YYYY-MM-DD'): null)}
+          onChange={(date) => field.onChange(date ? dayjs(date).toISOString(): null)}
         />
       )}
       name={menu.id}
@@ -79,6 +79,7 @@ export default function InputField({ menu, control }) {
           endAdornment: <InputAdornment position="end">{menu.endAdornment}</InputAdornment>,
         },
       }}
+      {...(menu.fieldType && { type: `${menu.fieldType}` })}
       {...menu.register}
     />
   ) : menu.type === 'select' ? (
