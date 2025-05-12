@@ -17,7 +17,7 @@ export default function AnimeImage({ isDialog, picture, episodeAired, anime, set
       toast.error('Anda harus login terlebih dahulu')
     }
   }
-  const episodeRemaining = episodeAired - anime.myListStatus?.progress;
+  const episodeRemaining = episodeAired - anime?.myListStatus?.progress;
 
   return (
     <Box className="w-full h-full relative">
@@ -37,7 +37,7 @@ export default function AnimeImage({ isDialog, picture, episodeAired, anime, set
             />
           )}
 
-          {anime.myListStatus?.status ? (
+          {anime?.myListStatus?.status ? (
             <AnimeButton 
               sx={{ position: 'absolute', top: 0, left: 0 }}
               backgroundColor={episodeRemaining > 0 ? 'yellow' : 'blue'} 

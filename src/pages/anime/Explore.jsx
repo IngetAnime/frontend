@@ -1,5 +1,5 @@
 import { Autorenew, CalendarMonth, EmojiEvents, Lightbulb, Login, RestartAlt, Star } from "@mui/icons-material";
-import { Box, Card, List, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, Skeleton, Collapse, FormControl, InputLabel, Select, MenuItem, Container, Button } from "@mui/material";
+import { Box, Card, List, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, Skeleton, Container, Button } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import AnimeImage from "../../component/AnimeImage";
 import Link from "../../component/Link";
@@ -240,7 +240,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
     setOriginalAnimes([]);
     setOffset(0);
     setIsLatest(false);
-  }, [rankingType]);
+  }, [rankingType, isLoggedIn]);
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
@@ -449,7 +449,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
     setOriginalAnimes([]);
     setOffset(0);
     setIsLatest(false);
-  }, [sort]);
+  }, [sort, isLoggedIn]);
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
@@ -688,7 +688,7 @@ function Seasons({ isMobile, isLoggedIn }) {
     setOriginalAnimes([]);
     setOffset(0);
     setIsLatest(false);
-  }, [sort, year, season]);
+  }, [sort, year, season, isLoggedIn]);
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
