@@ -225,9 +225,11 @@ function TopAnime({ isMobile, isLoggedIn }) {
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
-    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-    if (scrollTop + clientHeight >= scrollHeight) {
-      setOffset((offset) => offset + limit)
+    const scrollTop = window.scrollY;
+    const clientHeight = window.innerHeight;
+    const scrollHeight = document.documentElement.scrollHeight
+    if (scrollTop + clientHeight + 1 >= scrollHeight) {
+      setOffset((offset) => offset + limit);
     }
   }
   useEffect(() => {
@@ -415,9 +417,11 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
-    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-    if (scrollTop + clientHeight >= scrollHeight) {
-      setOffset((offset) => offset + limit)
+    const scrollTop = window.scrollY;
+    const clientHeight = window.innerHeight;
+    const scrollHeight = document.documentElement.scrollHeight
+    if (scrollTop + clientHeight + 1 >= scrollHeight) {
+      setOffset((offset) => offset + limit);
     }
   }
   useEffect(() => {
@@ -638,9 +642,11 @@ function Seasons({ isMobile, isLoggedIn }) {
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
-    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-    if (scrollTop + clientHeight >= scrollHeight) {
-      setOffset((offset) => offset + limit)
+    const scrollTop = window.scrollY;
+    const clientHeight = window.innerHeight;
+    const scrollHeight = document.documentElement.scrollHeight
+    if (scrollTop + clientHeight + 1 >= scrollHeight) {
+      setOffset((offset) => offset + limit);
     }
   }
   useEffect(() => {
@@ -697,24 +703,47 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState(Array(50).fill(null));
+  const [animes, setAnimes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const limit = isMobile ?  10 : 30;
+  const [offset, setOffset] = useState(0);
 
   // Get anime list of selected season
+  const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
     const getAnime = async () => {
-      const { data, success, message } = await getSuggestedAnime()
+      const { data, success, message } = await getSuggestedAnime(limit, offset)
       if (success) {
-        setAnimes(data.data)
+        if (!data.paging?.next) { // If next page not exist
+          setIsLatest(true);
+        }
+        setAnimes([...animes, ...data.data])
         setIsLoading(false)
       } else {
         setMessage(message)
       }
     }
-    setIsLoading(true)
-    getAnime()
-  }, [isLoggedIn])
+
+    if (!isLatest) { // If next page still exist
+      setIsLoading(true)
+      getAnime()
+    }
+  }, [isLoggedIn, offset])
+
+  // Get next anime list when user scrolling
+  const handleScroll = () => {
+    const scrollTop = window.scrollY;
+    const clientHeight = window.innerHeight;
+    const scrollHeight = document.documentElement.scrollHeight
+    if (scrollTop + clientHeight + 1 >= scrollHeight) {
+      setOffset((offset) => offset + limit);
+    }
+  }
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [])
 
   return (
     <AnimeWrapper>
@@ -735,7 +764,7 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
           <Typography variant="subtitle1">{message} </Typography>
           <ButtonLink variant="contained" endIcon={<Login />} to={'/auth'} className="w-full sm:w-fit" sx={{ mt: 5 }}>Masuk</ButtonLink>
         </Container> :
-        <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} />
+        <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} isLatest={isLatest} />
       }
     </AnimeWrapper>
   )
