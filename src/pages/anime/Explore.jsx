@@ -107,7 +107,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState([]);
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const limit = isMobile ?  10 : 30;
@@ -127,6 +127,9 @@ function TopAnime({ isMobile, isLoggedIn }) {
 
   // Watch input value changes
   const rankingType = watch('rankingType')
+  const accessType = watch('accessType');
+  const status = watch('status');
+  const platformId = watch('platform');
 
   // Get list of platform from database
   const [menus, setMenus] = useState([
@@ -212,17 +215,16 @@ function TopAnime({ isMobile, isLoggedIn }) {
 
       setIsLoading(true);
       const { data } = await getAnimeRanking(rankingType, limit, offset)
+      const filteredAnime = filterAndSortAnime(data.data, accessType, status, platformId);
       
       if (!data.paging?.next) {
         setIsLatest(true);
       }
 
-      // Jika offset 0, berarti reset
+      // If offset 0, that is a new fetch
       if (offset === 0) {
-        setAnimes([...data.data]);
         setOriginalAnimes([...data.data]);
       } else {
-        setAnimes(prev => [...prev, ...data.data]);
         setOriginalAnimes(prev => [...prev, ...data.data]);
       }
 
@@ -234,7 +236,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
 
   // Get anime list of current season
   useEffect(() => {
-    setAnimes([]);
+    setAnimes(Array(isMobile ? 3 : 12).fill(null));
     setOriginalAnimes([]);
     setOffset(0);
     setIsLatest(false);
@@ -255,9 +257,6 @@ function TopAnime({ isMobile, isLoggedIn }) {
   }, [])
 
   // Sort and filter anime
-  const accessType = watch('accessType');
-  const status = watch('status');
-  const platformId = watch('platform');
   useEffect(() => {
     if (originalAnimes.length) {
       setIsLoading(true)
@@ -270,7 +269,11 @@ function TopAnime({ isMobile, isLoggedIn }) {
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
       {
-        (!animes[0]?.title && !isLoading) ?
+        (animes.length) ?
+        <AnimeList 
+        animes={animes} isMobile={isMobile} isLoading={isLoading} 
+        setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} 
+        /> :
         <Container>
           <Typography 
             fontWeight={'bold'} 
@@ -289,11 +292,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
           <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
             Atur ulang
           </Button>
-        </Container> :
-        <AnimeList 
-          animes={animes} isMobile={isMobile} isLoading={isLoading} 
-          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} 
-        />
+        </Container>
       }
     </AnimeWrapper>
   )
@@ -303,7 +302,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState([])
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null))
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [isLoading, setIsLoading] = useState(true)
   const limit = isMobile ?  10 : 30;
@@ -325,6 +324,10 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
 
   // Watch input value changes
   const sort = watch('sort')
+  const animeType = watch('animeType');
+  const accessType = watch('accessType');
+  const status = watch('status');
+  const platformId = watch('platform');
 
   // Get list of platform from database
   const [menus, setMenus] = useState([
@@ -421,17 +424,16 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
 
       setIsLoading(true);
       const { data } = await getSeasonalAnime(year, season, sort, limit, offset);
+      const filteredAnime = firstFilter(data.data);
       
       if (!data.paging?.next) {
         setIsLatest(true);
       }
 
-      // Jika offset 0, berarti reset
+      // If offset 0, that is a new fetch
       if (offset === 0) {
-        setAnimes([...data.data]);
         setOriginalAnimes([...data.data]);
       } else {
-        setAnimes(prev => [...prev, ...data.data]);
         setOriginalAnimes(prev => [...prev, ...data.data]);
       }
 
@@ -443,7 +445,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
 
   // Get anime list of current season
   useEffect(() => {
-    setAnimes([]);
+    setAnimes(Array(isMobile ? 3 : 12).fill(null));
     setOriginalAnimes([]);
     setOffset(0);
     setIsLatest(false);
@@ -464,29 +466,27 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   }, [])
 
   // Sort and filter anime
-  const animeType = watch('animeType');
-  const accessType = watch('accessType');
-  const status = watch('status');
-  const platformId = watch('platform');
+  const firstFilter = (animes) => {
+    let newAnimes = [...animes]
+    if (animeType === 'new') {
+      newAnimes = newAnimes.filter(anime => 
+        (anime.start_season.season === season) && (anime.start_season.year === year)
+      )
+    } else if (animeType === 'continue') {
+      newAnimes = newAnimes.filter(anime => 
+        (anime.start_season.season !== season) || (anime.start_season.year !== year)
+      )
+    } else if (animeType !== 'all') {
+      newAnimes = newAnimes.filter(anime => anime.media_type === animeType)
+    }
+
+    newAnimes = filterAndSortAnime(newAnimes, accessType, status, platformId);
+    return newAnimes;
+  }
   useEffect(() => {
     if (originalAnimes.length) {
       setIsLoading(true)
-
-      // Filter anime type
-      let filteredAnime = [...originalAnimes]
-      if (animeType === 'new') {
-        filteredAnime = filteredAnime.filter(anime => 
-          (anime.start_season.season === season) && (anime.start_season.year === year)
-        )
-      } else if (animeType === 'continue') {
-        filteredAnime = filteredAnime.filter(anime => 
-          (anime.start_season.season !== season) || (anime.start_season.year !== year)
-        )
-      } else if (animeType !== 'all') {
-        filteredAnime = filteredAnime.filter(anime => anime.media_type === animeType)
-      }
-
-      setAnimes(filterAndSortAnime(filteredAnime, accessType, status, platformId))
+      setAnimes(firstFilter(originalAnimes))
       setIsLoading(false)
     }
   }, [originalAnimes, animeType, accessType, platformId, status])
@@ -495,7 +495,11 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
       {
-        (!animes[0]?.title && !isLoading) ?
+        (animes.length) ?
+        <AnimeList 
+        animes={animes} isMobile={isMobile} isLoading={isLoading} 
+        setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
+        /> :
         <Container>
           <Typography 
             fontWeight={'bold'} 
@@ -514,11 +518,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
           <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
             Atur ulang
           </Button>
-        </Container> :
-        <AnimeList 
-          animes={animes} isMobile={isMobile} isLoading={isLoading} 
-          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
-        />
+        </Container>
       }
     </AnimeWrapper>
   )
@@ -528,7 +528,7 @@ function Seasons({ isMobile, isLoggedIn }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState([])
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null))
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [isLoading, setIsLoading] = useState(true)
   const limit = isMobile ?  10 : 30;
@@ -559,9 +559,12 @@ function Seasons({ isMobile, isLoggedIn }) {
   })
 
   // Watch input value changes
-  const sort = watch('sort')
-  const year = watch('year')
-  const season = watch('season')
+  const sort = watch('sort');
+  const year = watch('year');
+  const season = watch('season');
+  const accessType = watch('accessType');
+  const status = watch('status');
+  const platformId = watch('platform');
 
   // Get list of platform from database
   const [menus, setMenus] = useState([
@@ -660,21 +663,17 @@ function Seasons({ isMobile, isLoggedIn }) {
 
       setIsLoading(true);
       const { data } = await getSeasonalAnime(year, season, sort, limit, offset);
+      const filteredAnime = firstFilter(data.data)
       
       if (!data.paging?.next) {
         setIsLatest(true);
       }
-      let filteredAnime = [...data.data].filter(anime => 
-        (anime.start_season.season === season) && (anime.start_season.year === year)
-      )
-
-      // Jika offset 0, berarti reset
+      
+      // If offset 0, that is a new fetch
       if (offset === 0) {
-        setAnimes([...filteredAnime]);
-        setOriginalAnimes([...filteredAnime]);
+        setOriginalAnimes([...data.data]);
       } else {
-        setAnimes(prev => [...prev, ...filteredAnime]);
-        setOriginalAnimes(prev => [...prev, ...filteredAnime]);
+        setOriginalAnimes(prev => [...prev, ...data.data]);
       }
 
       setIsLoading(false);
@@ -685,7 +684,7 @@ function Seasons({ isMobile, isLoggedIn }) {
 
   // Get anime list of current season
   useEffect(() => {
-    setAnimes([]);
+    setAnimes(Array(isMobile ? 3 : 12).fill(null));
     setOriginalAnimes([]);
     setOffset(0);
     setIsLatest(false);
@@ -706,13 +705,17 @@ function Seasons({ isMobile, isLoggedIn }) {
   }, [])
 
   // Sort and filter anime
-  const accessType = watch('accessType');
-  const status = watch('status');
-  const platformId = watch('platform');
+  const firstFilter = (animes) => {
+    let newAnimes = [...animes].filter(anime => 
+      (anime.start_season.season === season) && (anime.start_season.year === year)
+    );
+    newAnimes = filterAndSortAnime(newAnimes, accessType, status, platformId);
+    return newAnimes;
+  };
   useEffect(() => {
     if (originalAnimes.length) {
       setIsLoading(true)
-      setAnimes(filterAndSortAnime(originalAnimes, accessType, status, platformId))
+      setAnimes(firstFilter(originalAnimes))
       setIsLoading(false)
     }
   }, [originalAnimes, accessType, platformId, status])
@@ -721,7 +724,11 @@ function Seasons({ isMobile, isLoggedIn }) {
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
       {
-        (!animes[0]?.title && !isLoading) ?
+        (animes.length) ?
+        <AnimeList 
+        animes={animes} isMobile={isMobile} isLoading={isLoading} 
+        setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
+        /> :
         <Container>
           <Typography 
             fontWeight={'bold'} 
@@ -740,11 +747,7 @@ function Seasons({ isMobile, isLoggedIn }) {
           <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
             Atur ulang
           </Button>
-        </Container> :
-        <AnimeList 
-          animes={animes} isMobile={isMobile} isLoading={isLoading} 
-          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
-        />
+        </Container>
       }
     </AnimeWrapper>
   )
@@ -774,7 +777,7 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
           setIsLatest(true);
         }
   
-        // Jika offset 0, berarti reset
+        // If offset 0, that is a new fetch
         if (offset === 0) {
           setAnimes([...data.data]);
           setOriginalAnimes([...data.data]);
@@ -897,65 +900,69 @@ function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isL
         animes?.length ? 
         (animes.map((anime, index) => (
           <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
-            <Card className="w-full h-full">
-              {/* Dekstop Mode */}
-              <Box className="hidden sm:flex p-2 gap-2 justify-between">
-                <Box className="flex flex-col items-start">
-                  <AnimeTitle
-                    title={anime.title} releaseAt={anime.releaseAt} 
-                    episodeTotal={anime.num_episodes} averageEpisodeDuration={anime.average_episode_duration}
-                  />
-                </Box>
-                {anime.mean && (
-                  <AnimeScore score={anime.mean} />
-                )}
-              </Box>
-
-              <Box className="flex flex-wrap overflow-hidden w-full sm:h-40 gap-2 sm:gap-0">
-                <Box className="w-full sm:w-30 h-35 sm:h-full">
-                  <AnimeImage 
-                    anime={anime} setAnime={setAnime}
-                    episodeAired={anime.status === 'finished_airing' ? anime.num_episodes : anime.platforms[0]?.episodeAired} 
-                  />
-                </Box>
-
-                <Box className="flex flex-col justify-between pb-1 px-2 flex-1 gap-2 sm:gap-0">
-                  <Box className="block sm:hidden">
-                    <AnimeTitle 
+            {
+              anime ? 
+              <Card className="w-full h-full">
+                {/* Dekstop Mode */}
+                <Box className="hidden sm:flex p-2 gap-2 justify-between">
+                  <Box className="flex flex-col items-start">
+                    <AnimeTitle
                       title={anime.title} releaseAt={anime.releaseAt} 
                       episodeTotal={anime.num_episodes} averageEpisodeDuration={anime.average_episode_duration}
                     />
                   </Box>
-                  <Box>
-                    <Typography 
-                      sx={{ 
-                        display: '-webkit-box', WebkitLineClamp: anime.platforms[0]?.episodeAired ? 3 : 4, WebkitBoxOrient: 'vertical',
-                        fontSize: 'small', textAlign: 'left'
-                      }}
-                      className="overflow-y-auto"
-                    >
-                      {anime.synopsis}
-                    </Typography>
+                  {anime.mean && (
+                    <AnimeScore score={anime.mean} />
+                  )}
+                </Box>
+
+                <Box className="flex flex-wrap overflow-hidden w-full sm:h-40 gap-2 sm:gap-0">
+                  <Box className="w-full sm:w-30 h-35 sm:h-full">
+                    <AnimeImage 
+                      anime={anime} setAnime={setAnime}
+                      episodeAired={anime.status === 'finished_airing' ? anime.num_episodes : anime.platforms[0]?.episodeAired} 
+                    />
                   </Box>
 
-                  <Typography sx={{ fontSize: 'small' }}>
-                    Genre:&nbsp;
-                    {anime.genres?.map((genre, index) => (
-                      <span key={index} >
-                        <Link>{genre.name}</Link>
-                        {index < anime.genres.length - 1 && ', '}
-                      </span>
-                    ))}
-                  </Typography>
-                  {anime.mean && (
-                    <AnimeScore score={anime.mean} sx={{ display: { sm: 'none' } }} />
-                  )}
-                  
-                  { anime.platforms.length ? <AnimePlatform platforms={anime.platforms} /> : <></> }
-                  { (!anime.platforms.length && isMobile) && <Box /> }
+                  <Box className="flex flex-col justify-between pb-1 px-2 flex-1 gap-2 sm:gap-0">
+                    <Box className="block sm:hidden">
+                      <AnimeTitle 
+                        title={anime.title} releaseAt={anime.releaseAt} 
+                        episodeTotal={anime.num_episodes} averageEpisodeDuration={anime.average_episode_duration}
+                      />
+                    </Box>
+                    <Box>
+                      <Typography 
+                        sx={{ 
+                          display: '-webkit-box', WebkitLineClamp: anime.platforms[0]?.episodeAired ? 3 : 4, WebkitBoxOrient: 'vertical',
+                          fontSize: 'small', textAlign: 'left'
+                        }}
+                        className="overflow-y-auto"
+                      >
+                        {anime.synopsis}
+                      </Typography>
+                    </Box>
+
+                    <Typography sx={{ fontSize: 'small' }}>
+                      Genre:&nbsp;
+                      {anime.genres?.map((genre, index) => (
+                        <span key={index} >
+                          <Link>{genre.name}</Link>
+                          {index < anime.genres.length - 1 && ', '}
+                        </span>
+                      ))}
+                    </Typography>
+                    {anime.mean && (
+                      <AnimeScore score={anime.mean} sx={{ display: { sm: 'none' } }} />
+                    )}
+                    
+                    { anime.platforms.length ? <AnimePlatform platforms={anime.platforms} /> : <></> }
+                    { (!anime.platforms.length && isMobile) && <Box /> }
+                  </Box>
                 </Box>
-              </Box>
-            </Card>
+              </Card> :
+              <AnimeSkeleton />
+            }
           </ListItem>
         ))) : 
         (Array(isMobile ? 3 : 12).fill(null).map((_,index) => (
