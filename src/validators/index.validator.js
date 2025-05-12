@@ -47,9 +47,9 @@ export const ranking_type = z
     })
   })
 export const anime_type = z
-  .enum(["all", "tv", "ona", "ova", "movie", "special"], {
+  .enum(["all", "new", "continue", "tv", "ona", "ova", "movie", "special"], {
     errorMap: () => ({ 
-      message: "ranking_type must be one of: all, tv, ona, ova, movie, or special"
+      message: "ranking_type must be one of: all, new, continue, tv, ona, ova, movie, or special"
     })
   })
 export const oneAccessType = z
@@ -95,4 +95,16 @@ export const season = z
     errorMap: () => ({ 
       message: "season must be one of: winter, spring, summer, or fall"
     })
+  })
+export const searchAccessType = z
+  .enum(["all", "available_for_free", "limited_time", "subscription_only"], {
+    errorMap: () => ({ 
+      message: "accessType must be one of: all, available_for_free, limited_time, or subscription_only"
+    })
+  })
+export const searchStatus = z
+  .enum(["all", "none", "watching", "completed", "plan_to_watch", "on_hold", "dropped"], {
+    errorMap: () => ({ 
+      message: "status must be one of: all, none, watching, completed, plan_to_watch, on_hold, or dropped"
+    }),
   })

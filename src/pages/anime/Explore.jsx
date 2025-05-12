@@ -1,5 +1,5 @@
-import { Autorenew, CalendarMonth, EmojiEvents, Lightbulb, Login, Star } from "@mui/icons-material";
-import { Box, Card, List, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, Skeleton, Collapse, FormControl, InputLabel, Select, MenuItem, Container } from "@mui/material";
+import { Autorenew, CalendarMonth, EmojiEvents, Lightbulb, Login, RestartAlt, Star } from "@mui/icons-material";
+import { Box, Card, List, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, Skeleton, Collapse, FormControl, InputLabel, Select, MenuItem, Container, Button } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import AnimeImage from "../../component/AnimeImage";
 import Link from "../../component/Link";
@@ -16,6 +16,8 @@ import { useLocation } from "react-router-dom";
 import { getAnimeRankingSchema, getSeasonalAnimeSchema } from "../../validators/mal.validator";
 import getCurrentSeason from "../../helper/getCurrentSeason";
 import ButtonLink from "../../component/ButtonLink";
+import { getPlatforms } from "../../services/platform.service";
+import { toast } from "react-toastify";
 
 export default function Explore({ isDashboard=false }) {
   const theme = useTheme()
@@ -105,23 +107,47 @@ function TopAnime({ isMobile, isLoggedIn }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState(Array(50).fill(null))
-  const [isLoading, setIsLoading] = useState(true)
+  const [animes, setAnimes] = useState([]);
+  const [originalAnimes, setOriginalAnimes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const limit = isMobile ?  10 : 30;
+  const [offset, setOffset] = useState(0);
 
   // Form
 
   // Settings
-  const { control, watch } = useForm({ 
+  const { control, watch, reset } = useForm({
     resolver: zodResolver(getAnimeRankingSchema), defaultValues: {
       rankingType: 'all',
-      accessType: '',
-      status: '',
-      platform: ''
+      accessType: 'all',
+      status: 'all',
+      platform: 0,
     }
   })
 
   // Watch input value changes
   const rankingType = watch('rankingType')
+
+  // Get list of platform from database
+  const [menus, setMenus] = useState([
+    { text: 'All', value: 0 },
+  ])
+  useEffect(() => {
+    const getPlatformsProvider = async () => {
+      const { data, success, message } = await getPlatforms();
+      if (success) {
+        setMenus(data.map((menu) => {
+          return {
+            text: menu.name,
+            value: menu.id,
+          }
+        }))
+      } else {
+        toast.error(message)
+      }
+    }
+    getPlatformsProvider()
+  }, [])
 
   // Menu item
   const filterAndSort = [
@@ -147,9 +173,10 @@ function TopAnime({ isMobile, isLoggedIn }) {
       id: 'accessType',
       isMultiple: false,
       menus: [
-        { text: 'Tersedia gratis', value: 'free' },
+        { text: 'Semua', value: 'all' },
+        { text: 'Tersedia gratis', value: 'available_for_free' },
         { text: 'Waktu terbatas', value: 'limited_time' },
-        { text: 'Wajib berlangganan', value: 'subscription' },
+        { text: 'Wajib berlangganan', value: 'subscription_only' },
       ]
     },
     {
@@ -157,11 +184,13 @@ function TopAnime({ isMobile, isLoggedIn }) {
       id: 'status',
       isMultiple: true,
       menus: [
+        { text: 'Semua', value: 'all' },
         { text: 'Berjalan', value: 'watching' },
         { text: 'Selesai', value: 'completed' },
         { text: 'Ditunda', value: 'on_hold' },
         { text: 'Ditinggalkan', value: 'dropped' },
         { text: 'Direncanakan', value: 'plan_to_watch' },
+        { text: 'Tidak ada dalam list saya', value: 'none' },
       ]
     },
     {
@@ -169,31 +198,84 @@ function TopAnime({ isMobile, isLoggedIn }) {
       id: 'platform',
       isMultiple: true,
       menus: [
-        { text: 'Muse - YouTube' },
-        { text: 'AniOne - YouTube' },
-        { text: 'Bstation' },
-        { text: 'Netflix' },
-        { text: 'Catchplay+' },
-        { text: 'Crunchyroll' },
+        { text: 'Semua', value: 0 },
+        ...menus,
       ]
     },
   ]
 
   // Get anime ranking list based on select value
+  const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
     const getAnime = async () => {
-      const { data } = await getAnimeRanking(rankingType)
-      setAnimes(data.data)
+      const { data } = await getAnimeRanking(rankingType, limit, offset)
+      if (!data.paging?.next) { // If next page not exist
+        setIsLatest(true);
+      }
+      setAnimes([...animes, ...data.data])
+      setOriginalAnimes([...originalAnimes, ...data.data])
       setIsLoading(false)
     }
-    setIsLoading(true)
-    getAnime()
-  }, [rankingType, isLoggedIn])
+
+    if (!isLatest) { // If next page still exist
+      setIsLoading(true)
+      getAnime()
+    }
+  }, [rankingType, isLoggedIn, offset])
+
+  // Get next anime list when user scrolling
+  const handleScroll = () => {
+    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight) {
+      setOffset((offset) => offset + limit)
+    }
+  }
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [])
+
+  // Sort and filter anime
+  const accessType = watch('accessType');
+  const status = watch('status');
+  const platformId = watch('platform');
+  useEffect(() => {
+    if (originalAnimes.length) {
+      setIsLoading(true)
+      setAnimes(filterAndSortAnime(originalAnimes, accessType, status, platformId))
+      setIsLoading(false)
+    }
+  }, [originalAnimes, accessType, platformId, status])
 
   return (
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
-      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} />
+      {
+        (!animes[0]?.title && !isLoading) ?
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList 
+          animes={animes} isMobile={isMobile} isLoading={isLoading} 
+          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} 
+        />
+      }
     </AnimeWrapper>
   )
 }
@@ -202,25 +284,49 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState(Array(50).fill(null))
+  const [animes, setAnimes] = useState([])
+  const [originalAnimes, setOriginalAnimes] = useState([]);
   const [isLoading, setIsLoading] = useState(true)
+  const limit = isMobile ?  10 : 30;
+  const [offset, setOffset] = useState(0);
 
   // Form
 
   // Settings
   const { year, season } = getCurrentSeason()
-  const { control, watch } = useForm({ 
+  const { control, watch, reset } = useForm({ 
     resolver: zodResolver(getSeasonalAnimeSchema), defaultValues: {
       sort: 'anime_num_list_users', year, season,
-      animeType: '', 
-      accessType: '',
-      status: '',
-      platform: ''
+      animeType: 'all', 
+      accessType: 'all',
+      status: 'all',
+      platform: 0
     }
   })
 
   // Watch input value changes
   const sort = watch('sort')
+
+  // Get list of platform from database
+  const [menus, setMenus] = useState([
+    { text: 'All', value: 0 },
+  ])
+  useEffect(() => {
+    const getPlatformsProvider = async () => {
+      const { data, success, message } = await getPlatforms();
+      if (success) {
+        setMenus(data.map((menu) => {
+          return {
+            text: menu.name,
+            value: menu.id,
+          }
+        }))
+      } else {
+        toast.error(message)
+      }
+    }
+    getPlatformsProvider()
+  }, [])
 
   // Menu item
   const filterAndSort = [
@@ -229,12 +335,14 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
       id: 'animeType',
       isMultiple: false,
       menus: [
-        { text: 'Semua' },
-        { text: 'TV' },
-        { text: 'ONA' },
-        { text: 'OVA' },
-        { text: 'Movie' },
-        { text: 'Special' },
+        { text: 'Semua', value: 'all' },
+        { text: 'Baru', value: 'new' },
+        { text: 'Lanjutan', value: 'continue' },
+        { text: 'TV', value: 'tv' },
+        { text: 'ONA', value: 'ona' },
+        { text: 'OVA', value: 'ova' },
+        { text: 'Movie', value: 'movie' },
+        { text: 'Special', value: 'special' },
       ]
     },
     {
@@ -255,9 +363,10 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
       id: 'accessType',
       isMultiple: false,
       menus: [
-        { text: 'Tersedia gratis', value: 'free' },
+        { text: 'Semua', value: 'all' },
+        { text: 'Tersedia gratis', value: 'available_for_free' },
         { text: 'Waktu terbatas', value: 'limited_time' },
-        { text: 'Wajib berlangganan', value: 'subscription' },
+        { text: 'Wajib berlangganan', value: 'subscription_only' },
       ]
     },
     {
@@ -265,11 +374,13 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
       id: 'status',
       isMultiple: true,
       menus: [
+        { text: 'Semua', value: 'all' },
         { text: 'Berjalan', value: 'watching' },
         { text: 'Selesai', value: 'completed' },
         { text: 'Ditunda', value: 'on_hold' },
         { text: 'Ditinggalkan', value: 'dropped' },
         { text: 'Direncanakan', value: 'plan_to_watch' },
+        { text: 'Tidak ada dalam list saya', value: 'none' },
       ]
     },
     {
@@ -277,31 +388,100 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
       id: 'platform',
       isMultiple: true,
       menus: [
-        { text: 'Muse - YouTube' },
-        { text: 'AniOne - YouTube' },
-        { text: 'Bstation' },
-        { text: 'Netflix' },
-        { text: 'Catchplay+' },
-        { text: 'Crunchyroll' },
+        { text: 'Semua', value: 0 },
+        ...menus,
       ]
     },
   ]
 
   // Get anime list of current season
+  const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
     const getAnime = async () => {
-      const { data } = await getSeasonalAnime(year, season, sort)
-      setAnimes(data.data)
+      const { data } = await getSeasonalAnime(year, season, sort, limit, offset)
+      if (!data.paging?.next) { // If next page not exist
+        setIsLatest(true);
+      }
+      setAnimes([...animes, ...data.data])
+      setOriginalAnimes([...originalAnimes, ...data.data])
       setIsLoading(false)
     }
-    setIsLoading(true)
-    getAnime()
-  }, [sort, isLoggedIn])
+
+    if (!isLatest) { // If next page still exist
+      setIsLoading(true)
+      getAnime()
+    }
+  }, [sort, isLoggedIn, offset])
+
+  // Get next anime list when user scrolling
+  const handleScroll = () => {
+    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight) {
+      setOffset((offset) => offset + limit)
+    }
+  }
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [])
+
+  // Sort and filter anime
+  const animeType = watch('animeType');
+  const accessType = watch('accessType');
+  const status = watch('status');
+  const platformId = watch('platform');
+  useEffect(() => {
+    if (originalAnimes.length) {
+      setIsLoading(true)
+
+      // Filter anime type
+      let filteredAnime = [...originalAnimes]
+      if (animeType === 'new') {
+        filteredAnime = filteredAnime.filter(anime => 
+          (anime.start_season.season === season) && (anime.start_season.year === year)
+        )
+      } else if (animeType === 'continue') {
+        filteredAnime = filteredAnime.filter(anime => 
+          (anime.start_season.season !== season) || (anime.start_season.year !== year)
+        )
+      } else if (animeType !== 'all') {
+        filteredAnime = filteredAnime.filter(anime => anime.media_type === animeType)
+      }
+
+      setAnimes(filterAndSortAnime(filteredAnime, accessType, status, platformId))
+      setIsLoading(false)
+    }
+  }, [originalAnimes, animeType, accessType, platformId, status])
 
   return (
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
-      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} />
+      {
+        (!animes[0]?.title && !isLoading) ?
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList 
+          animes={animes} isMobile={isMobile} isLoading={isLoading} 
+          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
+        />
+      }
     </AnimeWrapper>
   )
 }
@@ -310,8 +490,11 @@ function Seasons({ isMobile, isLoggedIn }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState(Array(50).fill(null))
+  const [animes, setAnimes] = useState([])
+  const [originalAnimes, setOriginalAnimes] = useState([]);
   const [isLoading, setIsLoading] = useState(true)
+  const limit = isMobile ?  10 : 30;
+  const [offset, setOffset] = useState(0);
 
   // Generate 1917 until this year
   const earlyYear = 1917;
@@ -326,13 +509,13 @@ function Seasons({ isMobile, isLoggedIn }) {
 
   // Settings
   const { year: initialYear, season: initialSeason } = getCurrentSeason()
-  const { control, watch } = useForm({
+  const { control, watch, reset } = useForm({
     resolver: zodResolver(getSeasonalAnimeSchema), defaultValues: {
       sort: 'anime_num_list_users', year: initialYear, season: initialSeason,
       animeType: '', 
-      accessType: '',
-      status: '',
-      platform: ''
+      accessType: 'all',
+      status: 'all',
+      platform: 0
     }
   })
 
@@ -340,6 +523,27 @@ function Seasons({ isMobile, isLoggedIn }) {
   const sort = watch('sort')
   const year = watch('year')
   const season = watch('season')
+
+  // Get list of platform from database
+  const [menus, setMenus] = useState([
+    { text: 'All', value: 0 },
+  ])
+  useEffect(() => {
+    const getPlatformsProvider = async () => {
+      const { data, success, message } = await getPlatforms();
+      if (success) {
+        setMenus(data.map((menu) => {
+          return {
+            text: menu.name,
+            value: menu.id,
+          }
+        }))
+      } else {
+        toast.error(message)
+      }
+    }
+    getPlatformsProvider()
+  }, [])
 
   // Menu item
   const filterAndSort = [
@@ -378,9 +582,10 @@ function Seasons({ isMobile, isLoggedIn }) {
       id: 'accessType',
       isMultiple: false,
       menus: [
-        { text: 'Tersedia gratis' },
-        { text: 'Waktu terbatas' },
-        { text: 'Wajib berlangganan' },
+        { text: 'Semua', value: 'all' },
+        { text: 'Tersedia gratis', value: 'available_for_free' },
+        { text: 'Waktu terbatas', value: 'limited_time' },
+        { text: 'Wajib berlangganan', value: 'subscription_only' },
       ]
     },
     {
@@ -388,11 +593,13 @@ function Seasons({ isMobile, isLoggedIn }) {
       id: 'status',
       isMultiple: true,
       menus: [
-        { text: 'Berjalan' },
-        { text: 'Selesai' },
-        { text: 'Ditunda' },
-        { text: 'Ditinggalkan' },
-        { text: 'Direncanakan' },
+        { text: 'Semua', value: 'all' },
+        { text: 'Berjalan', value: 'watching' },
+        { text: 'Selesai', value: 'completed' },
+        { text: 'Ditunda', value: 'on_hold' },
+        { text: 'Ditinggalkan', value: 'dropped' },
+        { text: 'Direncanakan', value: 'plan_to_watch' },
+        { text: 'Tidak ada dalam list saya', value: 'none' },
       ]
     },
     {
@@ -400,31 +607,88 @@ function Seasons({ isMobile, isLoggedIn }) {
       id: 'platform',
       isMultiple: true,
       menus: [
-        { text: 'Muse - YouTube' },
-        { text: 'AniOne - YouTube' },
-        { text: 'Bstation' },
-        { text: 'Netflix' },
-        { text: 'Catchplay+' },
-        { text: 'Crunchyroll' },
+        { text: 'Semua', value: 0 },
+        ...menus,
       ]
     },
   ]
 
   // Get anime list of selected season
+  const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
     const getAnime = async () => {
-      const { data } = await getSeasonalAnime(year, season, sort)
-      setAnimes(data.data)
+      const { data } = await getSeasonalAnime(year, season, sort, limit, offset)
+      if (!data.paging?.next) { // If next page not exist
+        setIsLatest(true);
+      }
+
+      let filteredAnime = [...data.data].filter(anime => 
+        (anime.start_season.season === season) && (anime.start_season.year === year)
+      )
+      setAnimes([...animes, ...filteredAnime])
+      setOriginalAnimes([...originalAnimes, ...filteredAnime])
       setIsLoading(false)
     }
-    setIsLoading(true)
-    getAnime()
-  }, [sort, year, season, isLoggedIn])
+
+    if (!isLatest) { // If next page still exist
+      setIsLoading(true)
+      getAnime()
+    }
+  }, [sort, year, season, isLoggedIn, offset])
+
+  // Get next anime list when user scrolling
+  const handleScroll = () => {
+    const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight) {
+      setOffset((offset) => offset + limit)
+    }
+  }
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [])
+
+  // Sort and filter anime
+  const accessType = watch('accessType');
+  const status = watch('status');
+  const platformId = watch('platform');
+  useEffect(() => {
+    if (originalAnimes.length) {
+      setIsLoading(true)
+      setAnimes(filterAndSortAnime(originalAnimes, accessType, status, platformId))
+      setIsLoading(false)
+    }
+  }, [originalAnimes, accessType, platformId, status])
 
   return (
     <AnimeWrapper>
       <SortAndFilter filterAndSort={filterAndSort} control={control} disabled={isLoading} />
-      <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} />
+      {
+        (!animes[0]?.title && !isLoading) ?
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList 
+          animes={animes} isMobile={isMobile} isLoading={isLoading} 
+          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
+        />
+      }
     </AnimeWrapper>
   )
 }
@@ -479,17 +743,54 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
 
 function AnimeWrapper({ children }) {
   return (
-    <Box className="flex flex-col px-1 gap-2.5">
+    <Box className="flex flex-col px-1">
       {children}
     </Box>
   )
 }
 
+// Filter and sort anime
+
+function filterAndSortAnime(originalAnimes, accessType, status, platformId) {
+  let filteredAnime = [...originalAnimes]
+  
+  // Filter accessType
+  if (accessType === 'available_for_free') {
+    filteredAnime = filteredAnime.filter(anime => {
+      return anime.platforms.some(platform => platform.accessType === 'free');
+    })
+  } else if (accessType === 'limited_time') {
+    filteredAnime = filteredAnime.filter(anime => {
+      return (anime.platforms.length && anime.platforms.every(platform => platform.accessType === 'limited_time'));
+    })
+  } else if (accessType === 'subscription_only') {
+    filteredAnime = filteredAnime.filter(anime => {
+      return (anime.platforms.length && anime.platforms.every(platform => platform.accessType === 'subscription'));
+    })
+  }
+
+  // Filter status
+  if (status === 'none') {
+    filteredAnime = filteredAnime.filter(anime => !anime.myListStatus?.status)
+  } else if (status !== 'all') {
+    filteredAnime = filteredAnime.filter(anime => anime.myListStatus?.status === status)
+  }
+
+  // Filter platform
+  if (platformId !== 0) {
+    filteredAnime = filteredAnime.filter(anime => {
+      return (anime.platforms.length && anime.platforms.some(platform => platform.platform.id === platformId));
+    })
+  }
+
+  return filteredAnime
+}
+
 // List anime item
 
-function AnimeList({ animes, isMobile, isLoading, setAnimes }) {
+function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isLatest }) {  
   const setAnime = (newAnime) => {
-    const newAnimes = animes.map(anime => {
+    const newAnimes = originalAnimes.map(anime => {
       if (anime.id === newAnime.id) {
         return { ...anime, ...newAnime }
       }
@@ -498,11 +799,14 @@ function AnimeList({ animes, isMobile, isLoading, setAnimes }) {
     setAnimes(newAnimes)
   }
   return (
-    <List disablePadding className={`flex flex-col gap-5 ${ !isMobile && 'flex-row flex-wrap justify-center'}`}>
-      {animes.map((anime, index) => (
-        <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
-          {isLoading ? 
-            <AnimeSkeleton /> :
+    <List 
+      disablePadding sx={{ py: '1rem' }}
+      className={`flex flex-col gap-5 ${ !isMobile && 'flex-row flex-wrap justify-center'}`}
+    >
+      {
+        animes?.length ? 
+        (animes.map((anime, index) => (
+          <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
             <Card className="w-full h-full">
               {/* Dekstop Mode */}
               <Box className="hidden sm:flex p-2 gap-2 justify-between">
@@ -562,9 +866,21 @@ function AnimeList({ animes, isMobile, isLoading, setAnimes }) {
                 </Box>
               </Box>
             </Card>
-          }
-        </ListItem>
-      ))}
+          </ListItem>
+        ))) : 
+        (Array(isMobile ? 3 : 12).fill(null).map((_,index) => (
+          <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
+            <AnimeSkeleton />
+          </ListItem>
+        )))
+      }
+      {!isLatest &&
+        (Array(isMobile ? 1 : 3).fill(null).map((_,index) => (
+          <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
+            <AnimeSkeleton />
+          </ListItem>
+        )))
+      }
     </List>
   )
 }

@@ -60,7 +60,7 @@ export default function AnimeImage({ isDialog, picture, episodeAired, anime, set
 
           {isAdmin && <AnimeSettings sx={{ position: 'absolute', top: 0, right: 0 }} anime={anime} setAnime={setAnime} />}
 
-          <AnimeEdit isOpen={isOpen} handleClick={handleIsOpen} anime={anime} />
+          <AnimeEdit isOpen={isOpen} handleClick={handleIsOpen} anime={anime} setAnime={setAnime} />
         </>
       }
     </Box>

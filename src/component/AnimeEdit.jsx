@@ -15,7 +15,7 @@ import { deleteAnimeList, updateAnimeList } from "../services/animeList.service"
 import { getMyAnimeListStatus } from "../services/mal.service";
 import { DatePicker } from "@mui/x-date-pickers";
 
-export default function AnimeEdit({ isOpen, handleClick, anime }) {
+export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
   // Form
 
   // Settings
@@ -132,6 +132,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime }) {
       handleClose()
       delete data.anime;
       anime.myListStatus = data;
+      setAnime(anime)
     } else {
       toast.error(message)
     }
@@ -340,13 +341,13 @@ export default function AnimeEdit({ isOpen, handleClick, anime }) {
       </DialogActions>
     </Dialog>
     <AnimeListDelete
-      anime={anime} open={open} handleOpen={handleOpen} handleCloseEditAnime={handleClick} 
+      anime={anime} open={open} handleOpen={handleOpen} handleCloseEditAnime={handleClick} setAnime={setAnime}
     />
     </>
   )
 }
 
-function AnimeListDelete({ anime, open, handleOpen, handleCloseEditAnime }) {
+function AnimeListDelete({ anime, open, handleOpen, handleCloseEditAnime, setAnime }) {
   // Form
 
   // Setting
@@ -374,6 +375,7 @@ function AnimeListDelete({ anime, open, handleOpen, handleCloseEditAnime }) {
       handleOpen(false);
       handleCloseEditAnime();
       delete anime.myListStatus;
+      setAnime(anime)
     } else {
       toast.error(message);
     }

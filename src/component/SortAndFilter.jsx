@@ -17,7 +17,7 @@ export default function SortAndFilter({ filterAndSort, control, disabled }) {
                 multiple={false}
               >
                 {menu.menus.map((item, index) => (
-                  <MenuItem value={item.value || item.text} className="flex items-center" key={index}>
+                  <MenuItem value={item.value ?? item.text} className="flex items-center" key={index}>
                     {item.text}
                   </MenuItem>
                 ))}
