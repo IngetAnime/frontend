@@ -207,21 +207,38 @@ function TopAnime({ isMobile, isLoggedIn }) {
   // Get anime ranking list based on select value
   const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
-    const getAnime = async () => {
+    const fetchAnime = async () => {
+      if (isLatest) return;
+
+      setIsLoading(true);
       const { data } = await getAnimeRanking(rankingType, limit, offset)
-      if (!data.paging?.next) { // If next page not exist
+      
+      if (!data.paging?.next) {
         setIsLatest(true);
       }
-      setAnimes([...animes, ...data.data])
-      setOriginalAnimes([...originalAnimes, ...data.data])
-      setIsLoading(false)
-    }
 
-    if (!isLatest) { // If next page still exist
-      setIsLoading(true)
-      getAnime()
-    }
-  }, [rankingType, isLoggedIn, offset])
+      // Jika offset 0, berarti reset
+      if (offset === 0) {
+        setAnimes([...data.data]);
+        setOriginalAnimes([...data.data]);
+      } else {
+        setAnimes(prev => [...prev, ...data.data]);
+        setOriginalAnimes(prev => [...prev, ...data.data]);
+      }
+
+      setIsLoading(false);
+    };
+
+    fetchAnime();
+  }, [offset, rankingType, isLoggedIn, isLatest]);
+
+  // Get anime list of current season
+  useEffect(() => {
+    setAnimes([]);
+    setOriginalAnimes([]);
+    setOffset(0);
+    setIsLatest(false);
+  }, [rankingType]);
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
@@ -396,24 +413,41 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
     },
   ]
 
-  // Get anime list of current season
+  // Get anime list based on user scrolling
   const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
-    const getAnime = async () => {
-      const { data } = await getSeasonalAnime(year, season, sort, limit, offset)
-      if (!data.paging?.next) { // If next page not exist
+    const fetchAnime = async () => {
+      if (isLatest) return;
+
+      setIsLoading(true);
+      const { data } = await getSeasonalAnime(year, season, sort, limit, offset);
+      
+      if (!data.paging?.next) {
         setIsLatest(true);
       }
-      setAnimes([...animes, ...data.data])
-      setOriginalAnimes([...originalAnimes, ...data.data])
-      setIsLoading(false)
-    }
 
-    if (!isLatest) { // If next page still exist
-      setIsLoading(true)
-      getAnime()
-    }
-  }, [sort, isLoggedIn, offset])
+      // Jika offset 0, berarti reset
+      if (offset === 0) {
+        setAnimes([...data.data]);
+        setOriginalAnimes([...data.data]);
+      } else {
+        setAnimes(prev => [...prev, ...data.data]);
+        setOriginalAnimes(prev => [...prev, ...data.data]);
+      }
+
+      setIsLoading(false);
+    };
+
+    fetchAnime();
+  }, [offset, sort, isLoggedIn, isLatest]);
+
+  // Get anime list of current season
+  useEffect(() => {
+    setAnimes([]);
+    setOriginalAnimes([]);
+    setOffset(0);
+    setIsLatest(false);
+  }, [sort]);
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
@@ -505,7 +539,8 @@ function Seasons({ isMobile, isLoggedIn }) {
   const lastYear = dayjs().get('year') + 1; // +1 for next year season
   const years = Array(lastYear-earlyYear+1).fill().map((_, i) => {
     return {
-      text: (lastYear - i).toString()
+      text: (lastYear - i).toString(),
+      value: (lastYear - i)
     }
   })
 
@@ -620,25 +655,41 @@ function Seasons({ isMobile, isLoggedIn }) {
   // Get anime list of selected season
   const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
-    const getAnime = async () => {
-      const { data } = await getSeasonalAnime(year, season, sort, limit, offset)
-      if (!data.paging?.next) { // If next page not exist
+    const fetchAnime = async () => {
+      if (isLatest) return;
+
+      setIsLoading(true);
+      const { data } = await getSeasonalAnime(year, season, sort, limit, offset);
+      
+      if (!data.paging?.next) {
         setIsLatest(true);
       }
-
       let filteredAnime = [...data.data].filter(anime => 
         (anime.start_season.season === season) && (anime.start_season.year === year)
       )
-      setAnimes([...animes, ...filteredAnime])
-      setOriginalAnimes([...originalAnimes, ...filteredAnime])
-      setIsLoading(false)
-    }
 
-    if (!isLatest) { // If next page still exist
-      setIsLoading(true)
-      getAnime()
-    }
-  }, [sort, year, season, isLoggedIn, offset])
+      // Jika offset 0, berarti reset
+      if (offset === 0) {
+        setAnimes([...filteredAnime]);
+        setOriginalAnimes([...filteredAnime]);
+      } else {
+        setAnimes(prev => [...prev, ...filteredAnime]);
+        setOriginalAnimes(prev => [...prev, ...filteredAnime]);
+      }
+
+      setIsLoading(false);
+    };
+
+    fetchAnime();
+  }, [offset, sort, year, season, isLoggedIn, isLatest]);
+
+  // Get anime list of current season
+  useEffect(() => {
+    setAnimes([]);
+    setOriginalAnimes([]);
+    setOffset(0);
+    setIsLatest(false);
+  }, [sort, year, season]);
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
@@ -712,24 +763,34 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
   // Get anime list of selected season
   const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
-    const getAnime = async () => {
-      const { data, success, message } = await getSuggestedAnime(limit, offset)
+    const fetchAnime = async () => {
+      if (isLatest) return;
+
+      setIsLoading(true);
+      const { data, success, message } = await getSuggestedAnime(limit, offset);
+
       if (success) {
-        if (!data.paging?.next) { // If next page not exist
+        if (!data.paging?.next) {
           setIsLatest(true);
         }
-        setAnimes([...animes, ...data.data])
-        setIsLoading(false)
+  
+        // Jika offset 0, berarti reset
+        if (offset === 0) {
+          setAnimes([...data.data]);
+          setOriginalAnimes([...data.data]);
+        } else {
+          setAnimes(prev => [...prev, ...data.data]);
+          setOriginalAnimes(prev => [...prev, ...data.data]);
+        }
+  
+        setIsLoading(false);
       } else {
-        setMessage(message)
+        setMessage(message);
       }
-    }
+    };
 
-    if (!isLatest) { // If next page still exist
-      setIsLoading(true)
-      getAnime()
-    }
-  }, [isLoggedIn, offset])
+    fetchAnime();
+  }, [offset, isLoggedIn]);
 
   // Get next anime list when user scrolling
   const handleScroll = () => {
@@ -903,12 +964,12 @@ function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isL
           </ListItem>
         )))
       }
-      {!isLatest &&
-        (Array(isMobile ? 1 : 3).fill(null).map((_,index) => (
+      {(!isLatest && animes?.length) ?
+        (Array(isMobile ? 1 : (3 - animes.length % 3)).fill(null).map((_,index) => (
           <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
             <AnimeSkeleton />
           </ListItem>
-        )))
+        ))) : <></>
       }
     </List>
   )
