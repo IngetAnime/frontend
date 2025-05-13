@@ -107,11 +107,13 @@ function TopAnime({ isMobile, isLoggedIn }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const [originalAnimes, setOriginalAnimes] = useState([]);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const [isLoading, setIsLoading] = useState(true);
-  const limit = isMobile ?  10 : 30;
-  const [offset, setOffset] = useState(0);
+  const limit = isMobile ? 10 : 30;
+  const [offset, setOffset] = useState(limit);
+  const [isLatest, setIsLatest] = useState(false);
 
   // Form
 
@@ -159,16 +161,16 @@ function TopAnime({ isMobile, isLoggedIn }) {
       id: 'rankingType',
       isMultiple: false,
       menus: [
-        { text: 'All Anime', value: 'all' },
-        { text: 'Top Airing', value: 'airing' },
-        { text: 'Top Upcoming', value: 'upcoming' },
-        { text: 'Top TV Series', value: 'tv' },
-        { text: 'Top Movies', value: 'movie' },
-        { text: 'Top OVAs', value: 'ova' },
-        { text: 'Top ONAs', value: 'ona' },
-        { text: 'Top Specials', value: 'special' },
-        { text: 'Most Popular', value: 'bypopularity' },
-        { text: 'Most Favorited', value: 'favorite' },
+        { text: 'Semua Anime', value: 'all' },
+        { text: 'Sedang Tayang', value: 'airing' },
+        { text: 'Segera Tayang', value: 'upcoming' },
+        { text: 'TV Series Terbaik', value: 'tv' },
+        { text: 'Film Terbaik', value: 'movie' },
+        { text: 'OVA Terbaik', value: 'ova' },
+        { text: 'ONA Terbaik', value: 'ona' },
+        { text: 'Spesial Terbaik', value: 'special' },
+        { text: 'Paling Populer', value: 'bypopularity' },
+        { text: 'Paling Difavoritkan', value: 'favorite' },
       ],
     },
     {
@@ -208,62 +210,45 @@ function TopAnime({ isMobile, isLoggedIn }) {
   ]
 
   // Get anime ranking list based on select value
-  const [isLatest, setIsLatest] = useState(false);
+  // Get all anime list
   useEffect(() => {
     const fetchAnime = async () => {
-      if (isLatest) return;
-
       setIsLoading(true);
-      const { data } = await getAnimeRanking(rankingType, limit, offset)
-      const filteredAnime = filterAndSortAnime(data.data, accessType, status, platformId);
-      
-      if (!data.paging?.next) {
-        setIsLatest(true);
-      }
 
-      // If offset 0, that is a new fetch
-      if (offset === 0) {
-        setOriginalAnimes([...data.data]);
-      } else {
-        setOriginalAnimes(prev => [...prev, ...data.data]);
-      }
+      const initialLimit = rankingType === 'upcoming' ? 128 : 500; // Upcoming cannot use limit 500
+      const { data } = await getAnimeRanking(rankingType, initialLimit, 0);
+      setOriginalAnimes(data.data);
 
       setIsLoading(false);
-    };
-
-    fetchAnime();
-  }, [offset, rankingType, isLoggedIn, isLatest]);
-
-  // Get anime list of current season
-  useEffect(() => {
-    setAnimes(Array(isMobile ? 3 : 12).fill(null));
-    setOriginalAnimes([]);
-    setOffset(0);
-    setIsLatest(false);
-  }, [rankingType, isLoggedIn]);
-
-  // Get next anime list when user scrolling
-  const handleScroll = () => {
-    const scrollTop = window.scrollY;
-    const clientHeight = window.innerHeight;
-    const scrollHeight = document.documentElement.scrollHeight
-    if (scrollTop + clientHeight + 1 >= scrollHeight) {
-      setOffset((offset) => offset + limit);
     }
-  }
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [])
+    
+    fetchAnime();
+  }, [isLoggedIn, rankingType]);
 
   // Sort and filter anime
   useEffect(() => {
-    if (originalAnimes.length) {
-      setIsLoading(true)
-      setAnimes(filterAndSortAnime(originalAnimes, accessType, status, platformId))
-      setIsLoading(false)
-    }
-  }, [originalAnimes, accessType, platformId, status])
+    setOffset(limit);
+    setIsLatest(false);
+    setFilteredAnimes(filterAndSortAnime(originalAnimes, accessType, status, platformId));
+  }, [originalAnimes, accessType, status, platformId]);
+
+  // Limit and offset to display on user screen
+  useEffect(() => {
+    if (isLatest) return;
+    setAnimes(filteredAnimes.slice(0, offset));
+    if (animes.length === filteredAnimes.length) setIsLatest(true);
+  }, [filteredAnimes, offset]);
+
+  // Get next anime list when user scrolling
+  useEffect(() => {
+    if (isLatest) return;
+
+    const onScroll = () => handleScroll(setOffset, limit);
+
+    window.addEventListener('scroll', onScroll);
+    
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isLatest, limit]);
 
   return (
     <AnimeWrapper>
@@ -272,7 +257,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
         (animes.length) ?
         <AnimeList 
         animes={animes} isMobile={isMobile} isLoading={isLoading} 
-        setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} 
+        setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
         /> :
         <Container>
           <Typography 
@@ -302,20 +287,22 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null))
   const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [isLoading, setIsLoading] = useState(true)
-  const limit = isMobile ?  10 : 30;
-  const [offset, setOffset] = useState(0);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [isLoading, setIsLoading] = useState(true);
+  const limit = isMobile ? 10 : 30;
+  const [offset, setOffset] = useState(limit);
+  const [isLatest, setIsLatest] = useState(false);
 
   // Form
 
   // Settings
   const { year, season } = getCurrentSeason()
-  const { control, watch, reset } = useForm({ 
+  const { control, watch } = useForm({ 
     resolver: zodResolver(getSeasonalAnimeSchema), defaultValues: {
-      sort: 'anime_num_list_users', year, season,
-      animeType: 'all', 
+      sort: 'num_list_users', year, season,
+      animeType: 'all',
       accessType: 'all',
       status: 'all',
       platform: 0
@@ -323,7 +310,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   })
 
   // Watch input value changes
-  const sort = watch('sort')
+  const sort = watch('sort');
   const animeType = watch('animeType');
   const accessType = watch('accessType');
   const status = watch('status');
@@ -372,12 +359,9 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
       id: 'sort',
       isMultiple: false,
       menus: [
-        { text: 'Anggota', value: 'anime_num_list_users' },
-        { text: 'Skor', value: 'anime_score' },
-        // { text: 'Tanggal mulai' },
-        // { text: 'Judul' },
-        // { text: 'Studio' },
-        // { text: 'Lisensor' },
+        { text: 'Anggota', value: 'num_list_users' },
+        { text: 'Skor', value: 'mean' },
+        { text: 'Tanggal rilis', value: 'start_date' },
       ]
     },
     {
@@ -416,80 +400,90 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
     },
   ]
 
-  // Get anime list based on user scrolling
-  const [isLatest, setIsLatest] = useState(false);
+  // Get all anime list
   useEffect(() => {
     const fetchAnime = async () => {
-      if (isLatest) return;
-
       setIsLoading(true);
-      const { data } = await getSeasonalAnime(year, season, sort, limit, offset);
-      const filteredAnime = firstFilter(data.data);
-      
-      if (!data.paging?.next) {
-        setIsLatest(true);
-      }
 
-      // If offset 0, that is a new fetch
-      if (offset === 0) {
-        setOriginalAnimes([...data.data]);
-      } else {
-        setOriginalAnimes(prev => [...prev, ...data.data]);
-      }
+      const { data } = await getSeasonalAnime(year, season, undefined, 500, 0);
+      setOriginalAnimes(data.data);
 
       setIsLoading(false);
-    };
-
-    fetchAnime();
-  }, [offset, sort, isLoggedIn, isLatest]);
-
-  // Get anime list of current season
-  useEffect(() => {
-    setAnimes(Array(isMobile ? 3 : 12).fill(null));
-    setOriginalAnimes([]);
-    setOffset(0);
-    setIsLatest(false);
-  }, [sort, isLoggedIn]);
-
-  // Get next anime list when user scrolling
-  const handleScroll = () => {
-    const scrollTop = window.scrollY;
-    const clientHeight = window.innerHeight;
-    const scrollHeight = document.documentElement.scrollHeight
-    if (scrollTop + clientHeight + 1 >= scrollHeight) {
-      setOffset((offset) => offset + limit);
     }
-  }
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [])
+    
+    fetchAnime();
+  }, [isLoggedIn]);
 
   // Sort and filter anime
-  const firstFilter = (animes) => {
-    let newAnimes = [...animes]
-    if (animeType === 'new') {
-      newAnimes = newAnimes.filter(anime => 
-        (anime.start_season.season === season) && (anime.start_season.year === year)
-      )
-    } else if (animeType === 'continue') {
-      newAnimes = newAnimes.filter(anime => 
-        (anime.start_season.season !== season) || (anime.start_season.year !== year)
-      )
-    } else if (animeType !== 'all') {
-      newAnimes = newAnimes.filter(anime => anime.media_type === animeType)
+  useEffect(() => {
+    const firstFilter = (animes) => {
+      let newAnimes = [...animes]
+
+      // Anime type filter
+      if (animeType === 'new') {
+        newAnimes = newAnimes.filter(anime =>
+          anime.start_season?.season === season &&
+          anime.start_season?.year === year
+        );
+      } else if (animeType === 'continue') {
+        newAnimes = newAnimes.filter(anime =>
+          anime.start_season?.season !== season ||
+          anime.start_season?.year !== year
+        );
+      } else if (animeType !== 'all') {
+        newAnimes = newAnimes.filter(anime =>
+          anime.media_type === animeType
+        );
+      }
+
+      // Anime sort
+      if (sort === 'num_list_users') {
+        newAnimes.sort((a, b) => {
+          const aVal = a.num_list_users ?? 0;
+          const bVal = b.num_list_users ?? 0;
+          return bVal - aVal; // descending
+        });
+      } else if (sort === 'mean') {
+        newAnimes.sort((a, b) => {
+          const aVal = a.mean ?? 0;
+          const bVal = b.mean ?? 0;
+          return bVal - aVal; // descending
+        });
+      } else if (sort === 'start_date') {
+        newAnimes.sort((a, b) => {
+          if (!a.start_date) return 1;
+          if (!b.start_date) return -1;
+          return dayjs(a.start_date).diff(dayjs(b.start_date)); // ascending
+        });
+      }
+
+      // Filter for access type, user list status, and platform
+      newAnimes = filterAndSortAnime(newAnimes, accessType, status, platformId); 
+      return newAnimes;
     }
 
-    newAnimes = filterAndSortAnime(newAnimes, accessType, status, platformId);
-    return newAnimes;
-  }
+    setOffset(limit);
+    setIsLatest(false);
+    setFilteredAnimes(firstFilter(originalAnimes));
+  }, [originalAnimes, animeType, sort, accessType, status, platformId]);
+
+  // Limit and offset to display on user screen
   useEffect(() => {
-    if (originalAnimes.length) {
-      setIsLoading(true)
-      setAnimes(firstFilter(originalAnimes))
-      setIsLoading(false)
-    }
-  }, [originalAnimes, animeType, accessType, platformId, status])
+    if (isLatest) return;
+    setAnimes(filteredAnimes.slice(0, offset));
+    if (animes.length === filteredAnimes.length) setIsLatest(true);
+  }, [filteredAnimes, offset]);
+
+  // Get next anime list when user scrolling
+  useEffect(() => {
+    if (isLatest) return;
+
+    const onScroll = () => handleScroll(setOffset, limit);
+
+    window.addEventListener('scroll', onScroll);
+    
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isLatest, limit]);
 
   return (
     <AnimeWrapper>
@@ -528,11 +522,13 @@ function Seasons({ isMobile, isLoggedIn }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null))
   const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [isLoading, setIsLoading] = useState(true)
-  const limit = isMobile ?  10 : 30;
-  const [offset, setOffset] = useState(0);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [isLoading, setIsLoading] = useState(true);
+  const limit = isMobile ? 10 : 30;
+  const [offset, setOffset] = useState(limit);
+  const [isLatest, setIsLatest] = useState(false);
 
   // Generate 1917 until this year
   const earlyYear = 1917;
@@ -550,8 +546,8 @@ function Seasons({ isMobile, isLoggedIn }) {
   const { year: initialYear, season: initialSeason } = getCurrentSeason()
   const { control, watch, reset } = useForm({
     resolver: zodResolver(getSeasonalAnimeSchema), defaultValues: {
-      sort: 'anime_num_list_users', year: initialYear, season: initialSeason,
-      animeType: '', 
+      sort: 'num_list_users', year: initialYear, season: initialSeason,
+      animeType: 'new',
       accessType: 'all',
       status: 'all',
       platform: 0
@@ -611,12 +607,9 @@ function Seasons({ isMobile, isLoggedIn }) {
       id: 'sort',
       isMultiple: false,
       menus: [
-        { text: 'Anggota', value: 'anime_num_list_users' },
-        { text: 'Skor', value: 'anime_score' },
-        // { text: 'Tanggal mulai' },
-        // { text: 'Judul' },
-        // { text: 'Studio' },
-        // { text: 'Lisensor' },
+        { text: 'Anggota', value: 'num_list_users' },
+        { text: 'Skor', value: 'mean' },
+        { text: 'Tanggal rilis', value: 'start_date' },
       ]
     },
     {
@@ -656,69 +649,78 @@ function Seasons({ isMobile, isLoggedIn }) {
   ]
 
   // Get anime list of selected season
-  const [isLatest, setIsLatest] = useState(false);
   useEffect(() => {
     const fetchAnime = async () => {
-      if (isLatest) return;
-
       setIsLoading(true);
-      const { data } = await getSeasonalAnime(year, season, sort, limit, offset);
-      const filteredAnime = firstFilter(data.data)
-      
-      if (!data.paging?.next) {
-        setIsLatest(true);
-      }
-      
-      // If offset 0, that is a new fetch
-      if (offset === 0) {
-        setOriginalAnimes([...data.data]);
-      } else {
-        setOriginalAnimes(prev => [...prev, ...data.data]);
-      }
+
+      const { data } = await getSeasonalAnime(year, season, undefined, 500, 0);
+      setOriginalAnimes(data.data);
 
       setIsLoading(false);
-    };
-
-    fetchAnime();
-  }, [offset, sort, year, season, isLoggedIn, isLatest]);
-
-  // Get anime list of current season
-  useEffect(() => {
-    setAnimes(Array(isMobile ? 3 : 12).fill(null));
-    setOriginalAnimes([]);
-    setOffset(0);
-    setIsLatest(false);
-  }, [sort, year, season, isLoggedIn]);
-
-  // Get next anime list when user scrolling
-  const handleScroll = () => {
-    const scrollTop = window.scrollY;
-    const clientHeight = window.innerHeight;
-    const scrollHeight = document.documentElement.scrollHeight
-    if (scrollTop + clientHeight + 1 >= scrollHeight) {
-      setOffset((offset) => offset + limit);
     }
-  }
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [])
+    
+    fetchAnime();
+  }, [isLoggedIn, year, season]);
 
   // Sort and filter anime
-  const firstFilter = (animes) => {
-    let newAnimes = [...animes].filter(anime => 
-      (anime.start_season.season === season) && (anime.start_season.year === year)
-    );
-    newAnimes = filterAndSortAnime(newAnimes, accessType, status, platformId);
-    return newAnimes;
-  };
   useEffect(() => {
-    if (originalAnimes.length) {
-      setIsLoading(true)
-      setAnimes(firstFilter(originalAnimes))
-      setIsLoading(false)
+    const firstFilter = (animes) => {
+      let newAnimes = [...animes]
+
+      // Anime type filter
+      newAnimes = newAnimes.filter(anime =>
+        anime.start_season?.season === season &&
+        anime.start_season?.year === year
+      );
+
+      // Anime sort
+      if (sort === 'num_list_users') {
+        newAnimes.sort((a, b) => {
+          const aVal = a.num_list_users ?? 0;
+          const bVal = b.num_list_users ?? 0;
+          return bVal - aVal; // descending
+        });
+      } else if (sort === 'mean') {
+        newAnimes.sort((a, b) => {
+          const aVal = a.mean ?? 0;
+          const bVal = b.mean ?? 0;
+          return bVal - aVal; // descending
+        });
+      } else if (sort === 'start_date') {
+        newAnimes.sort((a, b) => {
+          if (!a.start_date) return 1;
+          if (!b.start_date) return -1;
+          return dayjs(a.start_date).diff(dayjs(b.start_date)); // ascending
+        });
+      }
+
+      // Filter for access type, user list status, and platform
+      newAnimes = filterAndSortAnime(newAnimes, accessType, status, platformId); 
+      return newAnimes;
     }
-  }, [originalAnimes, accessType, platformId, status])
+
+    setOffset(limit);
+    setIsLatest(false);
+    setFilteredAnimes(firstFilter(originalAnimes));
+  }, [originalAnimes, sort, accessType, status, platformId]);
+
+  // Limit and offset to display on user screen
+  useEffect(() => {
+    if (isLatest) return;
+    setAnimes(filteredAnimes.slice(0, offset));
+    if (animes.length === filteredAnimes.length) setIsLatest(true);
+  }, [filteredAnimes, offset]);
+
+  // Get next anime list when user scrolling
+  useEffect(() => {
+    if (isLatest) return;
+
+    const onScroll = () => handleScroll(setOffset, limit);
+
+    window.addEventListener('scroll', onScroll);
+    
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isLatest, limit]);
 
   return (
     <AnimeWrapper>
@@ -757,57 +759,49 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
   // Component
 
   // State
-  const [animes, setAnimes] = useState([]);
+  const [originalAnimes, setOriginalAnimes] = useState([]);
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const [isLoading, setIsLoading] = useState(true);
-  const [message, setMessage] = useState('');
-  const limit = isMobile ?  10 : 30;
-  const [offset, setOffset] = useState(0);
-
-  // Get anime list of selected season
+  const limit = isMobile ? 10 : 30;
+  const [offset, setOffset] = useState(limit);
   const [isLatest, setIsLatest] = useState(false);
+  const [message, setMessage] = useState('');
+
+  // Get anime recomendation
   useEffect(() => {
     const fetchAnime = async () => {
-      if (isLatest) return;
-
       setIsLoading(true);
-      const { data, success, message } = await getSuggestedAnime(limit, offset);
 
+      const { success, data, message } = await getSuggestedAnime(100);
       if (success) {
-        if (!data.paging?.next) {
-          setIsLatest(true);
-        }
-  
-        // If offset 0, that is a new fetch
-        if (offset === 0) {
-          setAnimes([...data.data]);
-          setOriginalAnimes([...data.data]);
-        } else {
-          setAnimes(prev => [...prev, ...data.data]);
-          setOriginalAnimes(prev => [...prev, ...data.data]);
-        }
-  
-        setIsLoading(false);
+        setOriginalAnimes(data.data);
       } else {
         setMessage(message);
       }
-    };
 
+      setIsLoading(false);
+    }
+    
     fetchAnime();
-  }, [offset, isLoggedIn]);
+  }, [isLoggedIn]);
+
+  // Limit and offset to display on user screen
+  useEffect(() => {
+    console.log(animes);
+    setAnimes(originalAnimes.slice(0, offset));
+    if (animes.length === originalAnimes.length) setIsLatest(true);
+  }, [originalAnimes, offset]);
 
   // Get next anime list when user scrolling
-  const handleScroll = () => {
-    const scrollTop = window.scrollY;
-    const clientHeight = window.innerHeight;
-    const scrollHeight = document.documentElement.scrollHeight
-    if (scrollTop + clientHeight + 1 >= scrollHeight) {
-      setOffset((offset) => offset + limit);
-    }
-  }
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [])
+    if (isLatest) return;
+
+    const onScroll = () => handleScroll(setOffset, limit);
+
+    window.addEventListener('scroll', onScroll);
+    
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isLatest, limit]);
 
   return (
     <AnimeWrapper>
@@ -828,7 +822,10 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
           <Typography variant="subtitle1">{message} </Typography>
           <ButtonLink variant="contained" endIcon={<Login />} to={'/auth'} className="w-full sm:w-fit" sx={{ mt: 5 }}>Masuk</ButtonLink>
         </Container> :
-        <AnimeList animes={animes} isMobile={isMobile} isLoading={isLoading} setAnimes={setAnimes} isLatest={isLatest} />
+        <AnimeList 
+          animes={animes} isMobile={isMobile} isLoading={isLoading} 
+          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest} 
+        />
       }
     </AnimeWrapper>
   )
@@ -842,41 +839,56 @@ function AnimeWrapper({ children }) {
   )
 }
 
-// Filter and sort anime
+// All anime explore function
 
-function filterAndSortAnime(originalAnimes, accessType, status, platformId) {
+const filterAndSortAnime = (originalAnimes, accessType, status, platformId) => {
   let filteredAnime = [...originalAnimes]
   
   // Filter accessType
   if (accessType === 'available_for_free') {
-    filteredAnime = filteredAnime.filter(anime => {
-      return anime.platforms.some(platform => platform.accessType === 'free');
-    })
+    filteredAnime = filteredAnime.filter(anime =>
+      Array.isArray(anime.platforms) &&
+      anime.platforms.some(platform => platform?.accessType === 'free')
+    );
   } else if (accessType === 'limited_time') {
-    filteredAnime = filteredAnime.filter(anime => {
-      return (anime.platforms.length && anime.platforms.every(platform => platform.accessType === 'limited_time'));
-    })
+    filteredAnime = filteredAnime.filter(anime =>
+      Array.isArray(anime.platforms) &&
+      anime.platforms.length > 0 &&
+      anime.platforms.every(platform => platform?.accessType === 'limited_time')
+    );
   } else if (accessType === 'subscription_only') {
-    filteredAnime = filteredAnime.filter(anime => {
-      return (anime.platforms.length && anime.platforms.every(platform => platform.accessType === 'subscription'));
-    })
+    filteredAnime = filteredAnime.filter(anime =>
+      Array.isArray(anime.platforms) &&
+      anime.platforms.length > 0 &&
+      anime.platforms.every(platform => platform?.accessType === 'subscription')
+    );
   }
 
   // Filter status
   if (status === 'none') {
-    filteredAnime = filteredAnime.filter(anime => !anime.myListStatus?.status)
+    filteredAnime = filteredAnime.filter(anime => !anime.myListStatus?.status);
   } else if (status !== 'all') {
-    filteredAnime = filteredAnime.filter(anime => anime.myListStatus?.status === status)
+    filteredAnime = filteredAnime.filter(anime => anime.myListStatus?.status === status);
   }
 
   // Filter platform
   if (platformId !== 0) {
-    filteredAnime = filteredAnime.filter(anime => {
-      return (anime.platforms.length && anime.platforms.some(platform => platform.platform.id === platformId));
-    })
+    filteredAnime = filteredAnime.filter(anime =>
+      Array.isArray(anime.platforms) &&
+      anime.platforms.some(platform => platform?.platform?.id === platformId)
+    );
   }
 
   return filteredAnime
+}
+
+const handleScroll = (setOffset, limit) => {
+  const scrollTop = window.scrollY;
+  const clientHeight = window.innerHeight;
+  const scrollHeight = document.documentElement.scrollHeight
+  if (scrollTop + clientHeight + 1 >= scrollHeight - clientHeight) {
+    setOffset((offset) => offset + limit);
+  }
 }
 
 // List anime item

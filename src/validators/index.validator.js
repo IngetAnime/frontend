@@ -69,9 +69,9 @@ export const status = z
   })
 export const onePlatform = z
   .enum()
-export const sortAnime = z.enum(["anime_score", "anime_num_list_users"], {
+export const sortAnime = z.enum(["mean", "num_list_users", "start_date"], {
     errorMap: () => ({ 
-      message: "sort must be one of: anime_score or anime_num_list_users"
+      message: "sort must be one of: mean num_list_users, or start_date"
     })
   })
 export const idB = z.number({ message: 'Wajib dipilih' }).int().nonnegative()

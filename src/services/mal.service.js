@@ -1,6 +1,6 @@
 import axios from "./axiosConfig.js";
 
-const initialFields = 'synopsis,mean,genres,start_date,average_episode_duration'
+const initialFields = 'synopsis,mean,genres,start_date,average_episode_duration,num_list_users,media_type,start_season'
 
 export const getAnimeRanking = async (ranking_type, limit=100, offset, fields) => {
   fields = `${initialFields}${fields ? fields : ''}`
@@ -31,7 +31,7 @@ export const getAnimeRanking = async (ranking_type, limit=100, offset, fields) =
 }
 
 export const getSeasonalAnime = async (year, season, sort, limit=100, offset, fields='') => {
-  fields = `${initialFields},media_type,start_season${fields ? fields : ''}`
+  fields = `${initialFields}${fields ? fields : ''}`
   let data, success, message, status;
   try {
     const response = await axios.get(`/api/v1/anime/season/${year}/${season}`, {
