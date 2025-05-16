@@ -219,8 +219,6 @@ function TopAnime({ isMobile, isLoggedIn }) {
       const initialLimit = rankingType === 'upcoming' ? 128 : 500; // Upcoming cannot use limit 500
       const { data } = await getAnimeRanking(rankingType, initialLimit, 0);
       setOriginalAnimes(data.data);
-
-      setIsLoading(false);
     }
     
     fetchAnime();
@@ -237,7 +235,8 @@ function TopAnime({ isMobile, isLoggedIn }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if (animes.length === filteredAnimes.length) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsLoading(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -408,8 +407,6 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
 
       const { data } = await getSeasonalAnime(year, season, undefined, 500, 0);
       setOriginalAnimes(data.data);
-
-      setIsLoading(false);
     }
     
     fetchAnime();
@@ -472,7 +469,8 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if (animes.length === filteredAnimes.length) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsLoading(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -656,8 +654,6 @@ function Seasons({ isMobile, isLoggedIn }) {
 
       const { data } = await getSeasonalAnime(year, season, undefined, 500, 0);
       setOriginalAnimes(data.data);
-
-      setIsLoading(false);
     }
     
     fetchAnime();
@@ -709,7 +705,8 @@ function Seasons({ isMobile, isLoggedIn }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if (animes.length === filteredAnimes.length) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsLoading(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -779,8 +776,6 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
       } else {
         setMessage(message);
       }
-
-      setIsLoading(false);
     }
     
     fetchAnime();
@@ -790,7 +785,8 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
   useEffect(() => {
     console.log(animes);
     setAnimes(originalAnimes.slice(0, offset));
-    if (animes.length === originalAnimes.length) setIsLatest(true);
+    if ((animes.length === originalAnimes.length) || originalAnimes.length <= limit) setIsLatest(true);
+    setIsLoading(false);
   }, [originalAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -860,7 +856,13 @@ function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isL
       className={`flex flex-col gap-5 ${ !isMobile && 'flex-row flex-wrap justify-center'}`}
     >
       {
-        animes?.length ? 
+        isLoading ?
+        (Array(isMobile ? 3 : 12).fill(null).map((_,index) => (
+          <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
+            <AnimeSkeleton />
+          </ListItem>
+        ))) :
+
         (animes.map((anime, index) => (
           <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
             {
@@ -927,14 +929,10 @@ function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isL
               <AnimeSkeleton />
             }
           </ListItem>
-        ))) : 
-        (Array(isMobile ? 3 : 12).fill(null).map((_,index) => (
-          <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
-            <AnimeSkeleton />
-          </ListItem>
         )))
       }
-      {(!isLatest && animes?.length) ?
+      {
+        !isLatest ?
         (Array(
           isMobile ? 1 : (3 - (animes.length % 3) + (animes.length > 3 ? 0 : 3))
         ).fill(null).map((_,index) => (

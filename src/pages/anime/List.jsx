@@ -209,7 +209,6 @@ function All({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-    setIsSort(false);
   }, [originalAnimes, sort, accessType, platform])
 
   // Limit and offset to display on user screen
@@ -217,6 +216,7 @@ function All({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
     if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsSort(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -311,14 +311,14 @@ function Watching({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-    setIsSort(false);
   }, [originalAnimes, sort, accessType, platform])
 
   // Limit and offset to display on user screen
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if (animes.length === filteredAnimes.length) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsSort(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -413,14 +413,14 @@ function Completed({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-    setIsSort(false);
   }, [originalAnimes, sort, accessType, platform])
 
   // Limit and offset to display on user screen
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if (animes.length === filteredAnimes.length) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsSort(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -515,14 +515,14 @@ function OnHold({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-    setIsSort(false);
   }, [originalAnimes, sort, accessType, platform])
 
   // Limit and offset to display on user screen
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if (animes.length === filteredAnimes.length) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsSort(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -617,14 +617,14 @@ function Dropped({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-    setIsSort(false);
   }, [originalAnimes, sort, accessType, platform])
 
   // Limit and offset to display on user screen
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if (animes.length === filteredAnimes.length) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsSort(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
@@ -719,14 +719,14 @@ function PlanToWatch({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-    setIsSort(false);
   }, [originalAnimes, sort, accessType, platform])
 
   // Limit and offset to display on user screen
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if (animes.length === filteredAnimes.length) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    setIsSort(false);
   }, [filteredAnimes, offset]);
 
   // Get next anime list when user scrolling
