@@ -59,3 +59,29 @@ export const deleteAnimeList = async (animeId) => {
 
   return { success, data, status, message };
 }
+
+export const getAllAnimeList = async (animeId) => {
+  let data, success, message, status;
+  try {
+    const response = await axios.get(`/api/v1/user/@me/my-list-status`);
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Berhasil mendapatkan list anime pengguna`
+  } catch(err) {
+    if (err.response?.status) {
+      status = err.response.status;
+      success = false;
+      if (status === 401 || status === 400 || status === 403) 
+        message = 'Ups! Anda belum login. Silakan masuk untuk melihat daftar anime Anda.'
+      else if (status === 404)
+        message = 'Daftar anime Anda masih kosong. Yuk, mulai jelajahi dan tambahkan anime favorit!'
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+
+  return { success, data, status, message };
+}

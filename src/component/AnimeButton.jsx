@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import ButtonLink from "./ButtonLink";
 
-export default function AnimeButton({ backgroundColor, sx, icon: Icon, content, to, onClick, title }) {
+export default function AnimeButton({ backgroundColor, sx, icon: Icon, content, to, onClick, title, disabled }) {
   backgroundColor = 
     backgroundColor === 'green' ? '#00BC7D' :
     backgroundColor === 'yellow' ? '#F0B100' :
@@ -12,7 +12,7 @@ export default function AnimeButton({ backgroundColor, sx, icon: Icon, content, 
 
   return (
     <ButtonLink 
-      to={to} variant="contained" size="small" onClick={onClick} { ...(title && { title: title })}
+      to={to} variant="contained" size="small" onClick={onClick} { ...(title && { title: title })} disabled={disabled}
       {...(to ? { target: '_blank', rel: 'noopener' } : {})}
       sx={{ 
         backgroundColor, justifyContent: 'space-around', gap: '0.5rem', px: '0.5rem', 

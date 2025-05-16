@@ -38,7 +38,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
   const progress = watch('progress');
   
   // Menu item
-  const totalEpisode = anime.platforms[0]?.episodeAired || anime.num_episodes || 99;
+  const totalEpisode = anime.platforms[0]?.episodeAired || anime.num_episodes || anime.episodeTotal || 99;
   const menuSelect = [
     {
       name: 'Status',
@@ -62,7 +62,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
       isDirty: dirtyFields.progress,
       menus: [
         { text: '-', value: 0 },
-        ...Array(totalEpisode + 1).fill(null).map((_, i) => {
+        ...Array(totalEpisode).fill(null).map((_, i) => {
           return {
             text: (i + 1).toString(),
             value: i + 1

@@ -18,6 +18,8 @@ import getCurrentSeason from "../../helper/getCurrentSeason";
 import ButtonLink from "../../component/ButtonLink";
 import { getPlatforms } from "../../services/platform.service";
 import { toast } from "react-toastify";
+import { handleScroll } from "../../helper/handleScroll";
+import filterAndSortAnime from "../../helper/filterAndSortAnime";
 
 export default function Explore({ isDashboard=false }) {
   const theme = useTheme()
@@ -210,7 +212,6 @@ function TopAnime({ isMobile, isLoggedIn }) {
   ]
 
   // Get anime ranking list based on select value
-  // Get all anime list
   useEffect(() => {
     const fetchAnime = async () => {
       setIsLoading(true);
@@ -841,56 +842,6 @@ function AnimeWrapper({ children }) {
 
 // All anime explore function
 
-const filterAndSortAnime = (originalAnimes, accessType, status, platformId) => {
-  let filteredAnime = [...originalAnimes]
-  
-  // Filter accessType
-  if (accessType === 'available_for_free') {
-    filteredAnime = filteredAnime.filter(anime =>
-      Array.isArray(anime.platforms) &&
-      anime.platforms.some(platform => platform?.accessType === 'free')
-    );
-  } else if (accessType === 'limited_time') {
-    filteredAnime = filteredAnime.filter(anime =>
-      Array.isArray(anime.platforms) &&
-      anime.platforms.length > 0 &&
-      anime.platforms.every(platform => platform?.accessType === 'limited_time')
-    );
-  } else if (accessType === 'subscription_only') {
-    filteredAnime = filteredAnime.filter(anime =>
-      Array.isArray(anime.platforms) &&
-      anime.platforms.length > 0 &&
-      anime.platforms.every(platform => platform?.accessType === 'subscription')
-    );
-  }
-
-  // Filter status
-  if (status === 'none') {
-    filteredAnime = filteredAnime.filter(anime => !anime.myListStatus?.status);
-  } else if (status !== 'all') {
-    filteredAnime = filteredAnime.filter(anime => anime.myListStatus?.status === status);
-  }
-
-  // Filter platform
-  if (platformId !== 0) {
-    filteredAnime = filteredAnime.filter(anime =>
-      Array.isArray(anime.platforms) &&
-      anime.platforms.some(platform => platform?.platform?.id === platformId)
-    );
-  }
-
-  return filteredAnime
-}
-
-const handleScroll = (setOffset, limit) => {
-  const scrollTop = window.scrollY;
-  const clientHeight = window.innerHeight;
-  const scrollHeight = document.documentElement.scrollHeight
-  if (scrollTop + clientHeight + 1 >= scrollHeight - clientHeight) {
-    setOffset((offset) => offset + limit);
-  }
-}
-
 // List anime item
 
 function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isLatest }) {  
@@ -984,7 +935,9 @@ function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isL
         )))
       }
       {(!isLatest && animes?.length) ?
-        (Array(isMobile ? 1 : (3 - animes.length % 3)).fill(null).map((_,index) => (
+        (Array(
+          isMobile ? 1 : (3 - (animes.length % 3) + (animes.length > 3 ? 0 : 3))
+        ).fill(null).map((_,index) => (
           <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
             <AnimeSkeleton />
           </ListItem>

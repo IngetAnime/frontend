@@ -140,10 +140,10 @@ function EditAnime({ handleClose, handleIsPlatform, anime, setAnime }) {
     resolver: zodResolver(updateAnimeSchema), mode: 'onChange', values: {
       picture: anime.picture,
       title: anime.title,
-      titleID: anime.titleID,
-      titleEN: anime.titleEN,
-      releaseAt: dayjs(anime.releaseAt).format('YYYY-MM-DD'),
-      episodeTotal: anime.num_episodes,
+      titleID: anime.titleID || null,
+      titleEN: anime.titleEN || null,
+      releaseAt: (anime.releaseAt || anime.start_date) ? dayjs(anime.releaseAt || anime.start_date).format('YYYY-MM-DD') : null,
+      episodeTotal: anime.num_episodes || anime.episodeTotal,
       status: anime.status
     }
   })

@@ -10,7 +10,7 @@ export default function AnimePlatform({ platforms }) {
           platform.platform.name.includes('Bstation') ? <img src='/images/bilibili.svg' className="h-full w-full object-contain"/>
          : <></>;
         return (
-          <li key={index} className="shrink-0 pb-2 sm:pb-0">
+          <li key={index} className="shrink-0 sm:pb-0">
             <ButtonLink sx={{ height: '2rem', minWidth: 'unset', p: 0 }} to={platform.link} target="blank">
               {icon}
             </ButtonLink>

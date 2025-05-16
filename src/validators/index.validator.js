@@ -108,3 +108,14 @@ export const searchStatus = z
       message: "status must be one of: all, none, watching, completed, plan_to_watch, on_hold, or dropped"
     }),
   })
+export const sortAllList = z
+  .enum(["status", "score", "start_date", "last_updated", "title", "remaining_watchable_episodes"], {
+    errorMap: () => ({ 
+      message: "sort must be one of: status, score, start_date, last_updated, title, remaining_watchable_episodes"
+    })
+  })
+export const sortList = z.enum(["title", "score", "remaining_watchable_episodes", "start_date", "last_updated"], {
+    errorMap: () => ({ 
+      message: "sort must be one of: title, accessType, or start_date"
+    })
+  })
