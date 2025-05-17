@@ -31,3 +31,35 @@ export const updateAnime = async (
 
   return { success, data, status, message };
 }
+
+export const getAnimeTimeline = async (
+  weekCount, timeZone, myListOnly, originalSchedule
+) => {
+  let data, success, message, status;
+  try {
+    const response = await axios.get(`/api/v1/anime/timeline`, {
+      params: {
+        weekCount, timeZone, myListOnly, originalSchedule
+      }
+    });
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Berhasil mendapatkan timeline ${timeZone}`
+  } catch(err) {
+    if (err.response?.status) {
+      status = err.response.status;
+      success = false;
+      if (status === 400) 
+        message = 'Kesalahan input'
+      else
+        message = err.response.data.message
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan'
+    }
+  }
+
+  return { success, data, status, message };
+}

@@ -451,7 +451,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
         newAnimes.sort((a, b) => {
           if (!a.start_date) return 1;
           if (!b.start_date) return -1;
-          return dayjs(a.start_date).diff(dayjs(b.start_date)); // ascending
+            
         });
       }
 
