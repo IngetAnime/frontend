@@ -8,6 +8,7 @@ import {
   Switch,
   FormGroup,
   FormControlLabel,
+  CircularProgress,
 } from "@mui/material";
 import { Timeline as MuiTimeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot,  } from "@mui/lab";
 import { timelineItemClasses } from '@mui/lab/TimelineItem';
@@ -24,7 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { getAnimeTimelineSchema } from "../../validators/anime.validator";
 import { getAnimeTimeline } from "../../services/anime.service";
 import { toast } from "react-toastify";
-import { AccessTime, Circle } from "@mui/icons-material";
+import { AccessTime, Circle, CircleOutlined } from "@mui/icons-material";
 import { undefined } from "zod";
 
 dayjs.locale('id')
@@ -67,14 +68,12 @@ export default function Timeline({ isDashboard=false }) {
       } else {
         toast.error(message);
       }
+
+      setIsLoading(false);
     }
 
     fetchAnime();
   }, [originalSchedule, myListOnly])
-
-  // useEffect(() => {
-  //   console.log(timelines);
-  // }, [timelines])
 
   // Update anime
   const handleTimelines = (newAnime) => {
@@ -97,11 +96,16 @@ export default function Timeline({ isDashboard=false }) {
     <Box className="flex flex-col gap-4">
       <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
       <FilterTimeline control={control} />
-      {/* <DekstopTimeline days={timelines} setAnimes={handleTimelines} /> */}
       {
-        isMobile ? 
-        (<MobileTimeline days={timelines} setAnimes={handleTimelines} />) : 
-        (<DekstopTimeline days={timelines} setAnimes={handleTimelines} />)
+        isLoading ? 
+        <Box className="w-full flex justify-center py-25">
+          <CircularProgress />
+        </Box> :
+        (
+          isMobile ? 
+          (<MobileTimeline days={timelines} setAnimes={handleTimelines} />) : 
+          (<DekstopTimeline days={timelines} setAnimes={handleTimelines} />)
+        )
       }
     </Box>
   )
@@ -272,7 +276,7 @@ function AnimeTimelineItem({ dateTime, animes, setAnimes }) {
     <TimelineItem>
       <TimelineSeparator>
         <TimelineDot sx={{ p: 0 }} {...(isTime && { color: 'primary' })}>
-          <Circle fontSize="small" />
+          <CircleOutlined fontSize="small" />
         </TimelineDot>
         <TimelineConnector {...(isTime && { sx: { backgroundColor: 'primary.main' } })} />
       </TimelineSeparator >
