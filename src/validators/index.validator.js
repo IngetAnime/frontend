@@ -119,3 +119,7 @@ export const sortList = z.enum(["title", "score", "remaining_watchable_episodes"
       message: "sort must be one of: title, accessType, or start_date"
     })
   })
+export const importType = z
+  .enum(["skip_duplicates", "overwrite_all", "latest_updated"], {
+    errorMap: () => ({ message: "Type must be one of: skip_duplicates, overwrite_all, or latest_updated" })
+  })

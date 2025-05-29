@@ -10,7 +10,6 @@ import Link from "./Link";
 import { useState, useContext } from "react";
 import PropTypes from 'prop-types';
 import { AppContext } from "../context/AppContext";
-import underDevelopment from "../helper/underDevelopment";
 import ButtonLink from "./ButtonLink";
 import Logo from "./Logo";
 import AnimeSearch from "./Search";
@@ -52,7 +51,9 @@ export default function Header() {
     {
       text: 'Pengaturan',
       icon: <Settings />,
-      onClick: underDevelopment,
+      onClick: () => {
+        navigate('/user')
+      },
     },
     {
       text: 'Keluar',

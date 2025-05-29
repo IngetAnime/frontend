@@ -15,7 +15,7 @@ import { timelineItemClasses } from '@mui/lab/TimelineItem';
 import AnimePlatform from "../../component/AnimePlatform";
 import AnimeImage from "../../component/AnimeImage";
 import CustomTabPanel from "../../component/CustomTabPanel";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import 'dayjs/locale/id'
 import Slider from "../../component/Slider";
@@ -27,6 +27,8 @@ import { getAnimeTimeline } from "../../services/anime.service";
 import { toast } from "react-toastify";
 import { AccessTime, Circle, CircleOutlined } from "@mui/icons-material";
 import { undefined } from "zod";
+import { AppContext } from "../../context/AppContext";
+import { useLocation } from "react-router-dom";
 
 dayjs.locale('id')
 
@@ -35,6 +37,9 @@ export default function Timeline({ isDashboard=false }) {
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md')) || isDashboard
+  const location = useLocation()
+  localStorage.setItem('lastPath', location.pathname)
+  const { isLoggedIn } = useContext(AppContext)
 
   // Form 
 
@@ -73,7 +78,7 @@ export default function Timeline({ isDashboard=false }) {
     }
 
     fetchAnime();
-  }, [originalSchedule, myListOnly])
+  }, [originalSchedule, myListOnly, isLoggedIn])
 
   // Update anime
   const handleTimelines = (newAnime) => {

@@ -31,6 +31,7 @@ export default function List({ isDashboard=false }) {
   
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    localStorage.setItem('lastAnimeList', newValue)
   };
 
   function a11yProps(index) {
@@ -75,7 +76,7 @@ export default function List({ isDashboard=false }) {
       text: 'Semua',
       icon: <CalendarToday />,
       element: <All 
-        isMobile={isMobile} isLoading={isLoading}
+        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
         rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} 
       />
     },
@@ -84,7 +85,7 @@ export default function List({ isDashboard=false }) {
       icon: <EventNote />,
       element: 
       <Watching
-        isMobile={isMobile} isLoading={isLoading}
+        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
         rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
       />
     },
@@ -92,7 +93,7 @@ export default function List({ isDashboard=false }) {
       text: 'Selesai',
       icon: <EventAvailable />,
       element: <Completed
-        isMobile={isMobile} isLoading={isLoading}
+        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
         rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
       />
     },
@@ -100,7 +101,7 @@ export default function List({ isDashboard=false }) {
       text: 'Ditunda',
       icon: <EventRepeat />,
       element: <OnHold
-        isMobile={isMobile} isLoading={isLoading}
+        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
         rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
       />
     },
@@ -108,7 +109,7 @@ export default function List({ isDashboard=false }) {
       text: 'Ditinggalkan',
       icon: <EventBusy />,
       element: <Dropped
-        isMobile={isMobile} isLoading={isLoading}
+        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
         rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
       />
     },
@@ -116,7 +117,7 @@ export default function List({ isDashboard=false }) {
       text: 'Direncanakan',
       icon: <EditCalendar />,
       element: <PlanToWatch
-        isMobile={isMobile} isLoading={isLoading}
+        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
         rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
       />
     },
@@ -173,7 +174,7 @@ export default function List({ isDashboard=false }) {
   )
 }
 
-function All({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
+function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [filteredAnimes, setFilteredAnimes] = useState([]);
@@ -215,7 +216,7 @@ function All({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsSort(false);
   }, [filteredAnimes, offset]);
 
@@ -275,7 +276,7 @@ function All({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   )
 }
 
-function Watching({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
+function Watching({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [filteredAnimes, setFilteredAnimes] = useState([]);
@@ -317,7 +318,7 @@ function Watching({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsSort(false);
   }, [filteredAnimes, offset]);
 
@@ -377,7 +378,7 @@ function Watching({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   )
 }
 
-function Completed({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
+function Completed({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [filteredAnimes, setFilteredAnimes] = useState([]);
@@ -419,7 +420,7 @@ function Completed({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsSort(false);
   }, [filteredAnimes, offset]);
 
@@ -479,7 +480,7 @@ function Completed({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   )
 }
 
-function OnHold({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
+function OnHold({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [filteredAnimes, setFilteredAnimes] = useState([]);
@@ -521,7 +522,7 @@ function OnHold({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsSort(false);
   }, [filteredAnimes, offset]);
 
@@ -581,7 +582,7 @@ function OnHold({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   )
 }
 
-function Dropped({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
+function Dropped({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [filteredAnimes, setFilteredAnimes] = useState([]);
@@ -623,7 +624,7 @@ function Dropped({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsSort(false);
   }, [filteredAnimes, offset]);
 
@@ -683,7 +684,7 @@ function Dropped({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   )
 }
 
-function PlanToWatch({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
+function PlanToWatch({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [filteredAnimes, setFilteredAnimes] = useState([]);
@@ -725,7 +726,7 @@ function PlanToWatch({ isMobile, isLoading, rootAnimes, setRootAnimes }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsSort(false);
   }, [filteredAnimes, offset]);
 

@@ -13,6 +13,7 @@ import Explore from './pages/anime/Explore';
 import List from './pages/anime/List';
 import GoogleCallback from './pages/auth/GoogleCallback';
 import MyAnimeListCallback from './pages/auth/MyAnimeListCallback';
+import Settings from './pages/Settings';
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
             element: <List />
           }
         ]
+      },
+      {
+        path: 'user',
+        element: <Settings />
       }
     ]
   },

@@ -27,7 +27,27 @@ const theme = createTheme({
     secondary: {
       main: '#FB2C36',
       contrastText: '#FFF'
-    }
+    },
+    green: {
+      main: '#00BC7D',
+      contrastText: '#FFF',
+    },
+    yellow: {
+      main: '#F0B100',
+      contrastText: '#000',
+    },
+    blue: {
+      main: '#0092B8',
+      contrastText: '#FFF',
+    },
+    red: {
+      main: '#FB2C36',
+      contrastText: '#FFF',
+    },
+    gray: {
+      main: '#90A1B9',
+      contrastText: '#000',
+    },
     // secondary: {
     //   light: '#ff7961',
     //   main: '#f44336',

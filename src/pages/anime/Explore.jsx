@@ -31,12 +31,12 @@ export default function Explore({ isDashboard=false }) {
     <Box className={`flex flex-col gap-5 $`}>
       <Typography variant="h2">Eksplorasi Judul Anime!</Typography>
 
-      <AnimeExploreType isMobile={isMobile} />
+      <AnimeExploreType isMobile={isMobile} isDashboard={isDashboard}/>
     </Box>
   )
 }
 
-function AnimeExploreType({ isMobile }) {
+function AnimeExploreType({ isMobile, isDashboard }) {
   const lastAnimeExplore = parseInt(localStorage.getItem('lastAnimeExplore')) || 0
   const { isLoggedIn } = useContext(AppContext)
   const [value, setValue] = useState(lastAnimeExplore);
@@ -50,22 +50,22 @@ function AnimeExploreType({ isMobile }) {
     {
       text: 'Anime Terbaik',
       icon: <EmojiEvents />,
-      element: <TopAnime isMobile={isMobile} isLoggedIn={isLoggedIn} />
+      element: <TopAnime isMobile={isMobile} isLoggedIn={isLoggedIn} isDashboard={isDashboard} />
     },
     {
       text: 'Musim Ini',
       icon: <Autorenew />,
-      element: <CurrentSeason isMobile={isMobile} isLoggedIn={isLoggedIn} />
+      element: <CurrentSeason isMobile={isMobile} isLoggedIn={isLoggedIn} isDashboard={isDashboard} />
     },
     {
       text: 'Rekomendasi',
       icon: <Lightbulb />,
-      element: <SuggestedAnime isMobile={isMobile} isLoggedIn={isLoggedIn} />
+      element: <SuggestedAnime isMobile={isMobile} isLoggedIn={isLoggedIn} isDashboard={isDashboard} />
     },
     {
       text: 'Musiman',
       icon: <CalendarMonth />,
-      element: <Seasons isMobile={isMobile} isLoggedIn={isLoggedIn} />
+      element: <Seasons isMobile={isMobile} isLoggedIn={isLoggedIn} isDashboard={isDashboard} />
     },
   ]
 
@@ -105,7 +105,7 @@ function AnimeExploreType({ isMobile }) {
 
 // List anime explore type
 
-function TopAnime({ isMobile, isLoggedIn }) {
+function TopAnime({ isMobile, isLoggedIn, isDashboard }) {
   // Component
 
   // State
@@ -235,7 +235,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsLoading(false);
   }, [filteredAnimes, offset]);
 
@@ -283,7 +283,7 @@ function TopAnime({ isMobile, isLoggedIn }) {
   )
 }
 
-function CurrentSeason({ isMobile, isLoggedIn  }) {
+function CurrentSeason({ isMobile, isLoggedIn, isDashboard  }) {
   // Component
 
   // State
@@ -469,7 +469,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsLoading(false);
   }, [filteredAnimes, offset]);
 
@@ -517,7 +517,7 @@ function CurrentSeason({ isMobile, isLoggedIn  }) {
   )
 }
 
-function Seasons({ isMobile, isLoggedIn }) {
+function Seasons({ isMobile, isLoggedIn, isDashboard }) {
   // Component
 
   // State
@@ -705,7 +705,7 @@ function Seasons({ isMobile, isLoggedIn }) {
   useEffect(() => {
     if (isLatest) return;
     setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsLoading(false);
   }, [filteredAnimes, offset]);
 
@@ -753,7 +753,7 @@ function Seasons({ isMobile, isLoggedIn }) {
   )
 }
 
-function SuggestedAnime({ isMobile, isLoggedIn }) {
+function SuggestedAnime({ isMobile, isLoggedIn, isDashboard }) {
   // Component
 
   // State
@@ -785,7 +785,7 @@ function SuggestedAnime({ isMobile, isLoggedIn }) {
   useEffect(() => {
     console.log(animes);
     setAnimes(originalAnimes.slice(0, offset));
-    if ((animes.length === originalAnimes.length) || originalAnimes.length <= limit) setIsLatest(true);
+    if ((animes.length === originalAnimes.length) || originalAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsLoading(false);
   }, [originalAnimes, offset]);
 

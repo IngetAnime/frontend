@@ -14,7 +14,8 @@ export default function MyAnimeListCallback() {
     didRun.current = true;
     
     const code = searchParam.get('code');
-    if (code) loginWithMal(code);
+    const state = searchParam.get('state');
+    if (code && state) loginWithMal(code, state);
   }, [searchParam, loginWithMal])
   
   return (

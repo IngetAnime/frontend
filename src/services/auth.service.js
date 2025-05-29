@@ -173,19 +173,27 @@ export const resetPassword = async (token, newPassword, confirmPassword) => {
   return { success, data, status, message };
 }
 
-export const loginWithGoogle = async (code) => {
+export const loginWithGoogle = async (code, state) => {
   let data, success, message, status;
   try {
-    const response = await axios.post('/api/v1/auth/google', { code })
+    const response = await axios.post('/api/v1/auth/google', { code, state })
     data = response.data;
     status = response.status;
     success = true;
-    message = `Login dengan Google berhasil`;
+    message = data.googleEmail ? 'Berhasil terhubung dengan Google' : `Login dengan Google berhasil`;
   } catch(err) {
     if (err.response && err.response.status === 400) {
       status = err.response.status;
       success = false;
       message = 'Code tidak valid atau sudah kedaluwarsa'
+    } else if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+      status = err.response.status;
+      success = false;
+      message = 'Silakan login terlebih dahulu'
+    } else if (err.response && err.response.status === 409) {
+      status = err.response.status;
+      success = false;
+      message = 'Akun Google ini sudah terhubung dengan pengguna lain'
     } else {
       status = err.status;
       success = false;
@@ -196,19 +204,27 @@ export const loginWithGoogle = async (code) => {
   return { success, data, status, message };
 }
 
-export const loginWithMal = async (code) => {
+export const loginWithMal = async (code, state) => {
   let data, success, message, status;
   try {
-    const response = await axios.post('/api/v1/auth/mal', { code })
+    const response = await axios.post('/api/v1/auth/mal', { code, state })
     data = response.data;
     status = response.status;
     success = true;
-    message = `Login dengan MyAnimeList berhasil`;
+    message = data.myAnimeList ? 'Berhasil terhubung dengan MyAnimeList' : `Login dengan MyAnimeList berhasil`;
   } catch(err) {
     if (err.response && err.response.status === 400) {
       status = err.response.status;
       success = false;
       message = 'Code tidak valid atau sudah kedaluwarsa'
+    } else if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+      status = err.response.status;
+      success = false;
+      message = 'Silakan login terlebih dahulu'
+    } else if (err.response && err.response.status === 409) {
+      status = err.response.status;
+      success = false;
+      message = 'Akun MyAnimeList ini sudah terhubung dengan pengguna lain'
     } else {
       status = err.status;
       success = false;
@@ -219,12 +235,12 @@ export const loginWithMal = async (code) => {
   return { success, data, status, message };
 }
 
-export const getGoogleAuthUrl = async () => {
-  const data = await axios.get('/api/v1/auth/google')
+export const getGoogleAuthUrl = async (mode='login') => {
+  const data = await axios.get('/api/v1/auth/google', { params: { mode } })
   return data;
 }
 
-export const getMALAuthUrl = async () => {
-  const data = await axios.get('/api/v1/auth/mal')
+export const getMALAuthUrl = async (mode='login') => {
+  const data = await axios.get('/api/v1/auth/mal', { params: { mode } })
   return data;
 }
