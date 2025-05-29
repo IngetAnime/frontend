@@ -15,7 +15,7 @@ export default function GoogleCallback() {
     
     const code = searchParam.get('code');
     const state = searchParam.get('state');
-    if (code && state) loginWithGoogle(code, state);
+    loginWithGoogle(code, state);
   }, [searchParam, loginWithGoogle])
 
   return (

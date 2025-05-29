@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import useLogin from "./useLogin";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
+import isValidJSON from "../helper/isValidJSON";
 
 export default function useGoogleLogin() {
   const navigate = useNavigate()
@@ -11,7 +12,7 @@ export default function useGoogleLogin() {
   const { setUserData } = useContext(AppContext)
   const lastPath = localStorage.getItem('lastPath') || '/';
   const googleLogin = async (code, state) => {
-    if (!code || !state) return;
+    if (!code || !state || !isValidJSON(atob(state))) navigate(lastPath);
     const stateDedoced = JSON.parse(atob(state));
     const { success, message, data } = await loginWithGoogle(code, state);
     if (success) {
