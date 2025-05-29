@@ -1,5 +1,5 @@
-import { Box, Card, LinearProgress, List as MuiList, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, IconButton, Container, Skeleton } from "@mui/material";
-import { Add, CalendarToday, Edit, EditCalendar, EventAvailable, EventBusy, EventNote, EventRepeat, Login } from "@mui/icons-material";
+import { Box, Card, LinearProgress, List as MuiList, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, IconButton, Container, Skeleton, Button } from "@mui/material";
+import { Add, CalendarToday, Edit, EditCalendar, EventAvailable, EventBusy, EventNote, EventRepeat, Login, RestartAlt } from "@mui/icons-material";
 import { useContext, useEffect, useState } from "react";
 import SortAndFilter from "../../component/SortAndFilter";
 import CustomTabPanel from "../../component/CustomTabPanel";
@@ -268,10 +268,32 @@ function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} />
+      {
+        !animes.length ? 
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList
+          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
+        />
+      }
     </>
   )
 }
@@ -370,10 +392,32 @@ function Watching({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes 
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} />
+      {
+        !animes.length ? 
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList
+          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
+        />
+      }
     </>
   )
 }
@@ -472,10 +516,32 @@ function Completed({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} />
+      {
+        !animes.length ? 
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList
+          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
+        />
+      }
     </>
   )
 }
@@ -574,10 +640,32 @@ function OnHold({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes })
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} />
+      {
+        !animes.length ? 
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList
+          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
+        />
+      }
     </>
   )
 }
@@ -676,10 +764,32 @@ function Dropped({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} />
+      {
+        !animes.length ? 
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList
+          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
+        />
+      }
     </>
   )
 }
@@ -778,10 +888,32 @@ function PlanToWatch({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnim
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} />
+      {
+        !animes.length ? 
+        <Container>
+          <Typography 
+            fontWeight={'bold'} 
+            color="secondary"
+            component={'div'}
+            fontSize={'small'} 
+            sx={{
+              fontSize: { xs: '3rem', md: '5rem' }
+            }}
+          >
+            Anime <br /> Tidak Ditemukan
+          </Typography>
+          <Typography variant="subtitle1">
+            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+          </Typography>
+          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+            Atur ulang
+          </Button>
+        </Container> :
+        <AnimeList
+          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
+        />
+      }
     </>
   )
 }
