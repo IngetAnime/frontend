@@ -10,6 +10,8 @@ import { confirmPassword, email, password, username } from "../../validators/ind
 import { zodResolver } from "@hookform/resolvers/zod";
 import { register as registerUser } from "../../services/auth.service.js";
 import useLogin from "../../hooks/useLogin.js";
+import { useEffect, useState } from "react";
+import { checkEmailAvailability, checkUsernameAvailability } from "../../services/user.service.js";
 
 export default function RegisterPage() {
   const schema = z.object({
@@ -22,7 +24,7 @@ export default function RegisterPage() {
     path: ["confirmPassword"],
   })
 
-  const { register, setError, clearErrors, handleSubmit, formState: { errors } } = useForm({
+  const { register, setError, clearErrors, watch, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema), mode: 'onChange'
   })
 
@@ -41,6 +43,43 @@ export default function RegisterPage() {
     }
   }
 
+  // Check username and email availability
+
+  const emailVal = watch('email');
+  const usernameVal = watch('username');
+  const [emailMessage, setEmailMessage] = useState('');
+  const [usernameMessage, setUsernameMessage] = useState('');
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout( async () => {
+      if (errors.email || !emailVal) return; // Local error
+      setEmailMessage('Mengecek ...');
+      const { status, message } = await checkEmailAvailability(emailVal); // Hit API
+      if (status === 400 || status === 409) {
+        setError('email', { message: message });
+      } else {
+        setEmailMessage(message);
+      }
+    }, 1000)
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [emailVal]);
+  
+  useEffect(() => {
+    const delayDebounceFn = setTimeout( async () => {
+      if (errors.username || !usernameVal) return; // Local error
+      setUsernameMessage('Mengecek ...');
+      const { status, message } = await checkUsernameAvailability(usernameVal); // Hit API
+      if (status === 400 || status === 409) {
+        setError('username', { message: message });
+      } else {
+        setUsernameMessage(message);
+      }
+    }, 1000)
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [usernameVal]);
+
   return (
     <>
       {/* Title and subtitle */}
@@ -48,7 +87,7 @@ export default function RegisterPage() {
 
       {/* Register form */}
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <TextField
+        {/* <TextField
           id="username"
           label="Username"
           autoComplete="username"
@@ -65,6 +104,46 @@ export default function RegisterPage() {
           {...register('email', { onChange: () => clearErrors('root') })}
           {...((errors.email) && {error: true, helperText: errors.email.message})}
           {...(errors.root && {error: true, helperText: 'Username atau email telah digunakan'})}
+        /> */}
+        <TextField
+          fullWidth
+          disabled={isSubmitting}
+          id="username"
+          label="Username"
+          autoComplete="username"
+          {...register('username', { 
+            onChange: () => { 
+              clearErrors('root'); 
+              clearErrors('username'); 
+            }
+          })}
+          helperText={
+            errors.username ? errors.username.message : 
+            errors.root ? 'Username tidak cocok' :
+            usernameMessage
+          }
+          {...((errors.username) && { error: true })}
+          {...((errors.root) && { error: true })}
+        />
+        <TextField
+          fullWidth
+          disabled={isSubmitting}
+          id="email"
+          label="Email"
+          autoComplete="email"
+          {...register('email', { 
+            onChange: () => { 
+              clearErrors('root'); 
+              clearErrors('email'); 
+            }
+          })}
+          helperText={
+            errors.email ? errors.email.message : 
+            errors.root ? 'Email tidak cocok' :
+            emailMessage
+          }
+          {...((errors.email) && { error: true })}
+          {...((errors.root) && { error: true })}
         />
         <PasswordField 
           required
