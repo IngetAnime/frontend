@@ -177,8 +177,8 @@ export default function List({ isDashboard=false }) {
 function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState([]);
-  const [animes, setAnimes] = useState([]);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const platformItems = usePlatforms();
   const [isSort, setIsSort] = useState(true);
   const limit = isMobile ? 10 : 30;
@@ -186,7 +186,7 @@ function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   const [isLatest, setIsLatest] = useState(false);
 
   // Settings
-  const { control, watch } = useForm({
+  const { control, watch, reset } = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'status',
       accessType: 'all',
@@ -268,32 +268,10 @@ function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      {
-        !animes.length ? 
-        <Container>
-          <Typography 
-            fontWeight={'bold'} 
-            color="secondary"
-            component={'div'}
-            fontSize={'small'} 
-            sx={{
-              fontSize: { xs: '3rem', md: '5rem' }
-            }}
-          >
-            Anime <br /> Tidak Ditemukan
-          </Typography>
-          <Typography variant="subtitle1">
-            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
-          </Typography>
-          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
-            Atur ulang
-          </Button>
-        </Container> :
-        <AnimeList
-          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
-        />
-      }
+      <AnimeList
+        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
+      />
     </>
   )
 }
@@ -301,8 +279,8 @@ function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
 function Watching({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState([]);
-  const [animes, setAnimes] = useState([]);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const platformItems = usePlatforms();
   const [isSort, setIsSort] = useState(true);
   const limit = isMobile ? 10 : 30;
@@ -310,7 +288,7 @@ function Watching({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes 
   const [isLatest, setIsLatest] = useState(false);
 
   // Settings
-  const { control, watch } = useForm({
+  const { control, watch, reset } = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'remaining_watchable_episodes',
       accessType: 'all',
@@ -392,32 +370,10 @@ function Watching({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes 
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      {
-        !animes.length ? 
-        <Container>
-          <Typography 
-            fontWeight={'bold'} 
-            color="secondary"
-            component={'div'}
-            fontSize={'small'} 
-            sx={{
-              fontSize: { xs: '3rem', md: '5rem' }
-            }}
-          >
-            Anime <br /> Tidak Ditemukan
-          </Typography>
-          <Typography variant="subtitle1">
-            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
-          </Typography>
-          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
-            Atur ulang
-          </Button>
-        </Container> :
-        <AnimeList
-          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
-        />
-      }
+      <AnimeList
+        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
+      />
     </>
   )
 }
@@ -425,8 +381,8 @@ function Watching({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes 
 function Completed({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState([]);
-  const [animes, setAnimes] = useState([]);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const platformItems = usePlatforms();
   const [isSort, setIsSort] = useState(true);
   const limit = isMobile ? 10 : 30;
@@ -434,7 +390,7 @@ function Completed({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
   const [isLatest, setIsLatest] = useState(false);
 
   // Settings
-  const { control, watch } = useForm({
+  const { control, watch, reset } = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'score',
       accessType: 'all',
@@ -516,32 +472,10 @@ function Completed({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      {
-        !animes.length ? 
-        <Container>
-          <Typography 
-            fontWeight={'bold'} 
-            color="secondary"
-            component={'div'}
-            fontSize={'small'} 
-            sx={{
-              fontSize: { xs: '3rem', md: '5rem' }
-            }}
-          >
-            Anime <br /> Tidak Ditemukan
-          </Typography>
-          <Typography variant="subtitle1">
-            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
-          </Typography>
-          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
-            Atur ulang
-          </Button>
-        </Container> :
-        <AnimeList
-          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
-        />
-      }
+      <AnimeList
+        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
+      />
     </>
   )
 }
@@ -549,8 +483,8 @@ function Completed({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
 function OnHold({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState([]);
-  const [animes, setAnimes] = useState([]);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const platformItems = usePlatforms();
   const [isSort, setIsSort] = useState(true);
   const limit = isMobile ? 10 : 30;
@@ -558,7 +492,7 @@ function OnHold({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes })
   const [isLatest, setIsLatest] = useState(false);
 
   // Settings
-  const { control, watch } = useForm({
+  const { control, watch, reset } = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'start_date',
       accessType: 'all',
@@ -640,32 +574,10 @@ function OnHold({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes })
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      {
-        !animes.length ? 
-        <Container>
-          <Typography 
-            fontWeight={'bold'} 
-            color="secondary"
-            component={'div'}
-            fontSize={'small'} 
-            sx={{
-              fontSize: { xs: '3rem', md: '5rem' }
-            }}
-          >
-            Anime <br /> Tidak Ditemukan
-          </Typography>
-          <Typography variant="subtitle1">
-            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
-          </Typography>
-          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
-            Atur ulang
-          </Button>
-        </Container> :
-        <AnimeList
-          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
-        />
-      }
+      <AnimeList
+        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
+      />
     </>
   )
 }
@@ -673,8 +585,8 @@ function OnHold({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes })
 function Dropped({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState([]);
-  const [animes, setAnimes] = useState([]);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const platformItems = usePlatforms();
   const [isSort, setIsSort] = useState(true);
   const limit = isMobile ? 10 : 30;
@@ -682,7 +594,7 @@ function Dropped({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }
   const [isLatest, setIsLatest] = useState(false);
 
   // Settings
-  const { control, watch } = useForm({
+  const { control, watch, reset } = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'title',
       accessType: 'all',
@@ -764,32 +676,10 @@ function Dropped({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      {
-        !animes.length ? 
-        <Container>
-          <Typography 
-            fontWeight={'bold'} 
-            color="secondary"
-            component={'div'}
-            fontSize={'small'} 
-            sx={{
-              fontSize: { xs: '3rem', md: '5rem' }
-            }}
-          >
-            Anime <br /> Tidak Ditemukan
-          </Typography>
-          <Typography variant="subtitle1">
-            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
-          </Typography>
-          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
-            Atur ulang
-          </Button>
-        </Container> :
-        <AnimeList
-          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
-        />
-      }
+      <AnimeList
+        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
+      />
     </>
   )
 }
@@ -797,8 +687,8 @@ function Dropped({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }
 function PlanToWatch({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState([]);
-  const [animes, setAnimes] = useState([]);
+  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
+  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const platformItems = usePlatforms();
   const [isSort, setIsSort] = useState(true);
   const limit = isMobile ? 10 : 30;
@@ -806,7 +696,7 @@ function PlanToWatch({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnim
   const [isLatest, setIsLatest] = useState(false);
 
   // Settings
-  const { control, watch } = useForm({
+  const { control, watch, reset } = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'last_updated',
       accessType: 'all',
@@ -888,37 +778,15 @@ function PlanToWatch({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnim
   return (
     <>
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      {
-        !animes.length ? 
-        <Container>
-          <Typography 
-            fontWeight={'bold'} 
-            color="secondary"
-            component={'div'}
-            fontSize={'small'} 
-            sx={{
-              fontSize: { xs: '3rem', md: '5rem' }
-            }}
-          >
-            Anime <br /> Tidak Ditemukan
-          </Typography>
-          <Typography variant="subtitle1">
-            {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
-          </Typography>
-          <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
-            Atur ulang
-          </Button>
-        </Container> :
-        <AnimeList
-          animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-          originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} 
-        />
-      }
+      <AnimeList
+        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
+      />
     </>
   )
 }
 
-function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isLatest }) {
+function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isLatest, reset }) {
   const setAnime = (newAnime) => {
     const newAnimes = originalAnimes.map(anime => {
       if (anime.id === newAnime.id) {
@@ -929,8 +797,8 @@ function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isL
     setAnimes(newAnimes)
   }
 
-  return (
-    <MuiList 
+  return animes.length ?
+    (<MuiList 
       disablePadding sx={{ py: '1rem' }}
       className={`flex flex-col gap-5 ${ !isMobile && 'flex-row flex-wrap justify-center'}`}>
       {
@@ -944,23 +812,27 @@ function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isL
         (animes.map((anime, i) => {
           return (
             <ListItem disablePadding key={i} className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
-              <Card className="flex overflow-hidden h-41 w-full">
-                <Box className="w-25 sm:w-30 h-full">
-                  <AnimeImage 
-                    anime={anime}
-                    setAnime={setAnime}
-                    episodeAired={anime.status === 'finished_airing' ? anime.episodeTotal : anime.platforms[0]?.episodeAired} 
-                  />
-                </Box>
-    
-                <Box className="flex flex-col justify-between py-1 px-2 flex-1">
-                  <Box className="flex flex-col gap-5">
-                    <AnimeTitle anime={anime} />
-                    <AnimeProgress anime={anime} setAnime={setAnime} />
+              {
+                anime ? 
+                <Card className="flex overflow-hidden h-41 w-full">
+                  <Box className="w-25 sm:w-30 h-full">
+                    <AnimeImage 
+                      anime={anime}
+                      setAnime={setAnime}
+                      episodeAired={anime.status === 'finished_airing' ? anime.episodeTotal : anime.platforms[0]?.episodeAired} 
+                    />
                   </Box>
-                  <AnimePlatform platforms={anime.platforms} />
-                </Box>
-              </Card>
+      
+                  <Box className="flex flex-col justify-between py-1 px-2 flex-1">
+                    <Box className="flex flex-col gap-5">
+                      <AnimeTitle anime={anime} />
+                      <AnimeProgress anime={anime} setAnime={setAnime} />
+                    </Box>
+                    <AnimePlatform platforms={anime.platforms} />
+                  </Box>
+                </Card> :
+                <AnimeSkeleton />
+              }
             </ListItem>
           )
         }))
@@ -975,8 +847,26 @@ function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isL
           </ListItem>
         )) : <></>
       }
-    </MuiList>
-  )
+    </MuiList>) :
+    (<Container>
+      <Typography 
+        fontWeight={'bold'} 
+        color="secondary"
+        component={'div'}
+        fontSize={'small'} 
+        sx={{
+          fontSize: { xs: '3rem', md: '5rem' }
+        }}
+      >
+        Anime <br /> Tidak Ditemukan
+      </Typography>
+      <Typography variant="subtitle1">
+        {'Silakan atur kembali filter dan pengurutan atau tekan tombol di bawah ini untuk mengatur ulang'}
+      </Typography>
+      <Button variant="contained" endIcon={<RestartAlt />} className="w-full sm:w-fit" sx={{ mt: 5 }} onClick={() => reset()}>
+        Atur ulang
+      </Button>
+    </Container>)
 }
 
 function AnimeTitle({ anime }) {
