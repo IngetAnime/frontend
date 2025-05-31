@@ -75,51 +75,81 @@ export default function List({ isDashboard=false }) {
     {
       text: 'Semua',
       icon: <CalendarToday />,
-      element: <All 
-        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
-        rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} 
-      />
+      element: 
+        <All>
+          {(form, sortMenu) => (
+            <CustomTab 
+              isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'all'}
+              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+            />
+          )}
+        </All>
     },
     { 
       text: 'Berjalan',
       icon: <EventNote />,
       element: 
       <Watching
-        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
-        rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
-      />
+        >
+          {(form, sortMenu) => (
+            <CustomTab 
+              isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'watching'}
+              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+            />
+          )}
+        </Watching>
     },
     { 
       text: 'Selesai',
       icon: <EventAvailable />,
-      element: <Completed
-        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
-        rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
-      />
+      element: 
+        <Completed>
+          {(form, sortMenu) => (
+            <CustomTab 
+              isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'completed'}
+              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+            />
+          )}
+        </Completed>
     },
     { 
       text: 'Ditunda',
       icon: <EventRepeat />,
-      element: <OnHold
-        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
-        rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
-      />
+      element: 
+        <OnHold>
+          {(form, sortMenu) => (
+            <CustomTab 
+              isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'on_hold'}
+              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+            />
+          )}
+        </OnHold>
     },
     { 
       text: 'Ditinggalkan',
       icon: <EventBusy />,
-      element: <Dropped
-        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
-        rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
-      />
+      element: 
+        <Dropped>
+          {(form, sortMenu) => (
+            <CustomTab 
+              isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'dropped'}
+              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+            />
+          )}
+        </Dropped>
     },
     { 
       text: 'Direncanakan',
       icon: <EditCalendar />,
-      element: <PlanToWatch
-        isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard}
-        rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes}
-      />
+      element: 
+        <PlanToWatch>
+          {(form, sortMenu) => (
+            <CustomTab 
+              isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'plan_to_watch'}
+              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+            />
+          )}
+        </PlanToWatch>
     },
   ]
 
@@ -174,34 +204,27 @@ export default function List({ isDashboard=false }) {
   )
 }
 
-function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
+function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes, status, form, sortMenu }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
   const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const platformItems = usePlatforms();
   const [isSort, setIsSort] = useState(true);
   const limit = isMobile ? 10 : 30;
   const [offset, setOffset] = useState(limit);
   const [isLatest, setIsLatest] = useState(false);
 
   // Settings
-  const { control, watch, reset } = useForm({
-    resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
-      sort: 'status',
-      accessType: 'all',
-      platform: 0
-    }
-  });
+  const { control, watch, reset } = form;
 
   // Watch input value
-  const sort = watch('sort')
-  const accessType = watch('accessType')
-  const platform = watch('platform')
+  const sort = watch('sort');
+  const accessType = watch('accessType');
+  const platform = watch('platform');
 
   // Update if root anime have update, for example if user logout
   useEffect(() => {
-    setOriginalAnimes(rootAnimes)
+    setOriginalAnimes(filterAndSortAnime(rootAnimes, 'all', status, 0))
   }, [rootAnimes]) // Store for clean data
 
   // Filter and sort data
@@ -231,6 +254,29 @@ function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, [isLatest, limit]);
 
+  return (
+    <>
+      <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
+      <AnimeList
+        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
+        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
+      />
+    </>
+  )
+}
+
+function All({ children }) {
+  // Settings
+  const form = useForm({
+    resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
+      sort: 'status',
+      accessType: 'all',
+      platform: 0
+    }
+  });
+
+  // Menu items
+  const platformItems = usePlatforms();
   const sortMenu = [
     {
       name: 'Urutan',
@@ -266,73 +312,21 @@ function All({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
   ]
 
   return (
-    <>
-      <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
-      />
-    </>
+    children(form, sortMenu)
   )
 }
 
-function Watching({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
-  // State
-  const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const platformItems = usePlatforms();
-  const [isSort, setIsSort] = useState(true);
-  const limit = isMobile ? 10 : 30;
-  const [offset, setOffset] = useState(limit);
-  const [isLatest, setIsLatest] = useState(false);
-
+function Watching({ children }) {
   // Settings
-  const { control, watch, reset } = useForm({
+  const form = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'remaining_watchable_episodes',
       accessType: 'all',
       platform: 0
     }
   });
-
-  // Watch input value
-  const sort = watch('sort')
-  const accessType = watch('accessType')
-  const platform = watch('platform')
-
-  // Update if root anime have update, for example if user logout
-  useEffect(() => {
-    setOriginalAnimes(filterAndSortAnime(rootAnimes, 'all', 'watching', 0))
-  }, [rootAnimes]) // Store for clean data
-
-  // Filter and sort data
-  useEffect(() => {
-    setIsSort(true);
-    setOffset(limit);
-    setIsLatest(false);
-    setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-  }, [originalAnimes, sort, accessType, platform])
-
-  // Limit and offset to display on user screen
-  useEffect(() => {
-    if (isLatest) return;
-    setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
-    setIsSort(false);
-  }, [filteredAnimes, offset]);
-
-  // Get next anime list when user scrolling
-  useEffect(() => {
-    if (isLatest) return;
-
-    const onScroll = () => handleScroll(setOffset, limit);
-
-    window.addEventListener('scroll', onScroll);
-    
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [isLatest, limit]);
-
+  
+  const platformItems = usePlatforms();
   const sortMenu = [
     {
       name: 'Urutan',
@@ -368,73 +362,21 @@ function Watching({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes 
   ]
 
   return (
-    <>
-      <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
-      />
-    </>
+    children(form, sortMenu)
   )
 }
 
-function Completed({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
-  // State
-  const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const platformItems = usePlatforms();
-  const [isSort, setIsSort] = useState(true);
-  const limit = isMobile ? 10 : 30;
-  const [offset, setOffset] = useState(limit);
-  const [isLatest, setIsLatest] = useState(false);
-
+function Completed({ children }) {
   // Settings
-  const { control, watch, reset } = useForm({
+  const form = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'score',
       accessType: 'all',
       platform: 0
     }
   });
-
-  // Watch input value
-  const sort = watch('sort')
-  const accessType = watch('accessType')
-  const platform = watch('platform')
-
-  // Update if root anime have update, for example if user logout
-  useEffect(() => {
-    setOriginalAnimes(filterAndSortAnime(rootAnimes, 'all', 'completed', 0))
-  }, [rootAnimes]) // Store for clean data
-
-  // Filter and sort data
-  useEffect(() => {
-    setIsSort(true);
-    setOffset(limit);
-    setIsLatest(false);
-    setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-  }, [originalAnimes, sort, accessType, platform])
-
-  // Limit and offset to display on user screen
-  useEffect(() => {
-    if (isLatest) return;
-    setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
-    setIsSort(false);
-  }, [filteredAnimes, offset]);
-
-  // Get next anime list when user scrolling
-  useEffect(() => {
-    if (isLatest) return;
-
-    const onScroll = () => handleScroll(setOffset, limit);
-
-    window.addEventListener('scroll', onScroll);
-    
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [isLatest, limit]);
-
+  
+  const platformItems = usePlatforms();
   const sortMenu = [
     {
       name: 'Urutan',
@@ -470,73 +412,21 @@ function Completed({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
   ]
 
   return (
-    <>
-      <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
-      />
-    </>
+    children(form, sortMenu)
   )
 }
 
-function OnHold({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
-  // State
-  const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const platformItems = usePlatforms();
-  const [isSort, setIsSort] = useState(true);
-  const limit = isMobile ? 10 : 30;
-  const [offset, setOffset] = useState(limit);
-  const [isLatest, setIsLatest] = useState(false);
-
+function OnHold({ children }) {
   // Settings
-  const { control, watch, reset } = useForm({
+  const form = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'start_date',
       accessType: 'all',
       platform: 0
     }
   });
-
-  // Watch input value
-  const sort = watch('sort')
-  const accessType = watch('accessType')
-  const platform = watch('platform')
-
-  // Update if root anime have update, for example if user logout
-  useEffect(() => {
-    setOriginalAnimes(filterAndSortAnime(rootAnimes, 'all', 'on_hold', 0))
-  }, [rootAnimes]) // Store for clean data
-
-  // Filter and sort data
-  useEffect(() => {
-    setIsSort(true);
-    setOffset(limit);
-    setIsLatest(false);
-    setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-  }, [originalAnimes, sort, accessType, platform])
-
-  // Limit and offset to display on user screen
-  useEffect(() => {
-    if (isLatest) return;
-    setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
-    setIsSort(false);
-  }, [filteredAnimes, offset]);
-
-  // Get next anime list when user scrolling
-  useEffect(() => {
-    if (isLatest) return;
-
-    const onScroll = () => handleScroll(setOffset, limit);
-
-    window.addEventListener('scroll', onScroll);
-    
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [isLatest, limit]);
-
+  
+  const platformItems = usePlatforms();
   const sortMenu = [
     {
       name: 'Urutan',
@@ -572,73 +462,21 @@ function OnHold({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes })
   ]
 
   return (
-    <>
-      <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
-      />
-    </>
+    children(form, sortMenu)
   )
 }
 
-function Dropped({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
-  // State
-  const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const platformItems = usePlatforms();
-  const [isSort, setIsSort] = useState(true);
-  const limit = isMobile ? 10 : 30;
-  const [offset, setOffset] = useState(limit);
-  const [isLatest, setIsLatest] = useState(false);
-
+function Dropped({ children }) {
   // Settings
-  const { control, watch, reset } = useForm({
+  const form = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'title',
       accessType: 'all',
       platform: 0
     }
   });
-
-  // Watch input value
-  const sort = watch('sort')
-  const accessType = watch('accessType')
-  const platform = watch('platform')
-
-  // Update if root anime have update, for example if user logout
-  useEffect(() => {
-    setOriginalAnimes(filterAndSortAnime(rootAnimes, 'all', 'dropped', 0))
-  }, [rootAnimes]) // Store for clean data
-
-  // Filter and sort data
-  useEffect(() => {
-    setIsSort(true);
-    setOffset(limit);
-    setIsLatest(false);
-    setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-  }, [originalAnimes, sort, accessType, platform])
-
-  // Limit and offset to display on user screen
-  useEffect(() => {
-    if (isLatest) return;
-    setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
-    setIsSort(false);
-  }, [filteredAnimes, offset]);
-
-  // Get next anime list when user scrolling
-  useEffect(() => {
-    if (isLatest) return;
-
-    const onScroll = () => handleScroll(setOffset, limit);
-
-    window.addEventListener('scroll', onScroll);
-    
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [isLatest, limit]);
-
+  
+  const platformItems = usePlatforms();
   const sortMenu = [
     {
       name: 'Urutan',
@@ -674,73 +512,21 @@ function Dropped({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }
   ]
 
   return (
-    <>
-      <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
-      />
-    </>
+    children(form, sortMenu)
   )
 }
 
-function PlanToWatch({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes }) {
-  // State
-  const [originalAnimes, setOriginalAnimes] = useState([]);
-  const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const [animes, setAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
-  const platformItems = usePlatforms();
-  const [isSort, setIsSort] = useState(true);
-  const limit = isMobile ? 10 : 30;
-  const [offset, setOffset] = useState(limit);
-  const [isLatest, setIsLatest] = useState(false);
-
+function PlanToWatch({ children }) {
   // Settings
-  const { control, watch, reset } = useForm({
+  const form = useForm({
     resolver: zodResolver(getAllAnimeListSchema), defaultValues: {
       sort: 'last_updated',
       accessType: 'all',
       platform: 0
     }
   });
-
-  // Watch input value
-  const sort = watch('sort')
-  const accessType = watch('accessType')
-  const platform = watch('platform')
-
-  // Update if root anime have update, for example if user logout
-  useEffect(() => {
-    setOriginalAnimes(filterAndSortAnime(rootAnimes, 'all', 'plan_to_watch', 0))
-  }, [rootAnimes]) // Store for clean data
-
-  // Filter and sort data
-  useEffect(() => {
-    setIsSort(true);
-    setOffset(limit);
-    setIsLatest(false);
-    setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-  }, [originalAnimes, sort, accessType, platform])
-
-  // Limit and offset to display on user screen
-  useEffect(() => {
-    if (isLatest) return;
-    setAnimes(filteredAnimes.slice(0, offset));
-    if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
-    setIsSort(false);
-  }, [filteredAnimes, offset]);
-
-  // Get next anime list when user scrolling
-  useEffect(() => {
-    if (isLatest) return;
-
-    const onScroll = () => handleScroll(setOffset, limit);
-
-    window.addEventListener('scroll', onScroll);
-    
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [isLatest, limit]);
-
+  
+  const platformItems = usePlatforms();
   const sortMenu = [
     {
       name: 'Urutan',
@@ -776,13 +562,7 @@ function PlanToWatch({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnim
   ]
 
   return (
-    <>
-      <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
-      <AnimeList
-        animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
-      />
-    </>
+    children(form, sortMenu)
   )
 }
 
