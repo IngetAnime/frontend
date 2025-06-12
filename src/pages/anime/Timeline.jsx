@@ -236,6 +236,24 @@ function MobileTimeline({ days, setAnimes }) {
 }
 
 function RenderTimeline({ index, animes, setAnimes }) {
+  const now = dayjs();
+
+  const renderTimeNow = () => (
+    <TimelineItem>
+      <TimelineSeparator>
+        <TimelineDot sx={{ p: 0 }} color="primary">
+          <AccessTime fontSize="small" />
+        </TimelineDot>
+        <TimelineConnector sx={{ backgroundColor: 'primary.main' }} />
+      </TimelineSeparator>
+      <TimelineContent sx={{ pr: 0 }}>
+        <Typography color="primary" className="pt-1.5">
+          {`Waktu saat ini: ${now.format('HH:mm')}`}
+        </Typography>
+      </TimelineContent>
+    </TimelineItem>
+  );
+
   return (
     <MuiTimeline key={index} sx={{
       p: 0,
@@ -245,26 +263,19 @@ function RenderTimeline({ index, animes, setAnimes }) {
       },
     }}>
       {animes.map((anime, i) => {
-        const date = dayjs(anime.dateTime);
-        const isNow = date.isAfter(dayjs()) && date.isSame(dayjs(), 'day');
+        const animeDate = dayjs(anime.dateTime);
+        const datePrevAnime = i > 0 ? dayjs(animes[i - 1].dateTime) : null;
+        const dateNextAnime = i < (animes.length - 1) ? dayjs(animes[i + 1].dateTime) : null;
+        
+        const isBefore = !datePrevAnime && now.isSame(animeDate, 'day') && now.isBefore(animeDate);
+        const isAfter = dateNextAnime ? (now.isAfter(animeDate) && now.isBefore(dateNextAnime)) :  
+          now.isSame(animeDate, 'day') && now.isAfter(animeDate);
+
         return (
           <Fragment key={i}>
-            { 
-              isNow ? 
-              <TimelineItem>
-                <TimelineSeparator>
-                  <TimelineDot sx={{ p: 0 }} color='primary' >
-                    <AccessTime fontSize="small" />
-                  </TimelineDot>
-                  <TimelineConnector sx={{ backgroundColor: 'primary.main' }} />
-                </TimelineSeparator>
-                <TimelineContent sx={{ pr: 0 }}>
-                  <Typography color="primary" className="pt-1.5">{`Waktu saat ini: ${dayjs().format('HH:mm')}`}</Typography>
-                </TimelineContent>
-              </TimelineItem> :
-              <></>
-            }
+            { isBefore && renderTimeNow() }
             <AnimeTimelineItem dateTime={anime.dateTime} animes={anime.data} key={i} setAnimes={setAnimes} />
+            { isAfter && renderTimeNow() }
           </Fragment>
         )
       })}
