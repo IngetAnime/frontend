@@ -1,4 +1,4 @@
-import { Box, Card, LinearProgress, List as MuiList, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, IconButton, Container, Skeleton, Button } from "@mui/material";
+import { Box, Card, LinearProgress, List as MuiList, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, IconButton, Container, Skeleton, Button, CardActionArea } from "@mui/material";
 import { Add, CalendarToday, Edit, EditCalendar, EventAvailable, EventBusy, EventNote, EventRepeat, Login, RestartAlt } from "@mui/icons-material";
 import { useContext, useEffect, useState } from "react";
 import SortAndFilter from "../../component/SortAndFilter";
@@ -594,23 +594,25 @@ function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isL
             <ListItem disablePadding key={i} className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
               {
                 anime ? 
-                <Card className="flex overflow-hidden h-41 w-full">
-                  <Box className="w-25 sm:w-30 h-full">
-                    <AnimeImage 
-                      anime={anime}
-                      setAnime={setAnime}
-                      episodeAired={anime.status === 'finished_airing' ? anime.episodeTotal : anime.platforms[0]?.episodeAired} 
-                    />
-                  </Box>
-      
-                  <Box className="flex flex-col justify-between py-1 px-2 flex-1">
-                    <Box className="flex flex-col gap-5">
-                      <AnimeTitle anime={anime} />
-                      <AnimeProgress anime={anime} setAnime={setAnime} />
+                <CardActionArea target={'_blank'} href={`https://myanimelist.net/anime/${anime.malId}`}>
+                  <Card className="flex overflow-hidden h-41 w-full">
+                    <Box className="w-25 sm:w-30 h-full">
+                      <AnimeImage 
+                        anime={anime}
+                        setAnime={setAnime}
+                        episodeAired={anime.status === 'finished_airing' ? anime.episodeTotal : anime.platforms[0]?.episodeAired} 
+                      />
                     </Box>
-                    <AnimePlatform platforms={anime.platforms} />
-                  </Box>
-                </Card> :
+        
+                    <Box className="flex flex-col justify-between py-1 px-2 flex-1">
+                      <Box className="flex flex-col gap-5">
+                        <AnimeTitle anime={anime} />
+                        <AnimeProgress anime={anime} setAnime={setAnime} />
+                      </Box>
+                      <AnimePlatform platforms={anime.platforms} />
+                    </Box>
+                  </Card> 
+                </CardActionArea> :
                 <AnimeSkeleton />
               }
             </ListItem>

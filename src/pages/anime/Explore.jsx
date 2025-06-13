@@ -1,5 +1,5 @@
 import { Autorenew, CalendarMonth, EmojiEvents, Lightbulb, Login, RestartAlt, Star } from "@mui/icons-material";
-import { Box, Card, List, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, Skeleton, Container, Button } from "@mui/material";
+import { Box, Card, List, ListItem, Tab, Tabs, Tooltip, Typography, useTheme, useMediaQuery, Skeleton, Container, Button, CardActionArea } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import AnimeImage from "../../component/AnimeImage";
 import Link from "../../component/Link";
@@ -867,65 +867,67 @@ function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isL
           <ListItem key={index} disablePadding className={`${ !isMobile && 'md:max-w-[47%] lg:max-w-[30%]'}`}>
             {
               anime ? 
-              <Card className="w-full h-full">
-                {/* Dekstop Mode */}
-                <Box className="hidden sm:flex p-2 gap-2 justify-between">
-                  <Box className="flex flex-col items-start">
-                    <AnimeTitle
-                      title={anime.title} releaseAt={anime.releaseAt} 
-                      episodeTotal={anime.num_episodes} averageEpisodeDuration={anime.average_episode_duration}
-                    />
-                  </Box>
-                  {anime.mean && (
-                    <AnimeScore score={anime.mean} />
-                  )}
-                </Box>
-
-                <Box className="flex flex-wrap overflow-hidden w-full sm:h-40 gap-2 sm:gap-0">
-                  <Box className="w-full sm:w-30 h-35 sm:h-full">
-                    <AnimeImage 
-                      anime={anime} setAnime={setAnime}
-                      episodeAired={anime.status === 'finished_airing' ? anime.num_episodes : anime.platforms[0]?.episodeAired} 
-                    />
-                  </Box>
-
-                  <Box className="flex flex-col justify-between pb-1 px-2 flex-1 gap-2 sm:gap-0">
-                    <Box className="block sm:hidden">
-                      <AnimeTitle 
+              <CardActionArea target={'_blank'} href={`https://myanimelist.net/anime/${anime.malId}`}>
+                <Card className="w-full h-full">
+                  {/* Dekstop Mode */}
+                  <Box className="hidden sm:flex p-2 gap-2 justify-between">
+                    <Box className="flex flex-col items-start">
+                      <AnimeTitle
                         title={anime.title} releaseAt={anime.releaseAt} 
                         episodeTotal={anime.num_episodes} averageEpisodeDuration={anime.average_episode_duration}
                       />
                     </Box>
-                    <Box>
-                      <Typography 
-                        sx={{ 
-                          display: '-webkit-box', WebkitLineClamp: anime.platforms[0]?.episodeAired ? 3 : 4, WebkitBoxOrient: 'vertical',
-                          fontSize: 'small', textAlign: 'left'
-                        }}
-                        className="overflow-y-auto"
-                      >
-                        {anime.synopsis}
-                      </Typography>
+                    {anime.mean && (
+                      <AnimeScore score={anime.mean} />
+                    )}
+                  </Box>
+
+                  <Box className="flex flex-wrap overflow-hidden w-full sm:h-40 gap-2 sm:gap-0">
+                    <Box className="w-full sm:w-30 h-35 sm:h-full">
+                      <AnimeImage 
+                        anime={anime} setAnime={setAnime}
+                        episodeAired={anime.status === 'finished_airing' ? anime.num_episodes : anime.platforms[0]?.episodeAired} 
+                      />
                     </Box>
 
-                    <Typography sx={{ fontSize: 'small' }}>
-                      Genre:&nbsp;
-                      {anime.genres?.map((genre, index) => (
-                        <span key={index} >
-                          <Link>{genre.name}</Link>
-                          {index < anime.genres.length - 1 && ', '}
-                        </span>
-                      ))}
-                    </Typography>
-                    {anime.mean && (
-                      <AnimeScore score={anime.mean} sx={{ display: { sm: 'none' } }} />
-                    )}
-                    
-                    { anime.platforms.length ? <AnimePlatform platforms={anime.platforms} /> : <></> }
-                    { (!anime.platforms.length && isMobile) && <Box /> }
+                    <Box className="flex flex-col justify-between pb-1 px-2 flex-1 gap-2 sm:gap-0">
+                      <Box className="block sm:hidden">
+                        <AnimeTitle 
+                          title={anime.title} releaseAt={anime.releaseAt} 
+                          episodeTotal={anime.num_episodes} averageEpisodeDuration={anime.average_episode_duration}
+                        />
+                      </Box>
+                      <Box>
+                        <Typography 
+                          sx={{ 
+                            display: '-webkit-box', WebkitLineClamp: anime.platforms[0]?.episodeAired ? 3 : 4, WebkitBoxOrient: 'vertical',
+                            fontSize: 'small', textAlign: 'left'
+                          }}
+                          className="overflow-y-auto"
+                        >
+                          {anime.synopsis}
+                        </Typography>
+                      </Box>
+
+                      <Typography sx={{ fontSize: 'small' }}>
+                        Genre:&nbsp;
+                        {anime.genres?.map((genre, index) => (
+                          <span key={index} >
+                            <Link>{genre.name}</Link>
+                            {index < anime.genres.length - 1 && ', '}
+                          </span>
+                        ))}
+                      </Typography>
+                      {anime.mean && (
+                        <AnimeScore score={anime.mean} sx={{ display: { sm: 'none' } }} />
+                      )}
+                      
+                      { anime.platforms.length ? <AnimePlatform platforms={anime.platforms} /> : <></> }
+                      { (!anime.platforms.length && isMobile) && <Box /> }
+                    </Box>
                   </Box>
-                </Box>
-              </Card> :
+                </Card> 
+              </CardActionArea> :
               <AnimeSkeleton />
             }
           </ListItem>
