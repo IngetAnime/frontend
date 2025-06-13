@@ -10,6 +10,7 @@ import { getUserInformation, importAnimeList, checkEmailAvailability, checkUsern
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getGoogleAuthUrl, getMALAuthUrl } from "../services/auth.service";
+import Switch from "../component/Switch";
 
 export default function Settings({ }) {
   const { isLoggedIn, userData, setUserData } = useContext(AppContext);
@@ -179,7 +180,7 @@ function ExternalAccount({ userData, setUserData, isLoggedIn }) {
   return (
     <Box className="flex flex-col gap-2.5 w-full">
       <Typography>Akun eksternal</Typography>
-      <Box className="flex gap-2.5">
+      <Box className="flex flex-col sm:flex-row gap-2.5">
         <ButtonLink 
           fullWidth sx={{ textTransform: 'none' }}
           variant="contained" color="default" 
@@ -231,12 +232,12 @@ function ImportMyAnimeList() {
   const { control, formState: { isSubmitting }, handleSubmit } = useForm({
     resolver: zodResolver(importMyAnimeListSchema), values: {
       type: 'latest_updated',
-      isSyncedWithMAL: false
+      isSyncedWithMal: false
     }
   })
 
   const onSubmit = async (req) => {
-    const { success, message } = await importAnimeList(req.type, req.isSyncedWithMAL);
+    const { success, message } = await importAnimeList(req.type, req.isSyncedWithMal);
     if (success) {
       toast.success(message)
     } else {
@@ -265,7 +266,7 @@ function ImportMyAnimeList() {
   return (
     <Box className="flex flex-col gap-2.5 justify-center w-full">
       <Typography>Integrasi list dari MyAnimeList</Typography>
-      <Box component={'form'} className="flex gap-2.5 items-center" onSubmit={handleSubmit(onSubmit)}>
+      <Box component={'form'} className="flex flex-col lg:flex-row gap-2.5 items-center" onSubmit={handleSubmit(onSubmit)}>
         <FormControl size="small" disabled={isSubmitting} className="w-full">
           <InputLabel id={'type'}>Tipe</InputLabel>
           <Controller
@@ -286,6 +287,15 @@ function ImportMyAnimeList() {
             control={control}
           />
         </FormControl>
+        <Box className="pr-5 md:pr-2">
+          <Controller 
+            render={({ field }) => (
+              <Switch text={'Sinkronisasi dengan MyAnimeList'} labelPlacement="start" field={field} />
+            )}
+            name={'isSyncedWithMal'}
+            control={control}
+          />
+        </Box>
         <Box>
           <Button variant="contained" startIcon={<Add />} type="submit" disabled={isSubmitting}>Tambah</Button>
         </Box>

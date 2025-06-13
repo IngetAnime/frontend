@@ -23,10 +23,10 @@ export const getUserInformation = async () => {
   return { success, data, status, message };
 }
 
-export const importAnimeList = async (type, isSyncedWithMAL) => {
+export const importAnimeList = async (type, isSyncedWithMal) => {
   let data, success, message, status;
   try {
-    const response = await axios.post(`/api/v1/user/@me/import-list-mal`, { type, isSyncedWithMAL });
+    const response = await axios.post(`/api/v1/user/@me/import-list-mal`, { type, isSyncedWithMal });
     data = response.data;
     status = response.status;
     success = true;

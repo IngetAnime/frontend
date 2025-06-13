@@ -7,5 +7,5 @@ export const updateUserProfileSchema = z.object({
 
 export const importMyAnimeListSchema = z.object({
   type: importType,
-  isSyncedWithMAL: booleanB.optional()
+  isSyncedWithMal: booleanB.optional()
 })
