@@ -264,47 +264,10 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
                 <Typography fontSize={'small'}>Score: {score ? score : ' - '}</Typography>
                 <SlideNumber value={score} setValue={(value) => setValue('score', value)} menu={menuSelect[2].menus} />
               </Box>
-              <Box className="flex flex-col md:hidden justify-between gap-5 md:gap-2.5">
-                <Controller 
-                  render={({ field }) => (
-                    <DatePicker label={'Mulai nonton'} defaultValue={null} className="w-full"
-                      slotProps={{
-                        field: {
-                          clearable: true
-                        },
-                        textField: {
-                          variant: 'standard',
-                          error: errors.startDate,
-                          helperText: errors.startDate?.message,
-                        }
-                      }}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(date) => field.onChange(date ? dayjs(date).format('YYYY-MM-DD'): null)}
-                    />
-                  )}
-                  name={'startDate'}
-                  control={control}
-                />
-                <Controller 
-                  render={({ field }) => (
-                    <DatePicker label={'Selesai nonton'} defaultValue={null} className="w-full"
-                      slotProps={{
-                        field: {
-                          clearable: true
-                        },
-                        textField: {
-                          variant: 'standard',
-                          error: errors.finishDate,
-                          helperText: errors.finishDate?.message,
-                        }
-                      }}
-                      value={field.value ? dayjs(field.value) : null}
-                      onChange={(date) => field.onChange(date ? dayjs(date).format('YYYY-MM-DD'): null)}
-                    />
-                  )}
-                  name={'finishDate'}
-                  control={control}
-                />
+              <Box className="flex flex-col gap-2.5">
+                <InputField menu={menuSelect[3].name === 'Platform' && menuSelect[3]} control={control} />
+                <InputField menu={menuSelect[4].name === 'Mulai nonton' && menuSelect[4]} control={control} />
+                <InputField menu={menuSelect[5].name === 'Selesai nonton' && menuSelect[5]} control={control} />
               </Box>
             </Box>
             
