@@ -63,39 +63,26 @@ export default function Timeline({ isDashboard=false }) {
   const myListOnly = watch('myListOnly')
   const originalSchedule = watch('originalSchedule')
 
-  useEffect(() => {
-    const fetchAnime = async () => {
-      setIsLoading(true);
+  const fetchAnime = async () => {
+    setIsLoading(true);
 
-      const { success, data, message } = await getAnimeTimeline(weekCount, timeZone, myListOnly, !originalSchedule)
+    const { success, data, message } = await getAnimeTimeline(weekCount, timeZone, myListOnly, !originalSchedule)
 
-      if (success) {
-        setTimelines(data);
-      } else {
-        toast.error(message);
-      }
-
-      setIsLoading(false);
+    if (success) {
+      setTimelines(data);
+    } else {
+      toast.error(message);
     }
 
+    setIsLoading(false);
+  }
+  useEffect(() => {
     fetchAnime();
   }, [originalSchedule, myListOnly, isLoggedIn])
 
   // Update anime
-  const handleTimelines = (newAnime) => {
-    setTimelines(prevTimelines =>
-      prevTimelines.map(dateGroup => ({
-        ...dateGroup,
-        timelines: dateGroup.timelines.map(timeline => ({
-          ...timeline,
-          data: timeline.data.map(anime =>
-            anime.id === newAnime.id
-              ? { ...anime, ...newAnime }
-              : anime
-          )
-        }))
-      }))
-    );
+  const handleTimelines = () => {
+    fetchAnime()
   }
 
   return (
