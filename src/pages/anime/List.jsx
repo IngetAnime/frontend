@@ -600,7 +600,6 @@ function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isL
                       <AnimeImage 
                         anime={anime}
                         setAnime={setAnime}
-                        episodeAired={anime.status === 'finished_airing' ? anime.episodeTotal : anime.platforms[0]?.episodeAired} 
                       />
                     </Box>
         

@@ -128,10 +128,17 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
       req.progress, req.score, req.episodesDifference, req.status, req.isSyncedWithMal
     )
     if (success) {
-      toast.success(message)
-      handleClose()
+      // Update local anime
+      const platforms = [...anime.platforms];
+      const index = req.animePlatformId ? platforms.findIndex(platform => platform.id === req.animePlatformId) : -1;
       delete data.anime;
       anime.myListStatus = data;
+      if (index !== -1) {
+        anime.selectedPlatform = platforms[index];
+      }
+
+      toast.success(message)
+      handleClose()
       setAnime(anime)
     } else {
       toast.error(message)
@@ -146,7 +153,6 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
     const my_list_status = data.my_list_status;
     if (success) {
       toast.success(message);
-      console.log(my_list_status);
       setValue('startDate', my_list_status.start_date || null, { shouldDirty: true })
       setValue('finishDate', my_list_status.finish_date || null, { shouldDirty: true })
       setValue('progress', my_list_status.num_episodes_watched || 0, { shouldDirty: true })

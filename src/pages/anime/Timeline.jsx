@@ -307,7 +307,6 @@ function AnimeTimelineItem({ dateTime, animes, setAnimes }) {
                   <Box className="w-full sm:w-25 lg:w-35 h-25 sm:h-full">
                     <AnimeImage 
                       anime={anime} setAnime={setAnimes}
-                      episodeAired={anime.status === 'finished_airing' ? (anime.episodeTotal) : anime.platforms[0]?.episodeAired}
                     />
                   </Box>
                   <Box className="flex flex-col justify-between py-1 px-2 flex-1 gap-2 sm:gap-0">
