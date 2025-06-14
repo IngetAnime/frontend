@@ -885,7 +885,6 @@ export function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnim
                     <Box className="w-full sm:w-30 h-35 sm:h-full">
                       <AnimeImage 
                         anime={anime} setAnime={setAnime}
-                        episodeAired={anime.status === 'finished_airing' ? anime.num_episodes : anime.platforms[0]?.episodeAired} 
                       />
                     </Box>
 
@@ -899,7 +898,7 @@ export function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnim
                       <Box>
                         <Typography 
                           sx={{ 
-                            display: '-webkit-box', WebkitLineClamp: anime.platforms[0]?.episodeAired ? 3 : 4, WebkitBoxOrient: 'vertical',
+                            display: '-webkit-box', WebkitLineClamp: anime.selectedPlatform?.episodeAired ? 3 : 4, WebkitBoxOrient: 'vertical',
                             fontSize: 'small', textAlign: 'left'
                           }}
                           className="overflow-y-auto"

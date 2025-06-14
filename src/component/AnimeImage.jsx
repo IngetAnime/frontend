@@ -7,7 +7,7 @@ import AnimeSettings from "./AnimeSettings";
 import AnimeEdit from "./AnimeEdit";
 import { toast } from "react-toastify";
 
-export default function AnimeImage({ isDialog, picture, episodeAired, anime, setAnime }) {
+export default function AnimeImage({ isDialog, picture, anime, setAnime }) {
   const { isAdmin, isLoggedIn } = useContext(AppContext)
   const [isOpen, setIsOpen] = useState(false)
   function handleIsOpen() {
@@ -17,6 +17,7 @@ export default function AnimeImage({ isDialog, picture, episodeAired, anime, set
       toast.error('Anda harus login terlebih dahulu')
     }
   }
+  const episodeAired = anime.status === 'finished_airing' ? (anime.episodeTotal) : anime.selectedPlatform?.episodeAired
   const episodeRemaining = episodeAired - anime?.myListStatus?.progress;
 
   return (
@@ -32,7 +33,7 @@ export default function AnimeImage({ isDialog, picture, episodeAired, anime, set
                 anime.status === "currently_airing" ? 'green' :
                 'gray'
               }
-              { ...(anime.platforms[0]?.link && { to: anime.platforms[0].link })}
+              { ...(anime.selectedPlatform?.link && { to: anime.selectedPlatform.link })}
               content={episodeAired} title={`Episode ${episodeAired} sudah tayang`}
             />
           )}
