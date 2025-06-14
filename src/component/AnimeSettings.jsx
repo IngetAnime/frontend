@@ -407,7 +407,19 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
       req.intervalInDays, req.episodeAired, req.isMainPlatform, req.isHiatus
     );
     if (success) {
-      const platformAnime = [...platforms]
+      let platformAnime = [...platforms]
+
+      // If main platform change, set others isMainPlatform to false
+      if (req.isMainPlatform) { 
+        platformAnime = platformAnime.map(platform => {
+          return {
+            ...platform,
+            isMainPlatform: false,
+          }
+        })
+      }
+
+      // Update changed platform
       const index = platformAnime.findIndex(platform => platform.id === newPlatform.id)
       if (index !== -1) {
         platformAnime[index] = newPlatform
@@ -415,6 +427,19 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
         platformAnime.push(newPlatform)
       }
       anime.platforms = platformAnime;
+
+      // Update selected platform
+      if (
+        ((anime.selectedPlatform.id === newPlatform.id) || req.isMainPlatform) && 
+        (!anime.myListStatus.animePlatformId || (anime.myListStatus.animePlatformId === newPlatform.id))
+        // Update selected platform if:
+        // - The currently selected platform is the one being updated, OR the updated platform is set as isMainPlatform
+        // AND
+        // - The user hasn't selected a platform yet, OR the selected platform is the same as the one being updated
+      ) {
+        console.log(!anime.myListStatus.platformId);
+        anime.selectedPlatform = newPlatform;
+      }
       setAnime(anime)
       toast.success(message);
     } else {
