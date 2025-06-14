@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { anime_type, booleanB, date, idB, num_watched_episodes, oneAccessType, ranking_type, score, searchAccessType, searchStatus, season, sortAnime, status, year } from "./index.validator";
+import { anime_type, idB, q, ranking_type, searchAccessType, searchStatus, season, sortAnime, year } from "./index.validator";
+
+export const getAnimeListSchema = z.object({
+  q
+})
 
 export const getAnimeRankingSchema = z.object({
   rankingType: ranking_type,

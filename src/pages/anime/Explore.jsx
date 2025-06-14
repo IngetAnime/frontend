@@ -783,9 +783,8 @@ function SuggestedAnime({ isMobile, isLoggedIn, isDashboard }) {
 
   // Limit and offset to display on user screen
   useEffect(() => {
-    console.log(animes);
     setAnimes(originalAnimes.slice(0, offset));
-    if ((animes.length === originalAnimes.length) || originalAnimes.length <= limit || isDashboard) setIsLatest(true);
+    if ((animes.length === originalAnimes.length) || isDashboard) setIsLatest(true);
     setIsLoading(false);
   }, [originalAnimes, offset]);
 
@@ -828,7 +827,7 @@ function SuggestedAnime({ isMobile, isLoggedIn, isDashboard }) {
   )
 }
 
-function AnimeWrapper({ children }) {
+export function AnimeWrapper({ children }) {
   return (
     <Box className="flex flex-col px-1">
       {children}
@@ -840,7 +839,7 @@ function AnimeWrapper({ children }) {
 
 // List anime item
 
-function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isLatest }) {  
+export function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isLatest }) {  
   const setAnime = (newAnime) => {
     const newAnimes = originalAnimes.map(anime => {
       if (anime.id === newAnime.id) {

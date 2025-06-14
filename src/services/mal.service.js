@@ -2,6 +2,38 @@ import axios from "./axiosConfig.js";
 
 const initialFields = 'synopsis,mean,genres,start_date,average_episode_duration,num_list_users,media_type,start_season'
 
+export const getAnimeList = async (q, limit=100, offset, fields) => {
+  fields = `${initialFields}${fields ? fields : ''}`;
+  let data, success, message, status;
+  try {
+    const response = await axios.get('/api/v1/anime', {
+      params: {
+        q, limit, offset, fields
+      }
+    });
+    data = response.data;
+    status = response.status;
+    success = true;
+    message = `Berhasil mendapatkan list anime ${q}`;
+  } catch(err) {
+    if (err.response && err.response.status === 404) {
+      status = err.response.status;
+      success = false;
+      message = err.response.data.message;
+    } if (err.response && err.response.status === 400) {
+      status = err.response.status;
+      success = false;
+      message = 'Input tidak valid';
+    } else {
+      status = err.status;
+      success = false;
+      message = 'Terjadi kesalahan';
+    }  
+  }
+
+  return { success, data, status, message };
+}
+
 export const getAnimeRanking = async (ranking_type, limit=100, offset, fields) => {
   fields = `${initialFields}${fields ? fields : ''}`
   let data, success, message, status;

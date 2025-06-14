@@ -1,9 +1,45 @@
 import { styled, alpha } from "@mui/material/styles"
-import underDevelopment from "../helper/underDevelopment";
 import { InputBase } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getAnimeListSchema } from "../validators/mal.validator";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 export default function AnimeSearch({ isHeader=true }) {
+  // Search form 
+
+  const [searchParams] = useSearchParams();
+  const q = searchParams.get('q');
+
+  const navigate = useNavigate();
+  const { handleSubmit, getValues, setValue, formState: { errors } } = useForm({
+    resolver: zodResolver(getAnimeListSchema), mode: 'onChange', values: {
+      q: q || ''
+    }
+  })
+
+  useEffect(() => {
+    if (errors.q) {
+      toast.error(errors.q.message || "Input tidak valid");
+    }
+  }, [errors.q]);
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      setValue('q', e.target.value);
+      handleSubmit(onSubmit)();
+    }
+  }
+
+  const onSubmit = async (req) => {
+    navigate(`/?q=${encodeURIComponent(req.q)}`);
+  }
+
+  // Search component
+
   const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -48,11 +84,6 @@ export default function AnimeSearch({ isHeader=true }) {
     },
   }));
 
-  function handleSearch(e) {
-    if (e.key === 'Enter') {
-      underDevelopment(e);
-    }
-  }
   return (
     <Search onKeyDown={(e) => handleSearch(e)}>
       <SearchIconWrapper>
@@ -61,6 +92,7 @@ export default function AnimeSearch({ isHeader=true }) {
       <StyledInputBase sx={{ width: '100%' }}
         placeholder="Cari judul anime…"
         inputProps={{ 'aria-label': 'search' }}
+        defaultValue={getValues('q')}
       />
     </Search>
   )
