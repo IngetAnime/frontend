@@ -378,6 +378,7 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setRefresh }) {
   const [platformMap] = useState(new Map(
     platforms.map((platform) => [platform.platform.id, platform])
   ))
+  const lastEpisodeAiredAt = watch('lastEpisodeAiredAt')
 
   useEffect(() => {
     const selectedPlatform = platformMap.get(platformId)
@@ -399,6 +400,14 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setRefresh }) {
     setValue('isMainPlatform', selectedPlatform?.isMainPlatform || false, { shouldValidate: true })
     setValue('isHiatus', selectedPlatform?.isHiatus || false, { shouldValidate: true })
   }, [platformId, setValue, platformMap])
+
+  useEffect(() => {
+    if (lastEpisodeAiredAt) {
+      const lastDate = dayjs(lastEpisodeAiredAt);
+      const nextDate = lastDate.add(7, 'day').toISOString();
+      setValue('nextEpisodeAiringAt', nextDate, { shouldValidate: true })
+    }
+  }, [lastEpisodeAiredAt, setValue])
 
   // Submit edit anime platform
   const onSubmit = async (req) => {    
