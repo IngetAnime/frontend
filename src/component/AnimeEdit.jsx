@@ -20,7 +20,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
 
   // Settings
   const { handleSubmit, control, formState: { errors, isSubmitting, dirtyFields }, reset, setValue, watch } = useForm({
-    resolver: zodResolver(updateAnimeListSchema), mode: 'onChange', values: {
+    resolver: zodResolver(updateAnimeListSchema), mode: 'onChange', defaultValues: {
       animePlatformId: anime.myListStatus?.animePlatformId || 0,
       startDate: anime.myListStatus?.startDate ? dayjs(anime.myListStatus.startDate).format('YYYY-MM-DD') : null, 
       finishDate: anime.myListStatus?.finishDate ? dayjs(anime.myListStatus.finishDate).format('YYYY-MM-DD') : null, 
@@ -36,6 +36,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
   const status = watch('status');
   const score = watch('score');
   const progress = watch('progress');
+  const startDate = watch('startDate');
   
   // Menu item
   const totalEpisode = anime.platforms[0]?.episodeAired || anime.num_episodes || anime.episodeTotal || 99;
@@ -154,6 +155,15 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
     }
     setIsLoading(false);
   }
+
+  // Auto set status and startDate when progress move
+  useEffect(() => {
+    if (!dirtyFields.status && !dirtyFields.startDate && (progress > 0) && dirtyFields.progress) {
+      // Auto set if update progress to 1 or more in the first change
+      setValue('status', 'watching', { shouldDirty: true })
+      if (!startDate) setValue('startDate', dayjs().toISOString(), { shouldDirty: true });
+    }
+  }, [setValue, progress, startDate, dirtyFields.progress, dirtyFields.status, dirtyFields.startDate])
 
   // Component
 
