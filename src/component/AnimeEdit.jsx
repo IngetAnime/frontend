@@ -15,7 +15,7 @@ import { deleteAnimeList, updateAnimeList } from "../services/animeList.service"
 import { getMyAnimeListStatus } from "../services/mal.service";
 import { DatePicker } from "@mui/x-date-pickers";
 
-export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
+export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
   // Form
 
   // Settings
@@ -123,23 +123,14 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
   // Submit edit anime list
   const onSubmit = async (req) => {
     if (req.animePlatformId === 0) req.animePlatformId = null;
-    const { success, data, message } = await updateAnimeList(
+    const { success, message } = await updateAnimeList(
       anime.id, req.animePlatformId, req.startDate, req.finishDate, 
       req.progress, req.score, req.episodesDifference, req.status, req.isSyncedWithMal
     )
     if (success) {
       // Update local anime
-      const platforms = [...anime.platforms];
-      const index = req.animePlatformId ? platforms.findIndex(platform => platform.id === req.animePlatformId) : -1;
-      delete data.anime;
-      anime.myListStatus = data;
-      if (index !== -1) {
-        anime.selectedPlatform = platforms[index];
-      }
-
       toast.success(message)
-      handleClose()
-      setAnime(anime)
+      setRefresh(prev => !prev)
     } else {
       toast.error(message)
     }
@@ -310,13 +301,13 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setAnime }) {
       </DialogActions>
     </Dialog>
     <AnimeListDelete
-      anime={anime} open={open} handleOpen={handleOpen} handleCloseEditAnime={handleClick} setAnime={setAnime}
+      anime={anime} open={open} handleOpen={handleOpen} handleCloseEditAnime={handleClick} setRefresh={setRefresh}
     />
     </>
   )
 }
 
-function AnimeListDelete({ anime, open, handleOpen, handleCloseEditAnime, setAnime }) {
+function AnimeListDelete({ anime, open, handleOpen, handleCloseEditAnime, setRefresh }) {
   // Form
 
   // Setting
@@ -343,8 +334,7 @@ function AnimeListDelete({ anime, open, handleOpen, handleCloseEditAnime, setAni
       toast.success(message);
       handleOpen(false);
       handleCloseEditAnime();
-      delete anime.myListStatus;
-      setAnime(anime)
+      setRefresh(prev => !prev);
     } else {
       toast.error(message);
     }

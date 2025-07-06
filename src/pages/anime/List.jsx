@@ -47,6 +47,7 @@ export default function List({ isDashboard=false }) {
   const [orginalAnimes, setOriginalAnimes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [refresh, setRefresh] = useState(false);
 
   // Get user anime list
   useEffect(() => {
@@ -69,7 +70,7 @@ export default function List({ isDashboard=false }) {
     }
 
     fetchAnime();
-  }, [isLoggedIn])
+  }, [isLoggedIn, refresh])
   
   const menu = [
     {
@@ -94,7 +95,7 @@ export default function List({ isDashboard=false }) {
           {(form, sortMenu) => (
             <CustomTab 
               isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'watching'}
-              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+              rootAnimes={orginalAnimes} setRefresh={setRefresh} form={form} sortMenu={sortMenu}
             />
           )}
         </Watching>
@@ -107,7 +108,7 @@ export default function List({ isDashboard=false }) {
           {(form, sortMenu) => (
             <CustomTab 
               isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'completed'}
-              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+              rootAnimes={orginalAnimes} setRefresh={setRefresh} form={form} sortMenu={sortMenu}
             />
           )}
         </Completed>
@@ -120,7 +121,7 @@ export default function List({ isDashboard=false }) {
           {(form, sortMenu) => (
             <CustomTab 
               isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'on_hold'}
-              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+              rootAnimes={orginalAnimes} setRefresh={setRefresh} form={form} sortMenu={sortMenu}
             />
           )}
         </OnHold>
@@ -133,7 +134,7 @@ export default function List({ isDashboard=false }) {
           {(form, sortMenu) => (
             <CustomTab 
               isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'dropped'}
-              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+              rootAnimes={orginalAnimes} setRefresh={setRefresh} form={form} sortMenu={sortMenu}
             />
           )}
         </Dropped>
@@ -146,7 +147,7 @@ export default function List({ isDashboard=false }) {
           {(form, sortMenu) => (
             <CustomTab 
               isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'plan_to_watch'}
-              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+              rootAnimes={orginalAnimes} setRefresh={setRefresh} form={form} sortMenu={sortMenu}
             />
           )}
         </PlanToWatch>
@@ -204,7 +205,7 @@ export default function List({ isDashboard=false }) {
   )
 }
 
-function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes, status, form, sortMenu }) {
+function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRefresh, status, form, sortMenu }) {
   // State
   const [originalAnimes, setOriginalAnimes] = useState([]);
   const [filteredAnimes, setFilteredAnimes] = useState(Array(isMobile ? 3 : 12).fill(null));
@@ -225,7 +226,7 @@ function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
   // Update if root anime have update, for example if user logout
   useEffect(() => {
     setOriginalAnimes(filterAndSortAnime(rootAnimes, 'all', status, 0))
-  }, [rootAnimes]) // Store for clean data
+  }, [rootAnimes, status]) // Store for clean data
 
   // Filter and sort data
   useEffect(() => {
@@ -233,7 +234,7 @@ function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-  }, [originalAnimes, sort, accessType, platform])
+  }, [originalAnimes, sort, accessType, platform, limit])
 
   // Limit and offset to display on user screen
   useEffect(() => {
@@ -241,7 +242,7 @@ function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
     setAnimes(filteredAnimes.slice(0, offset));
     if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsSort(false);
-  }, [filteredAnimes, offset]);
+  }, [filteredAnimes, offset, animes.length, isDashboard, isLatest, limit]);
 
   // Get next anime list when user scrolling
   useEffect(() => {
@@ -259,7 +260,7 @@ function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRootAnimes
       <SortAndFilter filterAndSort={sortMenu} control={control} disabled={isLoading || isSort} />
       <AnimeList
         animes={animes} isMobile={isMobile} isLoading={isLoading || isSort}
-        originalAnimes={rootAnimes} setAnimes={setRootAnimes} isLatest={isLatest} reset={reset}
+        originalAnimes={rootAnimes} setRefresh={setRefresh} isLatest={isLatest} reset={reset}
       />
     </>
   )
@@ -566,17 +567,7 @@ function PlanToWatch({ children }) {
   )
 }
 
-function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isLatest, reset }) {
-  const setAnime = (newAnime) => {
-    const newAnimes = originalAnimes.map(anime => {
-      if (anime.id === newAnime.id) {
-        return { ...anime, ...newAnime }
-      }
-      return anime
-    })
-    setAnimes(newAnimes)
-  }
-
+function AnimeList({ animes, isMobile, setRefresh, isLoading, isLatest, reset }) {
   return animes.length ?
     (<MuiList 
       disablePadding sx={{ py: '1rem' }}
@@ -599,14 +590,14 @@ function AnimeList({ animes, isMobile, originalAnimes, setAnimes, isLoading, isL
                     <Box className="w-25 sm:w-30 h-full">
                       <AnimeImage 
                         anime={anime}
-                        setAnime={setAnime}
+                        setRefresh={setRefresh}
                       />
                     </Box>
         
                     <Box className="flex flex-col justify-between py-1 px-2 flex-1">
                       <Box className="flex flex-col gap-5">
                         <AnimeTitle anime={anime} />
-                        <AnimeProgress anime={anime} setAnime={setAnime} />
+                        <AnimeProgress anime={anime} setRefresh={setRefresh} />
                       </Box>
                       <AnimePlatform platforms={anime.platforms} />
                     </Box>
@@ -684,7 +675,7 @@ function AnimeTitle({ anime }) {
   )
 }
 
-function AnimeProgress({ anime, setAnime }) {
+function AnimeProgress({ anime, setRefresh }) {
   const range = anime.episodeTotal ? 100 / anime.episodeTotal : 0;
   const [episodes, setEpisodes] = useState(anime.myListStatus.progress);
   const [value, setValue] = useState(range ? range * anime.myListStatus.progress : 50);
@@ -698,7 +689,7 @@ function AnimeProgress({ anime, setAnime }) {
     } else {
       setValue(50);
     }
-  }, [anime])
+  }, [anime, range])
 
   async function handleValue(e) {
     setIsLoading(true);
@@ -706,9 +697,7 @@ function AnimeProgress({ anime, setAnime }) {
     e.preventDefault();
     if (episodes >= anime.episodeTotal && anime.episodeTotal > 0) return;
     await updateAnimeList(anime.id, undefined, undefined, undefined, episodes + 1);
-    anime.myListStatus.progress += 1;
-    setAnime(anime);
-
+    setRefresh(prev => !prev);
     setIsLoading(false);
   }
 
@@ -726,7 +715,7 @@ function AnimeProgress({ anime, setAnime }) {
       <LinearProgress variant="determinate" value={value} className="w-full"/>
       <Typography fontSize={'small'}>{episodes} / {`${anime.episodeTotal || '?'}`} ep</Typography>
 
-      <AnimeEdit isOpen={isOpen} handleClick={handleIsOpen} anime={anime} setAnime={setAnime} />
+      <AnimeEdit isOpen={isOpen} handleClick={handleIsOpen} anime={anime} setRefresh={setRefresh} />
     </Box>
   )
 }

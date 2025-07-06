@@ -26,8 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { getAnimeTimelineSchema } from "../../validators/anime.validator";
 import { getAnimeTimeline } from "../../services/anime.service";
 import { toast } from "react-toastify";
-import { AccessTime, Circle, CircleOutlined } from "@mui/icons-material";
-import { undefined } from "zod";
+import { AccessTime, CircleOutlined } from "@mui/icons-material";
 import { AppContext } from "../../context/AppContext";
 import { useLocation } from "react-router-dom";
 
@@ -47,6 +46,7 @@ export default function Timeline({ isDashboard=false }) {
   // State
   const [isLoading, setIsLoading] = useState(true);
   const [timelines, setTimelines] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   
   // Settings
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -63,27 +63,23 @@ export default function Timeline({ isDashboard=false }) {
   const myListOnly = watch('myListOnly')
   const originalSchedule = watch('originalSchedule')
 
-  const fetchAnime = async () => {
-    setIsLoading(true);
+  useEffect(() => {
+    const fetchAnime = async () => {
+      setIsLoading(true);
 
-    const { success, data, message } = await getAnimeTimeline(weekCount, timeZone, myListOnly, !originalSchedule)
+      const { success, data, message } = await getAnimeTimeline(weekCount, timeZone, myListOnly, !originalSchedule)
 
-    if (success) {
-      setTimelines(data);
-    } else {
-      toast.error(message);
+      if (success) {
+        setTimelines(data);
+      } else {
+        toast.error(message);
+      }
+
+      setIsLoading(false);
     }
 
-    setIsLoading(false);
-  }
-  useEffect(() => {
     fetchAnime();
-  }, [originalSchedule, myListOnly, isLoggedIn])
-
-  // Update anime
-  const handleTimelines = () => {
-    fetchAnime()
-  }
+  }, [originalSchedule, myListOnly, isLoggedIn, refresh, timeZone])
 
   return (
     <Box className="flex flex-col gap-4">
@@ -96,8 +92,8 @@ export default function Timeline({ isDashboard=false }) {
         </Box> :
         (
           isMobile ? 
-          (<MobileTimeline days={timelines} setAnimes={handleTimelines} />) : 
-          (<DekstopTimeline days={timelines} setAnimes={handleTimelines} />)
+          (<MobileTimeline days={timelines} setRefresh={setRefresh} />) : 
+          (<DekstopTimeline days={timelines} setRefresh={setRefresh} />)
         )
       }
     </Box>
@@ -137,7 +133,7 @@ function FilterTimeline({ control }) {
   )
 }
 
-function DekstopTimeline({ animes, days, setAnimes }) {
+function DekstopTimeline({ days, setRefresh }) {
   const theme = useTheme()
   const isSmall = useMediaQuery(theme.breakpoints.down('xl'))
 
@@ -160,7 +156,7 @@ function DekstopTimeline({ animes, days, setAnimes }) {
             <Box className="w-full px-2.5 pb-2.5">
               {
                 day.timelines.length ?
-                <RenderTimeline index={index} key={index} animes={day.timelines} setAnimes={setAnimes} /> :
+                <RenderTimeline index={index} key={index} animes={day.timelines} setRefresh={setRefresh} /> :
                 <Typography align="center" className="py-19.5">Tidak ada anime yang tayang pada hari ini</Typography>
               }
             </Box>
@@ -171,7 +167,7 @@ function DekstopTimeline({ animes, days, setAnimes }) {
   )
 }
 
-function MobileTimeline({ days, setAnimes }) {
+function MobileTimeline({ days, setRefresh }) {
   const [value, setValue] = useState(3);
 
   const handleChange = (event, newValue) => {
@@ -213,7 +209,7 @@ function MobileTimeline({ days, setAnimes }) {
           <CustomTabPanel value={value} index={index} key={index} sx={{ pb: '1.25rem' }}>
             {
               day.timelines.length ?
-              <RenderTimeline index={index} key={index} animes={day.timelines} setAnimes={setAnimes} /> :
+              <RenderTimeline index={index} key={index} animes={day.timelines} setRefresh={setRefresh} /> :
               <Typography align="center" className="py-19.5">Tidak ada anime yang tayang pada hari ini</Typography>
             }   
           </CustomTabPanel>
@@ -223,7 +219,7 @@ function MobileTimeline({ days, setAnimes }) {
   )
 }
 
-function RenderTimeline({ index, animes, setAnimes }) {
+function RenderTimeline({ index, animes, setRefresh }) {
   const now = dayjs();
 
   const renderTimeNow = () => (
@@ -262,7 +258,7 @@ function RenderTimeline({ index, animes, setAnimes }) {
         return (
           <Fragment key={i}>
             { isBefore && renderTimeNow() }
-            <AnimeTimelineItem dateTime={anime.dateTime} animes={anime.data} key={i} setAnimes={setAnimes} />
+            <AnimeTimelineItem dateTime={anime.dateTime} animes={anime.data} key={i} setRefresh={setRefresh} />
             { isAfter && renderTimeNow() }
           </Fragment>
         )
@@ -271,7 +267,7 @@ function RenderTimeline({ index, animes, setAnimes }) {
   )
 }
 
-function AnimeTimelineItem({ dateTime, animes, setAnimes }) {
+function AnimeTimelineItem({ dateTime, animes, setRefresh }) {
   const date = dayjs(dateTime);
   const time = date.format('HH:mm');
   const isTime = date.isAfter(dayjs().startOf('day')) && date.isBefore(dayjs());
@@ -293,7 +289,7 @@ function AnimeTimelineItem({ dateTime, animes, setAnimes }) {
                 <Card className="flex flex-wrap overflow-hidden w-full sm:h-30 gap-2 sm:gap-0">
                   <Box className="w-full sm:w-25 lg:w-35 h-25 sm:h-full">
                     <AnimeImage 
-                      anime={anime} setAnime={setAnimes}
+                      anime={anime} setRefresh={setRefresh}
                     />
                   </Box>
                   <Box className="flex flex-col justify-between py-1 px-2 flex-1 gap-2 sm:gap-0">

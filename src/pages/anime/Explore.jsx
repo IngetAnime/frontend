@@ -116,6 +116,7 @@ function TopAnime({ isMobile, isLoggedIn, isDashboard }) {
   const limit = isMobile ? 10 : 30;
   const [offset, setOffset] = useState(limit);
   const [isLatest, setIsLatest] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   // Form
 
@@ -222,14 +223,14 @@ function TopAnime({ isMobile, isLoggedIn, isDashboard }) {
     }
     
     fetchAnime();
-  }, [isLoggedIn, rankingType]);
+  }, [isLoggedIn, rankingType, refresh]);
 
   // Sort and filter anime
   useEffect(() => {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(filterAndSortAnime(originalAnimes, accessType, status, platformId));
-  }, [originalAnimes, accessType, status, platformId]);
+  }, [originalAnimes, accessType, status, platformId, limit]);
 
   // Limit and offset to display on user screen
   useEffect(() => {
@@ -237,7 +238,7 @@ function TopAnime({ isMobile, isLoggedIn, isDashboard }) {
     setAnimes(filteredAnimes.slice(0, offset));
     if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsLoading(false);
-  }, [filteredAnimes, offset]);
+  }, [filteredAnimes, offset, animes.length, isDashboard, isLatest, limit]);
 
   // Get next anime list when user scrolling
   useEffect(() => {
@@ -257,7 +258,7 @@ function TopAnime({ isMobile, isLoggedIn, isDashboard }) {
         (animes.length) ?
         <AnimeList 
         animes={animes} isMobile={isMobile} isLoading={isLoading} 
-        setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
+        setRefresh={setRefresh} isLatest={isLatest}
         /> :
         <Container>
           <Typography 
@@ -294,12 +295,13 @@ function CurrentSeason({ isMobile, isLoggedIn, isDashboard  }) {
   const limit = isMobile ? 10 : 30;
   const [offset, setOffset] = useState(limit);
   const [isLatest, setIsLatest] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   // Form
 
   // Settings
   const { year, season } = getCurrentSeason()
-  const { control, watch } = useForm({ 
+  const { control, watch, reset } = useForm({ 
     resolver: zodResolver(getSeasonalAnimeSchema), defaultValues: {
       sort: 'num_list_users', year, season,
       animeType: 'all',
@@ -410,7 +412,7 @@ function CurrentSeason({ isMobile, isLoggedIn, isDashboard  }) {
     }
     
     fetchAnime();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, season, year, refresh]);
 
   // Sort and filter anime
   useEffect(() => {
@@ -463,7 +465,7 @@ function CurrentSeason({ isMobile, isLoggedIn, isDashboard  }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(firstFilter(originalAnimes));
-  }, [originalAnimes, animeType, sort, accessType, status, platformId]);
+  }, [originalAnimes, animeType, sort, accessType, status, platformId, limit, season, year]);
 
   // Limit and offset to display on user screen
   useEffect(() => {
@@ -471,7 +473,7 @@ function CurrentSeason({ isMobile, isLoggedIn, isDashboard  }) {
     setAnimes(filteredAnimes.slice(0, offset));
     if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsLoading(false);
-  }, [filteredAnimes, offset]);
+  }, [filteredAnimes, offset, animes.length, isDashboard, isLatest, limit]);
 
   // Get next anime list when user scrolling
   useEffect(() => {
@@ -491,7 +493,7 @@ function CurrentSeason({ isMobile, isLoggedIn, isDashboard  }) {
         (animes.length) ?
         <AnimeList 
         animes={animes} isMobile={isMobile} isLoading={isLoading} 
-        setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
+        setRefresh={setRefresh} isLatest={isLatest}
         /> :
         <Container>
           <Typography 
@@ -528,6 +530,7 @@ function Seasons({ isMobile, isLoggedIn, isDashboard }) {
   const limit = isMobile ? 10 : 30;
   const [offset, setOffset] = useState(limit);
   const [isLatest, setIsLatest] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   // Generate 1917 until this year
   const earlyYear = 1917;
@@ -657,7 +660,7 @@ function Seasons({ isMobile, isLoggedIn, isDashboard }) {
     }
     
     fetchAnime();
-  }, [isLoggedIn, year, season]);
+  }, [isLoggedIn, year, season, refresh]);
 
   // Sort and filter anime
   useEffect(() => {
@@ -699,7 +702,7 @@ function Seasons({ isMobile, isLoggedIn, isDashboard }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(firstFilter(originalAnimes));
-  }, [originalAnimes, sort, accessType, status, platformId]);
+  }, [originalAnimes, sort, accessType, status, platformId, limit, season, year]);
 
   // Limit and offset to display on user screen
   useEffect(() => {
@@ -707,7 +710,7 @@ function Seasons({ isMobile, isLoggedIn, isDashboard }) {
     setAnimes(filteredAnimes.slice(0, offset));
     if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsLoading(false);
-  }, [filteredAnimes, offset]);
+  }, [filteredAnimes, offset, animes.length, isDashboard, isLatest, limit]);
 
   // Get next anime list when user scrolling
   useEffect(() => {
@@ -727,7 +730,7 @@ function Seasons({ isMobile, isLoggedIn, isDashboard }) {
         (animes.length) ?
         <AnimeList 
         animes={animes} isMobile={isMobile} isLoading={isLoading} 
-        setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest}
+        setRefresh={setRefresh} isLatest={isLatest}
         /> :
         <Container>
           <Typography 
@@ -764,6 +767,7 @@ function SuggestedAnime({ isMobile, isLoggedIn, isDashboard }) {
   const [offset, setOffset] = useState(limit);
   const [isLatest, setIsLatest] = useState(false);
   const [message, setMessage] = useState('');
+  const [refresh, setRefresh] = useState(false);
 
   // Get anime recomendation
   useEffect(() => {
@@ -779,14 +783,14 @@ function SuggestedAnime({ isMobile, isLoggedIn, isDashboard }) {
     }
     
     fetchAnime();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, refresh]);
 
   // Limit and offset to display on user screen
   useEffect(() => {
     setAnimes(originalAnimes.slice(0, offset));
     if ((animes.length === originalAnimes.length) || isDashboard) setIsLatest(true);
     setIsLoading(false);
-  }, [originalAnimes, offset]);
+  }, [originalAnimes, offset, animes.length, isDashboard]);
 
   // Get next anime list when user scrolling
   useEffect(() => {
@@ -820,7 +824,7 @@ function SuggestedAnime({ isMobile, isLoggedIn, isDashboard }) {
         </Container> :
         <AnimeList 
           animes={animes} isMobile={isMobile} isLoading={isLoading} 
-          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest} 
+          setRefresh={setRefresh} isLatest={isLatest} 
         />
       }
     </AnimeWrapper>
@@ -839,16 +843,7 @@ export function AnimeWrapper({ children }) {
 
 // List anime item
 
-export function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnimes, isLatest }) {  
-  const setAnime = (newAnime) => {
-    const newAnimes = originalAnimes.map(anime => {
-      if (anime.id === newAnime.id) {
-        return { ...anime, ...newAnime }
-      }
-      return anime
-    })
-    setAnimes(newAnimes)
-  }
+export function AnimeList({ animes, isMobile, isLoading, setRefresh, isLatest }) {  
   return (
     <List 
       disablePadding sx={{ py: '1rem' }}
@@ -884,7 +879,7 @@ export function AnimeList({ animes, isMobile, isLoading, setAnimes, originalAnim
                   <Box className="flex flex-wrap overflow-hidden w-full sm:h-40 gap-2 sm:gap-0">
                     <Box className="w-full sm:w-30 h-35 sm:h-full">
                       <AnimeImage 
-                        anime={anime} setAnime={setAnime}
+                        anime={anime} setRefresh={setRefresh}
                       />
                     </Box>
 

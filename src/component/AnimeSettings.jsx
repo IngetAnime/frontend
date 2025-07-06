@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { getAnimeDetail } from "../services/mal.service.js";
 import { deleteAnimePlatformSchema, updateAnimePlatformSchema } from "../validators/platform.validator.js";
 
-export default function AnimeSettings({ sx, anime, setAnime }) {
+export default function AnimeSettings({ sx, anime, setRefresh }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -66,15 +66,15 @@ export default function AnimeSettings({ sx, anime, setAnime }) {
       >
         {
           isPlatform ? 
-          <EditPlatform handleClose={handleClose} handleIsPlatform={handleIsPlatform} anime={anime} setAnime={setAnime} /> :
-          <EditAnime handleClose={handleClose} handleIsPlatform={handleIsPlatform} anime={anime} setAnime={setAnime} />
+          <EditPlatform handleClose={handleClose} handleIsPlatform={handleIsPlatform} anime={anime} setRefresh={setRefresh} /> :
+          <EditAnime handleClose={handleClose} handleIsPlatform={handleIsPlatform} anime={anime} setRefresh={setRefresh} />
         }
       </Dialog>
     </>
   )
 }
 
-function AnimeWrapper({ anime, handleClose, children, onSubmit, isSubmitting, platform, setAnime }) {
+function AnimeWrapper({ anime, handleClose, children, onSubmit, isSubmitting, platform, setRefresh }) {
   const [isOpen, setIsOpen] = useState(false);
   const handleIsOpen = (value) => {
     setIsOpen(value)
@@ -127,12 +127,12 @@ function AnimeWrapper({ anime, handleClose, children, onSubmit, isSubmitting, pl
         </Box>
       </DialogActions>
     </Box>
-    {platform && <DeletePlatform open={isOpen} handleIsOpen={handleIsOpen} platform={platform} anime={anime} setAnime={setAnime} />}
+    {platform && <DeletePlatform open={isOpen} handleIsOpen={handleIsOpen} platform={platform} anime={anime} setRefresh={setRefresh} />}
     </>
   )
 }
 
-function EditAnime({ handleClose, handleIsPlatform, anime, setAnime }) {
+function EditAnime({ handleClose, handleIsPlatform, anime, setRefresh }) {
   // Form
 
   // Settings
@@ -204,13 +204,12 @@ function EditAnime({ handleClose, handleIsPlatform, anime, setAnime }) {
 
   // Submit edit anime
   const onSubmit = async (req) => {
-    const { success, message, data } = await updateAnime(
+    const { success, message } = await updateAnime(
       anime.id, req.picture, req.title, req.titleID, req.titleEN, req.releaseAt, req.episodeTotal, req.status
     )
     
     if (success) {
-      // console.log(data);
-      setAnime(data)
+      setRefresh(prev => !prev);
       toast.success(message)
     } else {
       toast.error(message)
@@ -271,7 +270,7 @@ function EditAnime({ handleClose, handleIsPlatform, anime, setAnime }) {
   )
 }
 
-function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {  
+function EditPlatform({ handleClose, handleIsPlatform, anime, setRefresh }) {  
   // Form
 
   // Settings
@@ -376,9 +375,10 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
 
   // Handle which platform is selected
   const platformId = watch('platformId')
-  const platformMap = new Map(
+  const [platformMap] = useState(new Map(
     platforms.map((platform) => [platform.platform.id, platform])
-  )
+  ))
+
   useEffect(() => {
     const selectedPlatform = platformMap.get(platformId)
     setValue('platformId', platformId || '', { shouldValidate: true })
@@ -398,50 +398,17 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
     setValue('episodeAired', selectedPlatform?.episodeAired || null, { shouldValidate: true })
     setValue('isMainPlatform', selectedPlatform?.isMainPlatform || false, { shouldValidate: true })
     setValue('isHiatus', selectedPlatform?.isHiatus || false, { shouldValidate: true })
-  }, [platformId])
+  }, [platformId, setValue, platformMap])
 
   // Submit edit anime platform
   const onSubmit = async (req) => {    
-    const { success, message, data: newPlatform } = await updateAnimePlatform(
+    const { success, message } = await updateAnimePlatform(
       anime.id, req.platformId, req.link, req.accessType, req.nextEpisodeAiringAt, req.lastEpisodeAiredAt, 
       req.intervalInDays, req.episodeAired, req.isMainPlatform, req.isHiatus
     );
     if (success) {
-      let platformAnime = [...platforms]
-
-      // If main platform change, set others isMainPlatform to false
-      if (req.isMainPlatform) { 
-        platformAnime = platformAnime.map(platform => {
-          return {
-            ...platform,
-            isMainPlatform: false,
-          }
-        })
-      }
-
-      // Update changed platform
-      const index = platformAnime.findIndex(platform => platform.id === newPlatform.id)
-      if (index !== -1) {
-        platformAnime[index] = newPlatform
-      } else {
-        platformAnime.push(newPlatform)
-      }
-      anime.platforms = platformAnime;
-
-      // Update selected platform
-      if (
-        ((anime.selectedPlatform.id === newPlatform.id) || req.isMainPlatform) && 
-        (!anime.myListStatus.animePlatformId || (anime.myListStatus.animePlatformId === newPlatform.id))
-        // Update selected platform if:
-        // - The currently selected platform is the one being updated, OR the updated platform is set as isMainPlatform
-        // AND
-        // - The user hasn't selected a platform yet, OR the selected platform is the same as the one being updated
-      ) {
-        console.log(!anime.myListStatus.platformId);
-        anime.selectedPlatform = newPlatform;
-      }
-      setAnime(anime)
       toast.success(message);
+      setRefresh(prev => !prev);
     } else {
       toast.error(message);
     }
@@ -449,7 +416,7 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
 
   return (
     <AnimeWrapper anime={anime} handleClose={handleClose} onSubmit={handleSubmit(onSubmit)} isSubmitting={isSubmitting}
-      platform={platformMap.get(platformId)} setAnime={setAnime}
+      platform={platformMap.get(platformId)} setRefresh={setRefresh}
     >
       <Box className="flex flex-wrap flex-col md:flex-row justify-between gap-2.5">
         {menuSelect.map((menu, i) => {
@@ -484,7 +451,7 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setAnime }) {
   )
 }
 
-function DeletePlatform({ open, handleIsOpen, platform, anime, setAnime }) {
+function DeletePlatform({ open, handleIsOpen, platform, anime, setRefresh }) {
   // Settings
   const { handleSubmit, formState: { isSubmitting } } = useForm({
     resolver: zodResolver(deleteAnimePlatformSchema), mode: 'onChange', values: {
@@ -494,15 +461,9 @@ function DeletePlatform({ open, handleIsOpen, platform, anime, setAnime }) {
 
   // Submit delete anime
   const onSubmit = async (req) => {
-    const { success, message, data: newPlatform } = await deleteAnimePlatform(req.animeId, req.platformId);
+    const { success, message } = await deleteAnimePlatform(req.animeId, req.platformId);
     if (success) {
-      const platformAnime = [...anime.platforms]
-      const index = platformAnime.findIndex(platform => platform.id === newPlatform.id)
-      if (index !== -1) {
-        platformAnime.splice(index, 1);
-        anime.platforms = platformAnime;
-        setAnime(anime)
-      } 
+      setRefresh(prev => !prev)
       toast.success(message)
     } else {
       toast.error(message)
