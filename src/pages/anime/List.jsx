@@ -709,7 +709,7 @@ function AnimeProgress({ anime, setRefresh }) {
   return (
     <Box className="flex flex-col gap-1 items-end relative">
       <Box className="absolute -top-1 -translate-y-full flex items-center gap-1">
-        <IconButton size="small" onClick={handleIsOpen}><Edit fontSize="small"/></IconButton>
+        <IconButton size="small" onClick={(e) => { e.preventDefault(); setIsOpen(!isOpen) }}><Edit fontSize="small"/></IconButton>
         <AnimeButton onClick={(e) => handleValue(e)} icon={Add} disabled={isLoading}></AnimeButton>
       </Box>
       <LinearProgress variant="determinate" value={value} className="w-full"/>
