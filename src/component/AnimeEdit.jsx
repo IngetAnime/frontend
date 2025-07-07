@@ -244,7 +244,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
                   {menuSelect[0].menus.map((menu, i) => (
                     <Button key={i} 
                       variant={menu === status ? 'contained' : 'outlined'} 
-                      onClick={() => setValue('status', menu.value)} 
+                      onClick={() => setValue('status', menu.value, { shouldDirty: true })} 
                       color="default" disableElevation
                       sx={
                         menu.value === status ? 
@@ -259,7 +259,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
               </Box>
               <Box className="flex flex-col gap-2.5">
                 <Typography fontSize={'small'}>Progress: {progress ? progress : ' - '}</Typography>
-                <SlideNumber value={progress} setValue={(value) => setValue('progress', value)} menu={menuSelect[1].menus} />
+                <SlideNumber value={progress} setValue={(value) => setValue('progress', value, { shouldDirty: true })} menu={menuSelect[1].menus} />
               </Box>
               <Box className="flex flex-col gap-2.5">
                 <Typography fontSize={'small'}>Score: {score ? score : ' - '}</Typography>
