@@ -30,7 +30,7 @@ export default function Dashboard() {
   const limit = isMobile ? 10 : 30;
   const [offset, setOffset] = useState(limit);
   const [isLatest, setIsLatest] = useState(false);
-  const [message, setMessage] = useState('');
+  const [refresh, setRefresh] = useState(false);
 
   // Get anime list
   useEffect(() => {
@@ -44,14 +44,14 @@ export default function Dashboard() {
     }
     
     fetchAnime();
-  }, [isLoggedIn, q]);
+  }, [isLoggedIn, q, refresh]);
 
   // Limit and offset to display on user screen
   useEffect(() => {
     setAnimes(originalAnimes.slice(0, offset));
     if ((animes.length === originalAnimes.length)) setIsLatest(true);
     setIsLoading(false);
-  }, [originalAnimes, offset]);
+  }, [originalAnimes, offset, animes.length]);
 
   // Get next anime list when user scrolling
   useEffect(() => {
@@ -66,40 +66,23 @@ export default function Dashboard() {
 
   return q ?
     (<AnimeWrapper>
-      {
-        message ? 
-        <Container>
-          <Typography 
-            fontWeight={'bold'} 
-            color="secondary"
-            component={'div'}
-            fontSize={'small'} 
-            sx={{
-              fontSize: { xs: '3rem', md: '5rem' }
-            }}
-          >
-            Anime <br /> Tidak Ditemukan
-          </Typography>
-          <Typography variant="subtitle1">{message} </Typography>
-        </Container> :
-        <AnimeList 
-          animes={animes} isMobile={isMobile} isLoading={isLoading} 
-          setAnimes={setOriginalAnimes} originalAnimes={originalAnimes} isLatest={isLatest} 
-        />
-      }
+      <AnimeList 
+        animes={animes} isMobile={isMobile} isLoading={isLoading} 
+        setRefresh={setRefresh} isLatest={isLatest} 
+      />
     </AnimeWrapper>) :
     (<Container className="flex flex-wrap justify-between overflow-hidden" component={'main'}>
-        <AnimeWrap to={'/anime/timeline'}>
-          <Timeline isDashboard={'true'} />
-        </AnimeWrap>
-        <Divider orientation="vertical" flexItem />
-        <AnimeWrap to={'/anime'}>
-          <Explore isDashboard={'true'} />
-        </AnimeWrap>
-        <AnimeWrap to={'/anime/myliststatus'}>
-          <List isDashboard={'true'} />
-        </AnimeWrap>
-      </Container>)
+      <AnimeWrap to={'/anime/timeline'}>
+        <Timeline isDashboard={'true'} />
+      </AnimeWrap>
+      <Divider orientation="vertical" flexItem />
+      <AnimeWrap to={'/anime'}>
+        <Explore isDashboard={'true'} />
+      </AnimeWrap>
+      <AnimeWrap to={'/anime/myliststatus'}>
+        <List isDashboard={'true'} />
+      </AnimeWrap>
+    </Container>)
 }
 
 function AnimeWrap({ children, to }) {
