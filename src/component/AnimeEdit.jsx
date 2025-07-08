@@ -161,7 +161,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
     if (!dirtyFields.status && !dirtyFields.startDate && (progress > 0) && dirtyFields.progress) {
       // Auto set if update progress to 1 or more in the first change
       setValue('status', 'watching', { shouldDirty: true })
-      if (!startDate) setValue('startDate', dayjs().toISOString(), { shouldDirty: true });
+      if (!startDate) setValue('startDate', dayjs().format('YYYY-MM-DD'), { shouldDirty: true });
     }
   }, [setValue, progress, startDate, dirtyFields.progress, dirtyFields.status, dirtyFields.startDate])
 
