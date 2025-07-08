@@ -50,7 +50,7 @@ export default function Timeline({ isDashboard=false }) {
   
   // Settings
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const weekCount = 1;
+  const weekCount = isMobile ? 1 : 2;
   const { control, watch } = useForm({
     resolver: zodResolver(getAnimeTimelineSchema), mode: 'onChange',
     defaultValues: {
@@ -79,7 +79,7 @@ export default function Timeline({ isDashboard=false }) {
     }
 
     fetchAnime();
-  }, [originalSchedule, myListOnly, isLoggedIn, refresh, timeZone])
+  }, [originalSchedule, myListOnly, isLoggedIn, refresh, timeZone, weekCount])
 
   return (
     <Box className="flex flex-col gap-4">
@@ -138,7 +138,7 @@ function DekstopTimeline({ days, setRefresh }) {
   const isSmall = useMediaQuery(theme.breakpoints.down('xl'))
 
   return (
-    <Slider slidesToShow={isSmall ? 2 : 3}>
+    <Slider slidesToShow={isSmall ? 2 : 3} initialSlide={5} slidesToScroll={3}>
       {days.map((day, index) => {
         const hari = dayjs(day.dateTime).format('dddd')
         const tanggal = dayjs(day.dateTime).format('D')
