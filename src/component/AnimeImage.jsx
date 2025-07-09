@@ -25,7 +25,7 @@ export default function AnimeImage({ isDialog, picture, anime, setRefresh }) {
       <CardMedia className="w-full h-full" component={'img'} image={picture || anime.picture} />
       {!isDialog && 
         <>
-          {episodeAired && (
+          {episodeAired ? (
             <AnimeButton 
               sx={{ position: 'absolute', bottom: 0, left: { xs: 'unset', sm: '0' }, right: { xs: 0, sm: 'unset ' } }}
               icon={CloudUpload} backgroundColor={
@@ -36,7 +36,7 @@ export default function AnimeImage({ isDialog, picture, anime, setRefresh }) {
               { ...(anime.selectedPlatform?.link && { to: anime.selectedPlatform.link })}
               content={episodeAired} title={`Episode ${episodeAired} sudah tayang`}
             />
-          )}
+          ) : <></>}
 
           {anime?.myListStatus?.status ? (
             <AnimeButton 
