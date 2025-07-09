@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { getGoogleAuthUrl, getMALAuthUrl } from "../services/auth.service";
 import Switch from "../component/Switch";
 
-export default function Settings({ }) {
+export default function Settings() {
   const { isLoggedIn, userData, setUserData } = useContext(AppContext);
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ export default function Settings({ }) {
   }, [isLoggedIn, navigate])
 
   return (
-    <Box className="flex flex-col gap-4 px-4 sm:px-6 pt-5">
+    <Box className="flex flex-col gap-4 px-4 sm:px-6 pt-5 min-h-dvh">
       {
         isLoggedIn ? 
         <>

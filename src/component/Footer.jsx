@@ -15,8 +15,8 @@ export default function Footer() {
           </Box>
           <Typography>Designed and coded by Ahmad Subhan D</Typography>
         </Box>
-        <Box className="flex items-center justify-between">
-          <Typography>&copy; 2025. All rights reserved.</Typography>
+        <Box className="flex items-end justify-between">
+          <Typography className="p-1">&copy; 2025. All rights reserved.</Typography>
           <List disablePadding className="flex">
             <ListItem disablePadding>
               <IconButton href="https://github.com/ahmadsubhand" target={'_blank'} sx={{ color: 'white' }}>
