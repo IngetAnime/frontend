@@ -82,7 +82,7 @@ export default function Timeline({ isDashboard=false }) {
   }, [originalSchedule, myListOnly, isLoggedIn, refresh, timeZone, weekCount])
 
   return (
-    <Box className="flex flex-col gap-4">
+    <Box className="flex flex-col gap-4 pb-4">
       <Typography variant="h2">Jadwal Rilis Anime Mingguan!</Typography>
       <FilterTimeline control={control} />
       {
