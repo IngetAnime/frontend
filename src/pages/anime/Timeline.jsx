@@ -18,7 +18,9 @@ import AnimeImage from "../../component/AnimeImage";
 import CustomTabPanel from "../../component/CustomTabPanel";
 import { Fragment, useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
-import 'dayjs/locale/id'
+import 'dayjs/locale/id';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import Slider from "../../component/Slider";
 import Collapse from "../../component/Collapse";
 import { Controller, useForm } from "react-hook-form";
@@ -31,6 +33,8 @@ import { AppContext } from "../../context/AppContext";
 import { useLocation } from "react-router-dom";
 
 dayjs.locale('id')
+dayjs.extend(isSameOrAfter)
+dayjs.extend(isSameOrBefore)
 
 export default function Timeline({ isDashboard=false }) {
   // Component
@@ -270,7 +274,7 @@ function RenderTimeline({ index, animes, setRefresh }) {
 function AnimeTimelineItem({ dateTime, animes, setRefresh }) {
   const date = dayjs(dateTime);
   const time = date.format('HH:mm');
-  const isTime = date.isAfter(dayjs().startOf('day')) && date.isBefore(dayjs());
+  const isTime = date.isSameOrAfter(dayjs().startOf('day')) && date.isBefore(dayjs());
 
   return (
     <TimelineItem>
