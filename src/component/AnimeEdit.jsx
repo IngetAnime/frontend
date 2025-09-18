@@ -37,6 +37,7 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
   const score = watch('score');
   const progress = watch('progress');
   const startDate = watch('startDate');
+  const finishDate = watch('finishDate');
   
   // Menu item
   const totalEpisode = anime.platforms[0]?.episodeAired || anime.num_episodes || anime.episodeTotal || 99;
@@ -156,14 +157,39 @@ export default function AnimeEdit({ isOpen, handleClick, anime, setRefresh }) {
     setIsLoading(false);
   }
 
-  // Auto set status and startDate when progress move
+  // Auto set status and startDate/finishDate when progress change
   useEffect(() => {
-    if (!dirtyFields.status && !dirtyFields.startDate && (progress > 0) && dirtyFields.progress) {
-      // Auto set if update progress to 1 or more in the first change
-      setValue('status', 'watching', { shouldDirty: true })
-      if (!startDate) setValue('startDate', dayjs().format('YYYY-MM-DD'), { shouldDirty: true });
+    if (!dirtyFields.status && dirtyFields.progress) {
+      if (
+        !dirtyFields.finishDate &&
+        anime.episodeTotal &&
+        progress === anime.episodeTotal
+      ) {
+        // Prioritas: Completed
+        setValue('status', 'completed', { shouldDirty: true });
+        if (!finishDate) {
+          setValue('finishDate', dayjs().format('YYYY-MM-DD'), { shouldDirty: true });
+        }
+      } else if (!dirtyFields.startDate && progress > 0) {
+        // Kalau belum complete, fallback ke Watching
+        setValue('status', 'watching', { shouldDirty: true });
+        if (!startDate) {
+          setValue('startDate', dayjs().format('YYYY-MM-DD'), { shouldDirty: true });
+        }
+      }
     }
-  }, [setValue, progress, startDate, dirtyFields.progress, dirtyFields.status, dirtyFields.startDate])
+  }, [
+    setValue,
+    progress,
+    startDate,
+    finishDate,
+    dirtyFields.progress,
+    dirtyFields.status,
+    dirtyFields.startDate,
+    dirtyFields.finishDate,
+    anime.episodeTotal,
+  ]);
+
 
   // Component
 
