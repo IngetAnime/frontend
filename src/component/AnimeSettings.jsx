@@ -402,12 +402,12 @@ function EditPlatform({ handleClose, handleIsPlatform, anime, setRefresh }) {
   }, [platformId, setValue, platformMap])
 
   useEffect(() => {
-    if (lastEpisodeAiredAt) {
+    if (dirtyFields.lastEpisodeAiredAt) {
       const lastDate = dayjs(lastEpisodeAiredAt);
       const nextDate = lastDate.add(7, 'day').toISOString();
       setValue('nextEpisodeAiringAt', nextDate, { shouldValidate: true })
     }
-  }, [lastEpisodeAiredAt, setValue])
+  }, [lastEpisodeAiredAt, setValue, dirtyFields.lastEpisodeAiredAt]);
 
   // Submit edit anime platform
   const onSubmit = async (req) => {    
