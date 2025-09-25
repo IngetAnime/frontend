@@ -245,11 +245,6 @@ function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRefresh, s
     setIsSort(false);
   }, [filteredAnimes, offset, animes.length, isDashboard, isLatest, limit]);
 
-  // useEffect(() => {
-  //   console.log(isLatest);
-    
-  // }, [isLatest]);
-
   // Get next anime list when user scrolling
   useEffect(() => {
     if (isLatest) return;

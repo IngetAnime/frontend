@@ -230,7 +230,8 @@ function TopAnime({ isMobile, isLoggedIn, isDashboard }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(filterAndSortAnime(originalAnimes, accessType, status, platformId));
-  }, [originalAnimes, accessType, status, platformId, limit]);
+    setAnimes(Array(isMobile ? 3 : 12).fill(null));
+  }, [originalAnimes, accessType, status, platformId, limit, setAnimes, isMobile]);
 
   // Limit and offset to display on user screen
   useEffect(() => {
@@ -465,7 +466,8 @@ function CurrentSeason({ isMobile, isLoggedIn, isDashboard  }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(firstFilter(originalAnimes));
-  }, [originalAnimes, animeType, sort, accessType, status, platformId, limit, season, year]);
+    setAnimes(Array(isMobile ? 3 : 12).fill(null));
+  }, [originalAnimes, animeType, sort, accessType, status, platformId, limit, season, year, setAnimes, isMobile]);
 
   // Limit and offset to display on user screen
   useEffect(() => {
@@ -702,7 +704,8 @@ function Seasons({ isMobile, isLoggedIn, isDashboard }) {
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(firstFilter(originalAnimes));
-  }, [originalAnimes, sort, accessType, status, platformId, limit, season, year]);
+    setAnimes(Array(isMobile ? 3 : 12).fill(null));
+  }, [originalAnimes, sort, accessType, status, platformId, limit, season, year, setAnimes, isMobile]);
 
   // Limit and offset to display on user screen
   useEffect(() => {
@@ -785,9 +788,13 @@ function SuggestedAnime({ isMobile, isLoggedIn, isDashboard }) {
     fetchAnime();
   }, [isLoggedIn, refresh]);
 
+  useEffect(() => {
+    console.log(animes.length, originalAnimes.length, 'atau', isLatest);
+  }, [isLatest, animes.length, originalAnimes.length])
+
   // Limit and offset to display on user screen
   useEffect(() => {
-    setAnimes(originalAnimes.slice(0, offset));
+    if (originalAnimes.length) setAnimes(originalAnimes.slice(0, offset));
     if ((animes.length === originalAnimes.length) || isDashboard) setIsLatest(true);
     setIsLoading(false);
   }, [originalAnimes, offset, animes.length, isDashboard]);
