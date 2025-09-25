@@ -226,7 +226,7 @@ function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRefresh, s
   // Update if root anime have update, for example if user logout
   useEffect(() => {
     setOriginalAnimes(filterAndSortAnime(rootAnimes, 'all', status, 0))
-  }, [rootAnimes, status]) // Store for clean data
+  }, [rootAnimes, status, setFilteredAnimes, setAnimes, isMobile]) // Store for clean data
 
   // Filter and sort data
   useEffect(() => {
@@ -234,7 +234,8 @@ function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRefresh, s
     setOffset(limit);
     setIsLatest(false);
     setFilteredAnimes(sortAndFilterList(originalAnimes, sort, accessType, platform));
-  }, [originalAnimes, sort, accessType, platform, limit])
+    setAnimes(Array(isMobile ? 3 : 12).fill(null));
+  }, [originalAnimes, sort, accessType, platform, limit, setAnimes, isMobile])
 
   // Limit and offset to display on user screen
   useEffect(() => {
@@ -243,6 +244,11 @@ function CustomTab({ isMobile, isDashboard, isLoading, rootAnimes, setRefresh, s
     if ((animes.length === filteredAnimes.length) || filteredAnimes.length <= limit || isDashboard) setIsLatest(true);
     setIsSort(false);
   }, [filteredAnimes, offset, animes.length, isDashboard, isLatest, limit]);
+
+  // useEffect(() => {
+  //   console.log(isLatest);
+    
+  // }, [isLatest]);
 
   // Get next anime list when user scrolling
   useEffect(() => {
