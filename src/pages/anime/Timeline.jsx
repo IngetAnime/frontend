@@ -44,6 +44,7 @@ export default function Timeline({ isDashboard=false }) {
   const location = useLocation()
   localStorage.setItem('lastPath', location.pathname)
   const { isLoggedIn } = useContext(AppContext)
+  const [initialSlide, setInitialSlide] = useState(isMobile ? 3 : 5);
 
   // Form 
 
@@ -96,8 +97,8 @@ export default function Timeline({ isDashboard=false }) {
         </Box> :
         (
           isMobile ? 
-          (<MobileTimeline days={timelines} setRefresh={setRefresh} />) : 
-          (<DekstopTimeline days={timelines} setRefresh={setRefresh} />)
+          (<MobileTimeline days={timelines} setRefresh={setRefresh} initialSlide={initialSlide} setInitialSlide={setInitialSlide} />) : 
+          (<DekstopTimeline days={timelines} setRefresh={setRefresh} initialSlide={initialSlide} setInitialSlide={setInitialSlide} />)
         )
       }
     </Box>
@@ -137,12 +138,12 @@ function FilterTimeline({ control }) {
   )
 }
 
-function DekstopTimeline({ days, setRefresh }) {
+function DekstopTimeline({ days, setRefresh, initialSlide, setInitialSlide }) {
   const theme = useTheme()
   const isSmall = useMediaQuery(theme.breakpoints.down('xl'))
 
   return (
-    <Slider slidesToShow={isSmall ? 2 : 3} initialSlide={5} slidesToScroll={3}>
+    <Slider slidesToShow={isSmall ? 2 : 3} initialSlide={initialSlide} setInitialSlide={setInitialSlide} slidesToScroll={isSmall ? 2 : 3}>
       {days.map((day, index) => {
         const hari = dayjs(day.dateTime).format('dddd')
         const tanggal = dayjs(day.dateTime).format('D')
@@ -171,17 +172,15 @@ function DekstopTimeline({ days, setRefresh }) {
   )
 }
 
-function MobileTimeline({ days, setRefresh }) {
-  const [value, setValue] = useState(3);
-
+function MobileTimeline({ days, setRefresh, initialSlide, setInitialSlide }) {
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setInitialSlide(newValue);
   };
   
   return (
     <Box className="flex flex-col items-center gap-2">
       <Tabs
-        value={value}
+        value={initialSlide}
         onChange={handleChange}
       >
         {days.map((day, index) => {
@@ -210,7 +209,7 @@ function MobileTimeline({ days, setRefresh }) {
 
       {days.map((day, index) => {
         return (
-          <CustomTabPanel value={value} index={index} key={index} sx={{ pb: '1.25rem' }}>
+          <CustomTabPanel value={initialSlide} index={index} key={index} sx={{ pb: '1.25rem' }}>
             {
               day.timelines.length ?
               <RenderTimeline index={index} key={index} animes={day.timelines} setRefresh={setRefresh} /> :

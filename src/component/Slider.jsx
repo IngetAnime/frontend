@@ -5,7 +5,7 @@ import Slide from "react-slick";
 import { IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 
-export default function Slider({ children, slidesToShow=2, initialSlide=2, slidesToScroll=1 }) {
+export default function Slider({ children, slidesToShow=2, initialSlide=2, setInitialSlide, slidesToScroll=1 }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const totalSlides = children.length;
 
@@ -13,7 +13,10 @@ export default function Slider({ children, slidesToShow=2, initialSlide=2, slide
     <div className=" w-full">
       <Slide 
         dots={true} speed={300} slidesToShow={slidesToShow} slidesToScroll={slidesToScroll} infinite={false} initialSlide={initialSlide} 
-        beforeChange={(oldIndex, newIndex) => setCurrentSlide(newIndex)}
+        beforeChange={(oldIndex, newIndex) => {
+          setInitialSlide(newIndex);
+          setCurrentSlide(newIndex);
+        }}
         nextArrow={<NextArrow currentSlide={currentSlide} totalSlides={totalSlides} slidesToShow={slidesToShow}/>}  
         prevArrow={<PrevArrow currentSlide={currentSlide} />}
       >
