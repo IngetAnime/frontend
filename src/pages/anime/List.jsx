@@ -81,7 +81,7 @@ export default function List({ isDashboard=false }) {
           {(form, sortMenu) => (
             <CustomTab 
               isMobile={isMobile} isLoading={isLoading} isDashboard={isDashboard} status={'all'}
-              rootAnimes={orginalAnimes} setRootAnimes={setOriginalAnimes} form={form} sortMenu={sortMenu}
+              rootAnimes={orginalAnimes} setRefresh={setRefresh} form={form} sortMenu={sortMenu}
             />
           )}
         </All>
