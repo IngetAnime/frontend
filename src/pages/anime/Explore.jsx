@@ -875,11 +875,11 @@ export function AnimeList({ animes, isMobile, isLoading, setRefresh, isLatest })
                     <Box className="flex flex-col items-start">
                       <AnimeTitle
                         title={anime.title} releaseAt={anime.releaseAt} 
-                        episodeTotal={anime.num_episodes} averageEpisodeDuration={anime.average_episode_duration}
+                        episodeTotal={anime.num_episodes || anime.episodes} averageEpisodeDuration={anime.average_episode_duration || (parseInt(anime.duration) * 60)}
                       />
                     </Box>
-                    {anime.mean && (
-                      <AnimeScore score={anime.mean} />
+                    {(anime.mean || anime.score) && (
+                      <AnimeScore score={anime.mean || anime.score} />
                     )}
                   </Box>
 
@@ -918,8 +918,8 @@ export function AnimeList({ animes, isMobile, isLoading, setRefresh, isLatest })
                           </span>
                         ))}
                       </Typography>
-                      {anime.mean && (
-                        <AnimeScore score={anime.mean} sx={{ display: { sm: 'none' } }} />
+                      {(anime.mean || anime.score) && (
+                        <AnimeScore score={anime.mean || anime.score} sx={{ display: { sm: 'none' } }} />
                       )}
                       
                       { anime.platforms.length ? <AnimePlatform platforms={anime.platforms} /> : <></> }

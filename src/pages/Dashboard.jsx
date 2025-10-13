@@ -12,7 +12,7 @@ import Explore, { AnimeList, AnimeWrapper } from "./anime/Explore";
 import List from "./anime/List";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import { getAnimeList } from "../services/mal.service";
+import { getAnimeList } from "../services/jikan.service";
 import { AppContext } from "../context/AppContext";
 import { handleScroll } from "../helper/handleScroll";
 
@@ -39,7 +39,7 @@ export default function Dashboard() {
 
       const { success, data } = await getAnimeList(q);
       if (success) {
-        setOriginalAnimes(data.data);
+        setOriginalAnimes(data);
       }
     }
     
